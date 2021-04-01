@@ -1,0 +1,54 @@
+{
+    "name": "friendsofhyperf/websocket-connection",
+    "type": "library",
+    "license": "MIT",
+    "authors": [{
+        "name": "huangdijia",
+        "email": "huangdijia@gmail.com"
+    }],
+    "require": {
+        "php": ">=7.2",
+        "hyperf/utils": "^2.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "hyperf/command": "^2.0",
+        "hyperf/di": "^2.0",
+        "hyperf/event": "^2.0",
+        "hyperf/framework": "^2.0",
+        "hyperf/process": "^2.0",
+        "hyperf/redis": "^2.1",
+        "hyperf/server": "^2.0",
+        "hyperf/signal": "^2.1",
+        "hyperf/testing": "^2.0",
+        "hyperf/websocket-server": "^2.1",
+        "mockery/mockery": "^1.0",
+        "phpstan/phpstan": "^0.12",
+        "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0",
+        "swoole/ide-helper": "^4.5"
+    },
+    "description": "Config extension for Hyperf.",
+    "autoload": {
+        "psr-4": {
+            "FriendsOfHyperf\\WebsocketConnection\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FriendsOfHyperf\\WebsocketConnection\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit -c phpunit.xml --colors=always",
+        "analyse": "phpstan analyse --memory-limit 300M -l 0 -c phpstan.neon ./src",
+        "cs-fix": "php-cs-fixer fix $1"
+    },
+    "extra": {
+        "hyperf": {
+            "config": "FriendsOfHyperf\\WebsocketConnection\\ConfigProvider"
+        }
+    }
+}

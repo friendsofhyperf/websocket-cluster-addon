@@ -1,0 +1,53 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  ci:
+    name: Test on PHP ${{ matrix.php-version }}
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        php-version: ['7.2', '7.3', '7.4']
+      max-parallel: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: phpize, pecl
+          extensions: swoole,redis
+          coverage: none
+      - name: Setup Packages
+        run: composer update -o
+      - name: Setup Hyperf Project
+        run: |
+          php -m
+          echo $HOME
+          PACKAGE_HOME=$(pwd)
+          echo $PACKAGE_HOME
+          PROJECT_NAME=hyperf-demo
+          PROJECT_HOME=$HOME/$PROJECT_NAME
+          echo "Create project"
+          cd $HOME
+          composer create-project hyperf/hyperf-skeleton $PROJECT_NAME
+          cd $PROJECT_HOME
+          echo "Install package"
+          composer config repositories.hyperf-config-array path $PACKAGE_HOME
+          composer require "huangdijia/hyperf-config-array:*@dev" -o
+          php bin/hyperf.php vendor:publish huangdijia/hyperf-config-array
+          cp $PACKAGE_HOME/tests/IndexController.php.dist $PROJECT_HOME/app/Controller/IndexController.php
+          composer dump-autoload -o
+          echo "Service start"
+          php -d swoole.use_shortname=Off bin/hyperf.php start &
+          sleep 10
+      - name: Run Analyse
+        run: |
+          composer analyse src
+      - name: Run Test Cases
+        run: |
+          cp phpunit.xml.dist phpunit.xml
+          composer test
