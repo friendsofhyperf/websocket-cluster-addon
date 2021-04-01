@@ -25,7 +25,7 @@ class RedisConnection implements ConnectionInterface
     /**
      * @var string
      */
-    protected $prefix = 'websocket-connection';
+    protected $prefix = 'ws-connections';
 
     /**
      * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
