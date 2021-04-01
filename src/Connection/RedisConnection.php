@@ -38,10 +38,10 @@ class RedisConnection implements ConnectionInterface
      */
     private $serverId;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, ?string $serverId = null)
     {
         $this->redis = $container->get(RedisProxy::class)->get($this->connection);
-        $this->serverId = uniqid();
+        $this->serverId = $serverId ?? uniqid();
     }
 
     public function add(int $fd, int $uid): void
