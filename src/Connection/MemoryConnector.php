@@ -34,8 +34,4 @@ class MemoryConnector
     {
         return array_keys($this->container);
     }
-
-    public function flush(): void
-    {
-    }
 }
