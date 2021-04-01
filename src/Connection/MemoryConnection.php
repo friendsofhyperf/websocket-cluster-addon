@@ -17,7 +17,7 @@ use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
 use Swoole\Server;
 
-class MemoryConnection implements ConnectionInterface
+class MemoryConnection extends AbstractConnection
 {
     /**
      * @var MemoryConnector[]
@@ -25,34 +25,19 @@ class MemoryConnection implements ConnectionInterface
     protected $connections = [];
 
     /**
-     * @var int
-     */
-    protected $workerId;
-
-    /**
      * @var StdoutLoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var ContainerInterface
      */
-    private $container;
+    protected $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
-    }
-
-    public function setWorkerId(int $workerId): void
-    {
-        $this->workerId = $workerId;
-    }
-
-    public function getWorkerId(): int
-    {
-        return $this->workerId;
     }
 
     public function add(int $fd, int $uid): void

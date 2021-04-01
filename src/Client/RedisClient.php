@@ -9,13 +9,13 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection\Connection;
+namespace FriendsOfHyperf\WebsocketConnection\Client;
 
-use Hyperf\Redis\Redis;
+use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use Hyperf\Redis\RedisProxy;
 use Psr\Container\ContainerInterface;
 
-class RedisConnection extends AbstractConnection
+class RedisClient implements ClientInterface
 {
     /**
      * @var string
@@ -25,26 +25,32 @@ class RedisConnection extends AbstractConnection
     /**
      * @var string
      */
-    protected $prefix = 'ws-connections';
+    protected $prefix = 'ws-clients';
 
     /**
-     * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
+     * @var \Redis
      */
     protected $redis;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var string
+     */
+    protected $serverId;
+
+    public function __construct(ContainerInterface $container, $redis)
     {
+        $this->serverId = $container->get(ConnectionInterface::class)->getServerId();
         $this->redis = $container->get(RedisProxy::class)->get($this->connection);
     }
 
     public function add(int $fd, int $uid): void
     {
-        $this->redis->sAdd($this->key($uid), $fd);
+        $this->redis->sAdd($this->key($uid), $this->sid($fd));
     }
 
     public function del(int $fd, int $uid): void
     {
-        $this->redis->sRem($this->key($uid), $fd);
+        $this->redis->sRem($this->key($uid), $this->sid($fd));
     }
 
     public function size(int $uid): int
@@ -52,25 +58,18 @@ class RedisConnection extends AbstractConnection
         return $this->redis->sCard($this->key($uid));
     }
 
-    public function all(int $uid): array
+    public function getFd(string $sid): ?int
     {
-        return $this->redis->sMembers($this->key($uid));
+        return explode('#', $sid)[1] ?? null;
     }
 
-    public function flush(): void
+    protected function key(int $uid): string
     {
-        $keys = $this->redis->keys($this->key('*'));
-        $this->redis->multi();
-
-        foreach ($keys as $key) {
-            $this->redis->del($key);
-        }
-
-        $this->redis->exec();
+        return sprintf('%s:%s', $this->prefix, $uid);
     }
 
-    protected function key($uid): string
+    protected function sid(int $fd): string
     {
-        return sprintf('%s:%s:%s', $this->prefix, $this->serverId, $uid);
+        return sprintf('%s#%s', $this->serverId, $fd);
     }
 }

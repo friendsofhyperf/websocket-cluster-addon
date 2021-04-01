@@ -47,6 +47,7 @@ class InitConnectionListener implements ListenerInterface
         if ($this->container->has(ConnectionInterface::class)) {
             /** @var ConnectionInterface $connection */
             $connection = $this->container->get(ConnectionInterface::class);
+            $connection->setServerId(uniqid());
             $connection->setWorkerId($event->workerId);
         }
     }

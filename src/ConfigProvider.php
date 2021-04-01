@@ -20,6 +20,7 @@ class ConfigProvider
         return [
             'dependencies' => [
                 Connection\ConnectionInterface::class => Connection\MemoryConnection::class,
+                Client\ClientInterface::class => Client\RedisClient::class,
             ],
             'processes' => [],
             'listeners' => [],
