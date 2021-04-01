@@ -11,13 +11,15 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
+use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\MemoryConnector;
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
 use Swoole\Server;
 
-class MemoryConnection
+class MemoryConnection implements ConnectionInterface
 {
     /**
      * @var MemoryConnector[]
@@ -55,22 +57,22 @@ class MemoryConnection
         return $this->workerId;
     }
 
-    public function add(int $fd, int $uid, ?int $fromWorkerId = null): void
+    public function add(int $fd, int $uid): void
     {
         $this->getConnector($uid)->add($fd);
         $this->getConnector(0)->add($fd);
 
-        if (is_null($fromWorkerId)) {
+        if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
         }
     }
 
-    public function del(int $fd, int $uid, ?int $fromWorkerId = null): void
+    public function del(int $fd, int $uid): void
     {
         $this->getConnector($uid)->del($fd);
         $this->getConnector(0)->del($fd);
 
-        if (is_null($fromWorkerId)) {
+        if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
         }
     }
@@ -92,6 +94,10 @@ class MemoryConnection
         }
 
         return $this->connections[$uid];
+    }
+
+    public function flush(): void
+    {
     }
 
     protected function getServer(): Server

@@ -13,6 +13,10 @@ namespace FriendsOfHyperf\WebsocketConnection;
 
 interface ConnectionInterface
 {
+    const FROM_WORKER_ID = 'FROM_WORKER_ID';
+
+    public function setWorkerId(int $workerId): void;
+
     public function add(int $fd, int $uid): void;
 
     public function del(int $fd, int $uid): void;

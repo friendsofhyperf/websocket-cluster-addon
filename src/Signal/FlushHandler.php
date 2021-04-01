@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Signal;
 
-use FriendsOfHyperf\WebsocketConnection\Connection\RedisConnection;
 use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -56,14 +55,12 @@ class FlushHandler implements SignalHandlerInterface
 
     public function handle(int $signal): void
     {
-        if ($this->connection instanceof RedisConnection) {
-            if ($signal !== SIGINT) {
-                $time = $this->config->get('server.settings.max_wait_time', 5);
-                sleep($time);
-            }
-
-            $this->connection->flush();
-            $this->logger->info(sprintf('[WebSocketConnection] flushed by %s.', __CLASS__));
+        if ($signal !== SIGINT) {
+            $time = $this->config->get('server.settings.max_wait_time', 5);
+            sleep($time);
         }
+
+        $this->connection->flush();
+        $this->logger->info(sprintf('[WebSocketConnection] flushed by %s.', __CLASS__));
     }
 }

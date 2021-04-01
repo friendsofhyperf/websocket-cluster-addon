@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
-use FriendsOfHyperf\WebsocketConnection\Connection;
+use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\AfterWorkerStart;
@@ -44,9 +44,9 @@ class InitConnectionListener implements ListenerInterface
 
     public function process(object $event)
     {
-        if ($this->container->has(Connection::class)) {
-            /** @var Connection $connection */
-            $connection = $this->container->get(Connection::class);
+        if ($this->container->has(ConnectionInterface::class)) {
+            /** @var ConnectionInterface $connection */
+            $connection = $this->container->get(ConnectionInterface::class);
             $connection->setWorkerId($event->workerId);
         }
     }

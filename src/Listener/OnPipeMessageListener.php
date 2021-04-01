@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
 use FriendsOfHyperf\WebsocketConnection\Connection;
+use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\OnPipeMessage;
 use Hyperf\Process\Event\PipeMessage as UserProcessPipMessage;
+use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -66,6 +68,8 @@ class OnPipeMessageListener implements ListenerInterface
             $uid = $data->uid;
             $isAdd = $data->isAdd;
             $fromWorkerId = $event->fromWorkerId ?? $data->fromWorkerId;
+
+            Context::set(ConnectionInterface::FROM_WORKER_ID, $fromWorkerId);
 
             if ($isAdd) {
                 $this->connection->add($fd, $uid, $fromWorkerId);

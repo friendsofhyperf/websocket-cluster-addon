@@ -31,17 +31,27 @@ class RedisConnection implements ConnectionInterface
     /**
      * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
      */
-    private $redis;
+    protected $redis;
 
     /**
      * @var string
      */
-    private $serverId;
+    protected $serverId;
+
+    /**
+     * @var int
+     */
+    protected $workerId;
 
     public function __construct(ContainerInterface $container, ?string $serverId = null)
     {
         $this->redis = $container->get(RedisProxy::class)->get($this->connection);
         $this->serverId = $serverId ?? uniqid();
+    }
+
+    public function setWorkerId(int $workerId): void
+    {
+        $this->workerId = $workerId;
     }
 
     public function add(int $fd, int $uid): void
