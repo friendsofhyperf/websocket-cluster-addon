@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection;
+namespace FriendsOfHyperf\WebsocketConnection\Tests;
 
 /**
  * @internal
