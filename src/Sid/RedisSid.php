@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Sid;
 
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
@@ -33,9 +34,15 @@ class RedisSid implements SidInterface
      */
     protected $serverId;
 
+    /**
+     * @var StdoutLoggerInterface
+     */
+    protected $logger;
+
     public function __construct(ContainerInterface $container)
     {
         $this->redis = $container->get(RedisFactory::class)->get($this->connection);
+        $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
     public function setServerId(string $serverId): void
@@ -61,16 +68,23 @@ class RedisSid implements SidInterface
     public function flush(): void
     {
         $keys = $this->redis->keys($this->getSidKey('*'));
-        $this->redis->multi();
+        $disconnected = [];
 
         foreach ($keys as $key) {
             $sids = $this->redis->sMembers($key);
 
             foreach ((array) $sids as $sid) {
                 if ($this->isLocal($sid)) {
-                    $this->redis->sRem($key, $sid);
+                    $disconnected[] = [$key, $sid];
                 }
             }
+        }
+
+        $this->redis->multi();
+
+        foreach ($disconnected as $item) {
+            $this->logger->debug(sprintf('%s deleted by %s.', $item[1], __CLASS__));
+            $this->redis->sRem(...$item);
         }
 
         $this->redis->exec();
