@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
-use FriendsOfHyperf\WebsocketConnection\MemoryConnector;
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Utils\Context;
