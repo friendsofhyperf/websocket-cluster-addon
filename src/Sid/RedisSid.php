@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Sid;
 
-use Hyperf\Redis\RedisProxy;
+use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
 class RedisSid implements SidInterface
@@ -35,7 +35,7 @@ class RedisSid implements SidInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $this->redis = $container->get(RedisProxy::class)->get($this->connection);
+        $this->redis = $container->get(RedisFactory::class)->get($this->connection);
     }
 
     public function setServerId(string $serverId): void
