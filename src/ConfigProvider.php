@@ -13,8 +13,6 @@ namespace FriendsOfHyperf\ConfigAnyway;
 
 use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\Connection\MemoryConnection;
-use FriendsOfHyperf\WebsocketConnection\Listener\InitConnectionListener;
-use FriendsOfHyperf\WebsocketConnection\Listener\OnPipeMessageListener;
 
 class ConfigProvider
 {
@@ -27,10 +25,7 @@ class ConfigProvider
                 ConnectionInterface::class => MemoryConnection::class,
             ],
             'processes' => [],
-            'listeners' => [
-                InitConnectionListener::class,
-                OnPipeMessageListener::class,
-            ],
+            'listeners' => [],
             'annotations' => [
                 'scan' => [
                     'paths' => [
