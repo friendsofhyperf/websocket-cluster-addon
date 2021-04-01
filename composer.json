@@ -8,19 +8,19 @@
     }],
     "require": {
         "php": ">=7.2",
-        "hyperf/utils": "^2.0"
+        "hyperf/utils": "^2.1"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
-        "hyperf/command": "^2.0",
-        "hyperf/di": "^2.0",
-        "hyperf/event": "^2.0",
-        "hyperf/framework": "^2.0",
-        "hyperf/process": "^2.0",
+        "hyperf/command": "^2.1",
+        "hyperf/di": "^2.1",
+        "hyperf/event": "^2.1",
+        "hyperf/framework": "^2.1",
+        "hyperf/process": "^2.1",
         "hyperf/redis": "^2.1",
-        "hyperf/server": "^2.0",
+        "hyperf/server": "^2.1",
         "hyperf/signal": "^2.1",
-        "hyperf/testing": "^2.0",
+        "hyperf/testing": "^2.1",
         "hyperf/websocket-server": "^2.1",
         "mockery/mockery": "^1.0",
         "phpstan/phpstan": "^0.12",
