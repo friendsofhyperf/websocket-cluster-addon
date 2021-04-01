@@ -111,7 +111,7 @@ class MemoryConnection implements ConnectionInterface
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId !== $this->workerId) {
-                $server->sendMessage(new PipeMessage($fd, $uid, $isAdd, $this->workerId), $workerId);
+                $server->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
                 $this->logger->debug("[WebSocketConnection] Let Worker.{$workerId} try to {$fd}.");
             }
         }

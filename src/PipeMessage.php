@@ -28,16 +28,10 @@ class PipeMessage
      */
     public $isAdd;
 
-    /**
-     * @var int
-     */
-    public $fromWorkerId;
-
-    public function __construct(int $fd, int $uid, bool $isAdd = true, int $fromWorkerId = 0)
+    public function __construct(int $fd, int $uid, bool $isAdd = true)
     {
         $this->fd = $fd;
         $this->uid = $uid;
         $this->isAdd = $isAdd;
-        $this->fromWorkerId = $fromWorkerId;
     }
 }

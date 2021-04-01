@@ -66,15 +66,14 @@ class OnPipeMessageListener implements ListenerInterface
             $fd = $data->fd;
             $uid = $data->uid;
             $isAdd = $data->isAdd;
-            $fromWorkerId = $event->fromWorkerId ?? $data->fromWorkerId;
 
-            Context::set(ConnectionInterface::FROM_WORKER_ID, $fromWorkerId);
+            Context::set(ConnectionInterface::FROM_WORKER_ID, $event->fromWorkerId);
 
             if ($isAdd) {
-                $this->connection->add($fd, $uid, $fromWorkerId);
+                $this->connection->add($fd, $uid);
                 $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->connection->getWorkerId(), $fd, 'added', __CLASS__));
             } else {
-                $this->connection->del($fd, $uid, $fromWorkerId);
+                $this->connection->del($fd, $uid);
                 $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->connection->getWorkerId(), $fd, 'deleted', __CLASS__));
             }
         }
