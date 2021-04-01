@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
 use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketConnection\Sid\SidInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\AfterWorkerStart;
@@ -44,11 +45,15 @@ class InitConnectionListener implements ListenerInterface
 
     public function process(object $event)
     {
-        if ($this->container->has(ConnectionInterface::class)) {
-            /** @var ConnectionInterface $connection */
-            $connection = $this->container->get(ConnectionInterface::class);
-            $connection->setServerId(uniqid());
-            $connection->setWorkerId($event->workerId);
-        }
+        $serverId = uniqid();
+
+        /** @var ConnectionInterface $connection */
+        $connection = $this->container->get(ConnectionInterface::class);
+        $connection->setServerId($serverId);
+        $connection->setWorkerId($event->workerId);
+
+        /** @var SidInterface $sid */
+        $sid = $this->container->get(SidInterface::class);
+        $sid->setServerId($serverId);
     }
 }
