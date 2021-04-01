@@ -9,10 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\ConfigAnyway;
-
-use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketConnection\Connection\MemoryConnection;
+namespace FriendsOfHyperf\WebsocketConnection;
 
 class ConfigProvider
 {
@@ -22,7 +19,7 @@ class ConfigProvider
 
         return [
             'dependencies' => [
-                ConnectionInterface::class => MemoryConnection::class,
+                Connection\ConnectionInterface::class => Connection\MemoryConnection::class,
             ],
             'processes' => [],
             'listeners' => [],
