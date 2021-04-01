@@ -11,8 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
-use FriendsOfHyperf\WebsocketConnection\Connection;
-use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
@@ -28,7 +27,7 @@ use Psr\Container\ContainerInterface;
 class OnPipeMessageListener implements ListenerInterface
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
@@ -39,7 +38,7 @@ class OnPipeMessageListener implements ListenerInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $this->connection = $container->get(Connection::class);
+        $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 

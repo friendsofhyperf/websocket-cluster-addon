@@ -9,13 +9,15 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection;
+namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
 interface ConnectionInterface
 {
     const FROM_WORKER_ID = 'FROM_WORKER_ID';
 
     public function setWorkerId(int $workerId): void;
+
+    public function getWorkerId(): int;
 
     public function add(int $fd, int $uid): void;
 

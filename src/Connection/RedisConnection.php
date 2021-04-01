@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
-use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisProxy;
 use Psr\Container\ContainerInterface;
@@ -52,6 +51,11 @@ class RedisConnection implements ConnectionInterface
     public function setWorkerId(int $workerId): void
     {
         $this->workerId = $workerId;
+    }
+
+    public function getWorkerId(): int
+    {
+        return $this->workerId;
     }
 
     public function add(int $fd, int $uid): void

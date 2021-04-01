@@ -23,27 +23,6 @@ jobs:
           coverage: none
       - name: Setup Packages
         run: composer update -o
-      - name: Setup Hyperf Project
-        run: |
-          php -m
-          echo $HOME
-          PACKAGE_HOME=$(pwd)
-          echo $PACKAGE_HOME
-          PROJECT_NAME=hyperf-demo
-          PROJECT_HOME=$HOME/$PROJECT_NAME
-          echo "Create project"
-          cd $HOME
-          composer create-project hyperf/hyperf-skeleton $PROJECT_NAME
-          cd $PROJECT_HOME
-          echo "Install package"
-          composer config repositories.hyperf-config-array path $PACKAGE_HOME
-          composer require "huangdijia/hyperf-config-array:*@dev" -o
-          php bin/hyperf.php vendor:publish huangdijia/hyperf-config-array
-          cp $PACKAGE_HOME/tests/IndexController.php.dist $PROJECT_HOME/app/Controller/IndexController.php
-          composer dump-autoload -o
-          echo "Service start"
-          php -d swoole.use_shortname=Off bin/hyperf.php start &
-          sleep 10
       - name: Run Analyse
         run: |
           composer analyse src

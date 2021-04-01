@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Signal;
 
-use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Signal\Annotation\Signal;

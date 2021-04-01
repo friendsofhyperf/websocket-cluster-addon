@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\ConfigAnyway;
 
+use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\Connection\MemoryConnection;
-use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\Listener\InitConnectionListener;
 use FriendsOfHyperf\WebsocketConnection\Listener\OnPipeMessageListener;
 

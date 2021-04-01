@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
-use FriendsOfHyperf\WebsocketConnection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\AfterWorkerStart;
