@@ -16,18 +16,20 @@ use Psr\Container\ContainerInterface;
 class Emitter
 {
     /**
-     * @var Server
+     * @var ContainerInterface
      */
-    private $server;
+    private $container;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->server = $container->get(Server::class);
+        $this->container = $container;
     }
 
     public function emit(int $uid, string $message): void
     {
-        $this->server->publish(serialize([$uid, $message]));
+        /** @var Server $server */
+        $server = $this->container->get(Server::class);
+        $server->publish(serialize([$uid, $message]));
     }
 
     public function broadcast(string $message): void
