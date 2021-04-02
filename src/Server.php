@@ -63,7 +63,7 @@ class Server
 
     public function __construct(ContainerInterface $container)
     {
-        $this->connection = $container;
+        $this->container = $container;
         $this->redis = $container->get(RedisFactory::class)->get($this->connection);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->client = $container->get(ClientProviderInterface::class);
