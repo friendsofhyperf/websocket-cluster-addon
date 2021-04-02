@@ -80,11 +80,11 @@ class Addon
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
-        $this->subscriber = $container->get(SubscriberInterface::class);
-        $this->connection = $container->get(ConnectionInterface::class);
         $this->sender = $container->get(Sender::class);
+        $this->subscriber = $container->get(SubscriberInterface::class);
     }
 
     public function setIsRunning(bool $isRunning): void
