@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
 use FriendsOfHyperf\WebsocketConnection\Server;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BeforeMainServerStart;
@@ -27,9 +28,15 @@ class InitServerIdListener implements ListenerInterface
      */
     private $container;
 
+    /**
+     * @var StdoutLoggerInterface
+     */
+    private $logger;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
     /**
@@ -47,6 +54,6 @@ class InitServerIdListener implements ListenerInterface
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         $server->setServerId(uniqid());
-        var_dump(__METHOD__);
+        $this->logger->info(sprintf('[WebsocketConnection] serverId initialized by %s', __CLASS__));
     }
 }
