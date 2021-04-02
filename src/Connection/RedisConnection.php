@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
+use FriendsOfHyperf\WebsocketConnection\Server;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
@@ -75,7 +76,7 @@ class RedisConnection extends AbstractConnection
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->server->getServerId(),
+            $serverId ?? $this->container->get(Server::class)->getServerId(),
             $uid,
         ]);
     }

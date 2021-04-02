@@ -9,26 +9,29 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection\Connection;
+namespace FriendsOfHyperf\WebsocketConnection;
 
-use Hyperf\Contract\StdoutLoggerInterface;
 use Psr\Container\ContainerInterface;
 
-abstract class AbstractConnection implements ConnectionInterface
+class Emitter
 {
     /**
-     * @var StdoutLoggerInterface
+     * @var Server
      */
-    protected $logger;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    private $server;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
-        $this->logger = $container->get(StdoutLoggerInterface::class);
+        $this->server = $container->get(Server::class);
+    }
+
+    public function emit(int $uid, string $message): void
+    {
+        $this->server->publish(serialize([$uid, $message]));
+    }
+
+    public function broadcast(string $message): void
+    {
+        $this->emit(0, $message);
     }
 }

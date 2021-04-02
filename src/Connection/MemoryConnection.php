@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
+use FriendsOfHyperf\WebsocketConnection\Server;
 use Hyperf\Utils\Context;
 use Swoole\Server as SwooleServer;
 
@@ -75,9 +76,12 @@ class MemoryConnection extends AbstractConnection
         $server = $this->getServer();
         $workerCount = $server->setting['worker_num'] - 1;
         $isAdd = $method == 'add';
+        /** @var Server $wsServer */
+        $wsServer = $this->container->get(Server::class);
+        $currentWorkerId = $wsServer->getWorkerId();
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
-            if ($workerId !== $this->server->getWorkerId()) {
+            if ($workerId !== $currentWorkerId) {
                 $server->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
                 $this->logger->debug("[WebSocketConnection] Let Worker.{$workerId} try to {$fd}.");
             }
