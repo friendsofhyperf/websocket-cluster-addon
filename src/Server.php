@@ -57,26 +57,22 @@ class Server
     protected $client;
 
     /**
-     * @var ConnectionInterface
+     * @var ContainerInterface
      */
-    protected $conn;
+    protected $container;
 
     public function __construct(ContainerInterface $container)
     {
+        $this->connection = $container;
         $this->redis = $container->get(RedisFactory::class)->get($this->connection);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->client = $container->get(ClientProviderInterface::class);
-        $this->conn = $container->get(ConnectionInterface::class);
+        $this->container = $container;
     }
 
     public function setIsRunning(bool $isRunning): void
     {
         $this->isRunning = $isRunning;
-    }
-
-    public function getIsRunning(): bool
-    {
-        return $this->isRunning;
     }
 
     public function setServerId(string $serverId): void
@@ -145,9 +141,11 @@ class Server
         $start = '-inf';
         $end = strtotime('-10 seconds');
         $expiredServers = $this->redis->zRangeByScore($this->getKey(), $start, $end);
+        /** @var ConnectionInterface $connection */
+        $connection = $this->container->get(ConnectionInterface::class);
 
         foreach ($expiredServers as $serverId) {
-            $this->conn->flush($serverId);
+            $connection->flush($serverId);
             $this->client->flush($serverId);
             $this->redis->zRem($this->getKey(), $serverId);
         }
