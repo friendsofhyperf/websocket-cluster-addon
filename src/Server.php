@@ -116,8 +116,8 @@ class Server
     {
         $this->isRunning = true;
 
+        $this->subscribe();
         $this->keepalive();
-
         $this->clearUpExpired();
     }
 
@@ -149,7 +149,7 @@ class Server
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebSocketConnection.%s] stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebSocketConnection.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
@@ -166,7 +166,7 @@ class Server
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebSocketConnection.%s] stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebSocketConnection.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
