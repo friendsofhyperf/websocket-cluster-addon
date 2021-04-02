@@ -54,6 +54,6 @@ class InitWorkerIdListener implements ListenerInterface
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         $server->setWorkerId($event->workerId);
-        $this->logger->info(sprintf('[WebsocketConnection] workerId#%s initialized by %s', $event->workerId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketConnection.%s] workerId#%s initialized by %s', $server->getServerId(), $event->workerId, __CLASS__));
     }
 }

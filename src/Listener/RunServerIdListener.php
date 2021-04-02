@@ -54,6 +54,6 @@ class RunServerIdListener implements ListenerInterface
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         $server->start();
-        $this->logger->info(sprintf('[WebsocketConnection] started by %s', __CLASS__));
+        $this->logger->info(sprintf('[WebsocketConnection.%s] started by %s', $server->getServerId(), __CLASS__));
     }
 }
