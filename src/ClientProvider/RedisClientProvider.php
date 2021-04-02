@@ -9,34 +9,49 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection\Connection;
+namespace FriendsOfHyperf\WebsocketConnection\ClientProvider;
 
-use Hyperf\Redis\Redis;
+use FriendsOfHyperf\WebsocketConnection\Server;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
+use Hyperf\Utils\Parallel;
 use Psr\Container\ContainerInterface;
 
-class RedisConnection extends AbstractConnection
+class RedisClientProvider implements ClientProviderInterface
 {
-    /**
-     * @var string
-     */
     protected $connection = 'default';
 
     /**
-     * @var string
-     */
-    protected $prefix = 'websocket-io:fds';
-
-    /**
-     * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
+     * @var \Redis
      */
     protected $redis;
+
+    /**
+     * @var string
+     */
+    protected $prefix = 'websocket-io:online';
+
+    /**
+     * @var string
+     */
+    protected $serverId;
+
+    /**
+     * @var StdoutLoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var Server
+     */
+    protected $server;
 
     public function __construct(ContainerInterface $container)
     {
         $this->redis = $container->get(RedisFactory::class)->get($this->connection);
-
-        parent::__construct($container);
+        $this->logger = $container->get(StdoutLoggerInterface::class);
+        $this->server = $container->get(Server::class);
+        $this->serverId = $this->server->getServerId();
     }
 
     public function add(int $fd, int $uid): void
@@ -51,15 +66,21 @@ class RedisConnection extends AbstractConnection
 
     public function size(int $uid): int
     {
-        return $this->redis->sCard($this->getKey($uid));
+        $servers = $this->server->all();
+        $parallel = new Parallel();
+
+        foreach ($servers as $serverId) {
+            $parallel->add(function () use ($serverId, $uid) {
+                return $this->redis->sCard($this->getKey($uid, $serverId));
+            });
+        }
+
+        $result = $parallel->wait();
+
+        return array_sum(array_values($result));
     }
 
-    public function all(int $uid): array
-    {
-        return $this->redis->sMembers($this->getKey($uid));
-    }
-
-    public function flush(?string $serverId = null): void
+    public function flush(string $serverId = null): void
     {
         $keys = $this->redis->keys($this->getKey('*', $serverId));
         $this->redis->multi();

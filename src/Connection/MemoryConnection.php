@@ -12,10 +12,8 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
-use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Utils\Context;
-use Psr\Container\ContainerInterface;
-use Swoole\Server;
+use Swoole\Server as SwooleServer;
 
 class MemoryConnection extends AbstractConnection
 {
@@ -23,22 +21,6 @@ class MemoryConnection extends AbstractConnection
      * @var MemoryConnector[]
      */
     protected $connections = [];
-
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-    }
 
     public function add(int $fd, int $uid): void
     {
@@ -79,13 +61,13 @@ class MemoryConnection extends AbstractConnection
         return $this->connections[$uid];
     }
 
-    public function flush(): void
+    public function flush(?string $serverId = null): void
     {
     }
 
-    protected function getServer(): Server
+    protected function getServer(): SwooleServer
     {
-        return $this->container->get(Server::class);
+        return $this->container->get(SwooleServer::class);
     }
 
     protected function sendPipeMessage(int $fd, int $uid, string $method = ''): void

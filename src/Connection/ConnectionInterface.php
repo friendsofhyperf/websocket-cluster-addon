@@ -15,14 +15,6 @@ interface ConnectionInterface
 {
     const FROM_WORKER_ID = 'FROM_WORKER_ID';
 
-    public function setServerId(string $serverId): void;
-
-    public function getServerId(): ?string;
-
-    public function setWorkerId(int $workerId): void;
-
-    public function getWorkerId(): int;
-
     public function add(int $fd, int $uid): void;
 
     public function del(int $fd, int $uid): void;
@@ -31,5 +23,5 @@ interface ConnectionInterface
 
     public function all(int $uid): array;
 
-    public function flush(): void;
+    public function flush(?string $serverId = null): void;
 }

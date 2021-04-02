@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Signal;
 
 use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketConnection\Sid\SidInterface;
+use FriendsOfHyperf\WebsocketConnection\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Signal\Annotation\Signal;
@@ -22,7 +22,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @Signal(priority=-1)
  */
-class FlushHandler implements SignalHandlerInterface
+class StopServerHandler implements SignalHandlerInterface
 {
     /**
      * @var ConfigInterface
@@ -40,16 +40,15 @@ class FlushHandler implements SignalHandlerInterface
     protected $logger;
 
     /**
-     * @var SidInterface
+     * @var Server
      */
-    protected $sid;
+    protected $server;
 
     public function __construct(ContainerInterface $container)
     {
         $this->config = $container->get(ConfigInterface::class);
-        $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->sid = $container->get(SidInterface::class);
+        $this->server = $container->get(Server::class);
     }
 
     public function listen(): array
@@ -67,8 +66,7 @@ class FlushHandler implements SignalHandlerInterface
             sleep($time);
         }
 
-        $this->connection->flush();
-        $this->sid->flush();
+        $this->server->setIsRunning(false);
 
         $this->logger->info(sprintf('[WebSocketConnection] flushed by %s.', __CLASS__));
     }

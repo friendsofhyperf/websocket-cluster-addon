@@ -11,29 +11,39 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
+use FriendsOfHyperf\WebsocketConnection\Server;
+use Hyperf\Contract\StdoutLoggerInterface;
+use Psr\Container\ContainerInterface;
+
 abstract class AbstractConnection implements ConnectionInterface
 {
+    /**
+     * @var StdoutLoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @var string
+     */
     protected $serverId;
 
+    /**
+     * @var int
+     */
     protected $workerId;
 
-    public function setServerId(string $serverId): void
+    public function __construct(ContainerInterface $container)
     {
-        $this->serverId = $serverId;
-    }
-
-    public function getServerId(): ?string
-    {
-        return $this->serverId;
-    }
-
-    public function setWorkerId(int $workerId): void
-    {
-        $this->workerId = $workerId;
-    }
-
-    public function getWorkerId(): int
-    {
-        return $this->workerId;
+        $this->container = $container;
+        $this->logger = $container->get(StdoutLoggerInterface::class);
+        /** @var Server $server */
+        $server = $container->get(Server::class);
+        $this->serverId = $server->getServerId();
+        $this->workerId = $server->getWorkerId();
     }
 }
