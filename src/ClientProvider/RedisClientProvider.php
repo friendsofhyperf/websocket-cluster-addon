@@ -56,7 +56,9 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function add(int $fd, int $uid): void
     {
-        $this->redis->sAdd($this->getKey($uid), $fd);
+        $key = $this->getKey($uid);
+        $this->redis->sAdd($key, $fd);
+        $this->redis->expire($key, 172800);
     }
 
     public function del(int $fd, int $uid): void
