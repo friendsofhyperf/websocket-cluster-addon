@@ -133,7 +133,7 @@ class Server
     public function clearUp(): void
     {
         $start = '-inf';
-        $end = strtotime('-10 seconds');
+        $end = (string) strtotime('-10 seconds');
         $expiredServers = $this->redis->zRangeByScore($this->getKey(), $start, $end);
         /** @var ConnectionInterface $connection */
         $connection = $this->container->get(ConnectionInterface::class);

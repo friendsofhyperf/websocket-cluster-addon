@@ -68,6 +68,6 @@ class StopServerHandler implements SignalHandlerInterface
 
         $this->server->setIsRunning(false);
 
-        $this->logger->info(sprintf('[WebSocketConnection] flushed by %s.', __CLASS__));
+        $this->logger->info(sprintf('[WebSocketConnection] stopped by %s.', __CLASS__));
     }
 }

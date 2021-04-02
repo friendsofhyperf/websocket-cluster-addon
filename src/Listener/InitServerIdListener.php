@@ -15,6 +15,7 @@ use FriendsOfHyperf\WebsocketConnection\Server;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BeforeMainServerStart;
+use Hyperf\Framework\Event\MainWorkerStart;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -38,7 +39,8 @@ class InitServerIdListener implements ListenerInterface
     public function listen(): array
     {
         return [
-            BeforeMainServerStart::class,
+            // BeforeMainServerStart::class,
+            MainWorkerStart::class,
         ];
     }
 
@@ -48,7 +50,7 @@ class InitServerIdListener implements ListenerInterface
         $server = $this->container->get(Server::class);
         $server->setServerId(uniqid());
         $server->setIsRunning(true);
+
         $server->start();
-        var_dump(__METHOD__);
     }
 }
