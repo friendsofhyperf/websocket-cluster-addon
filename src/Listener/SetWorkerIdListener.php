@@ -21,7 +21,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @Listener
  */
-class InitWorkerIdListener implements ListenerInterface
+class SetWorkerIdListener implements ListenerInterface
 {
     /**
      * @var ContainerInterface

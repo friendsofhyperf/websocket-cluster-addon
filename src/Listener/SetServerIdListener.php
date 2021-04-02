@@ -15,13 +15,13 @@ use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
-use Hyperf\Framework\Event\MainWorkerStart;
+use Hyperf\Framework\Event\BeforeMainServerStart;
 use Psr\Container\ContainerInterface;
 
 /**
  * @Listener
  */
-class RunServerIdListener implements ListenerInterface
+class SetServerIdListener implements ListenerInterface
 {
     /**
      * @var ContainerInterface
@@ -45,7 +45,7 @@ class RunServerIdListener implements ListenerInterface
     public function listen(): array
     {
         return [
-            MainWorkerStart::class,
+            BeforeMainServerStart::class,
         ];
     }
 
@@ -53,7 +53,7 @@ class RunServerIdListener implements ListenerInterface
     {
         /** @var Server $server */
         $server = $this->container->get(Server::class);
-        $server->start();
-        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] started by %s', $server->getServerId(), __CLASS__));
+        $server->setServerId(uniqid());
+        $this->logger->info(sprintf('[WebsocketClusterAddon] serverId initialized by %s', __CLASS__));
     }
 }
