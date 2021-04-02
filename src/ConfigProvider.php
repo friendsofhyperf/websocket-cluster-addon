@@ -20,7 +20,8 @@ class ConfigProvider
         return [
             'dependencies' => [
                 Connection\ConnectionInterface::class => Connection\MemoryConnection::class,
-                ClientProvider\ClientProviderInterface::class => ClientProvider\RedisClientProvider::class,
+                Provider\ClientProviderInterface::class => Provider\RedisClientProvider::class,
+                Provider\OnlineProviderInterface::class => Provider\RedisOnlineProvider::class,
                 Subscriber\SubscriberInterface::class => Subscriber\PhpRedisSubscriber::class,
             ],
             'processes' => [],

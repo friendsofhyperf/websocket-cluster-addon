@@ -22,12 +22,12 @@ class RedisConnection implements ConnectionInterface
     /**
      * @var string
      */
-    protected $connection = 'default';
+    protected $redisPool = 'default';
 
     /**
      * @var string
      */
-    protected $prefix = 'wsc:connections';
+    protected $prefix = 'wssa:connections';
 
     /**
      * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
@@ -48,7 +48,7 @@ class RedisConnection implements ConnectionInterface
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->redis = $container->get(RedisFactory::class)->get($this->connection);
+        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
     }
 
     public function add(int $fd, int $uid): void

@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon;
 
-use FriendsOfHyperf\WebsocketClusterAddon\ClientProvider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
@@ -25,7 +25,7 @@ use Throwable;
 
 class Server
 {
-    protected $prefix = 'wsc:servers';
+    protected $prefix = 'wssa:servers';
 
     /**
      * @var int
@@ -40,7 +40,7 @@ class Server
     /**
      * @var string
      */
-    protected $connection = 'default';
+    protected $redisPool = 'default';
 
     /**
      * @var string
@@ -70,7 +70,7 @@ class Server
     /**
      * @var ConnectionInterface
      */
-    protected $connectionProvider;
+    protected $connection;
 
     /**
      * @var Sender
@@ -81,9 +81,9 @@ class Server
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->redis = $container->get(RedisFactory::class)->get($this->connection);
+        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
         $this->subscriber = $container->get(SubscriberInterface::class);
-        $this->connectionProvider = $container->get(ConnectionInterface::class);
+        $this->connection = $container->get(ConnectionInterface::class);
         $this->sender = $container->get(Sender::class);
     }
 
@@ -199,7 +199,7 @@ class Server
     {
         [$uid, $message] = unserialize($payload);
 
-        $fds = $this->connectionProvider->all((int) $uid);
+        $fds = $this->connection->all((int) $uid);
 
         foreach ($fds as $fd) {
             $this->sender->push($fd, $message);

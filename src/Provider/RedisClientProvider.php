@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\ClientProvider;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -19,7 +19,7 @@ use Psr\Container\ContainerInterface;
 
 class RedisClientProvider implements ClientProviderInterface
 {
-    protected $connection = 'default';
+    protected $redisPool = 'default';
 
     /**
      * @var \Redis
@@ -29,7 +29,7 @@ class RedisClientProvider implements ClientProviderInterface
     /**
      * @var string
      */
-    protected $prefix = 'wsc:clients';
+    protected $prefix = 'wssa:clients';
 
     /**
      * @var string
@@ -42,16 +42,15 @@ class RedisClientProvider implements ClientProviderInterface
     protected $logger;
 
     /**
-     * @var Server
+     * @var ContainerInterface
      */
-    protected $server;
+    protected $container;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->redis = $container->get(RedisFactory::class)->get($this->connection);
+        $this->container = $container;
+        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
-        $this->serverId = $this->server->getServerId();
     }
 
     public function add(int $fd, int $uid): void
@@ -68,7 +67,9 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function size(int $uid): int
     {
-        $servers = $this->server->all();
+        /** @var Server $server */
+        $server = $this->container->get(Server::class);
+        $servers = $server->all();
         $parallel = new Parallel();
 
         foreach ($servers as $serverId) {
@@ -98,7 +99,7 @@ class RedisClientProvider implements ClientProviderInterface
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->serverId,
+            $serverId ?? $this->container->get(Server::class)->getServerId(),
             $uid,
         ]);
     }

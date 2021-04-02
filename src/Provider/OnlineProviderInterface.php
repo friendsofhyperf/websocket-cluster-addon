@@ -9,15 +9,15 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\ClientProvider;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
-interface ClientProviderInterface
+interface OnlineProviderInterface
 {
-    public function add(int $fd, int $uid): void;
+    public function add(int $uid): void;
 
-    public function del(int $fd, int $uid): void;
+    public function del(int $uid): void;
 
-    public function size(int $uid): int;
+    public function get(int $uid): bool;
 
-    public function flush(string $serverId = null): void;
+    public function multiGet(array $uids): array;
 }
