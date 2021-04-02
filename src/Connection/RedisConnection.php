@@ -12,11 +12,12 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
 use FriendsOfHyperf\WebsocketConnection\Server;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
-class RedisConnection extends AbstractConnection
+class RedisConnection implements ConnectionInterface
 {
     /**
      * @var string
@@ -33,11 +34,21 @@ class RedisConnection extends AbstractConnection
      */
     protected $redis;
 
+    /**
+     * @var StdoutLoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
+        $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->redis = $container->get(RedisFactory::class)->get($this->connection);
-
-        parent::__construct($container);
     }
 
     public function add(int $fd, int $uid): void

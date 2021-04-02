@@ -13,15 +13,33 @@ namespace FriendsOfHyperf\WebsocketConnection\Connection;
 
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
 use FriendsOfHyperf\WebsocketConnection\Server;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Utils\Context;
+use Psr\Container\ContainerInterface;
 use Swoole\Server as SwooleServer;
 
-class MemoryConnection extends AbstractConnection
+class MemoryConnection implements ConnectionInterface
 {
     /**
      * @var MemoryConnector[]
      */
     protected $connections = [];
+
+    /**
+     * @var StdoutLoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+        $this->logger = $container->get(StdoutLoggerInterface::class);
+    }
 
     public function add(int $fd, int $uid): void
     {
