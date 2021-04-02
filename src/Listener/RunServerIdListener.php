@@ -20,7 +20,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @Listener
  */
-class InitServerIdListener implements ListenerInterface
+class RunServerIdListener implements ListenerInterface
 {
     /**
      * @var ContainerInterface
@@ -46,6 +46,6 @@ class InitServerIdListener implements ListenerInterface
     {
         /** @var Server $server */
         $server = $this->container->get(Server::class);
-        $server->setServerId(uniqid());
+        $server->start();
     }
 }
