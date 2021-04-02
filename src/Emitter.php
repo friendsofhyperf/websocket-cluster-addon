@@ -25,15 +25,36 @@ class Emitter
         $this->container = $container;
     }
 
-    public function emit(int $uid, string $message): void
+    /**
+     * @param array|object|string $data
+     */
+    public function emit(int $uid, $data, bool $isLocal = false): void
     {
+        $data = $this->formatData($data);
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
-        $addon->publish(serialize([$uid, $message]));
+        $addon->broadcast(serialize([$uid, $data, $isLocal]));
     }
 
-    public function broadcast(string $message): void
+    /**
+     * @param array|object|string $data
+     */
+    public function broadcast($data, bool $isLocal = false): void
     {
-        $this->emit(0, $message);
+        $this->emit(0, $data, $isLocal);
+    }
+
+    /**
+     * @param array|object|string $data
+     */
+    protected function formatData($data): string
+    {
+        if (is_array($data)) {
+            $data = json_encode($data, JSON_UNESCAPED_UNICODE);
+        } elseif (is_callable([$data, '__toString'])) {
+            $data = $data->__toString();
+        }
+
+        return $data;
     }
 }

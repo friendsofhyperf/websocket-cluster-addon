@@ -102,7 +102,7 @@ class Addon
         return $this->serverId;
     }
 
-    public function setWorkerId(int $workerId)
+    public function setWorkerId(int $workerId): void
     {
         $this->workerId = $workerId;
     }
@@ -121,9 +121,17 @@ class Addon
         $this->clearUpExpired();
     }
 
-    public function publish(string $payload): void
+    public function broadcast(string $payload): void
     {
-        $this->redis->publish($this->getChannelKey(), $payload);
+        [$uid, $message, $isLocal] = unserialize($payload);
+
+        if ($isLocal) {
+            $this->doBroadcast($payload);
+
+            return;
+        }
+
+        $this->publish($this->getChannelKey(), $payload);
     }
 
     public function subscribe(): void
@@ -193,6 +201,11 @@ class Addon
     public function all(): array
     {
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
+    }
+
+    protected function publish(string $channel, string $payload): void
+    {
+        $this->redis->publish($channel, $payload);
     }
 
     protected function doBroadcast(string $payload): void
