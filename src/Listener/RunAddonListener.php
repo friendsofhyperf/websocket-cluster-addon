@@ -21,7 +21,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @Listener
  */
-class RunServerListener implements ListenerInterface
+class RunAddonListener implements ListenerInterface
 {
     /**
      * @var ContainerInterface
