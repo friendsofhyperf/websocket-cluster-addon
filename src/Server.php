@@ -15,6 +15,7 @@ use FriendsOfHyperf\WebsocketConnection\ClientProvider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
+use Hyperf\Utils\Coroutine;
 use Psr\Container\ContainerInterface;
 
 class Server
@@ -90,7 +91,7 @@ class Server
 
     public function start(): void
     {
-        co(function () {
+        Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
                     $this->logger->info(sprintf('[WebSocketConnection.%s] stopped by %s', $this->serverId, __CLASS__));
@@ -104,7 +105,7 @@ class Server
             }
         });
 
-        co(function () {
+        Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
                     $this->logger->info(sprintf('[WebSocketConnection.%s] stopped by %s', $this->serverId, __CLASS__));
