@@ -13,6 +13,7 @@ namespace FriendsOfHyperf\WebsocketConnection\Listener;
 
 use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketConnection\PipeMessage;
+use FriendsOfHyperf\WebsocketConnection\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -36,10 +37,16 @@ class OnPipeMessageListener implements ListenerInterface
      */
     private $logger;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var Server
+     */
+    private $server;
+
+    public function __construct(ContainerInterface $container, $server)
     {
         $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
+        $this->server = $container->get(Server::class);
     }
 
     /**
@@ -71,10 +78,10 @@ class OnPipeMessageListener implements ListenerInterface
 
             if ($isAdd) {
                 $this->connection->add($fd, $uid);
-                $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->connection->getWorkerId(), $fd, 'added', __CLASS__));
+                $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'added', __CLASS__));
             } else {
                 $this->connection->del($fd, $uid);
-                $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->connection->getWorkerId(), $fd, 'deleted', __CLASS__));
+                $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'deleted', __CLASS__));
             }
         }
     }
