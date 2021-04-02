@@ -47,5 +47,6 @@ class InitWorkerIdListener implements ListenerInterface
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         $server->setWorkerId($event->workerId);
+        var_dump(__METHOD__);
     }
 }

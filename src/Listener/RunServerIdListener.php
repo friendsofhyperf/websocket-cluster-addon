@@ -46,6 +46,7 @@ class RunServerIdListener implements ListenerInterface
     {
         /** @var Server $server */
         $server = $this->container->get(Server::class);
-        $server->start();
+        // $server->start();
+        var_dump(__METHOD__);
     }
 }
