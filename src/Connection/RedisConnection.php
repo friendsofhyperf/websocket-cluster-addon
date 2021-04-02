@@ -54,11 +54,13 @@ class RedisConnection implements ConnectionInterface
     public function add(int $fd, int $uid): void
     {
         $this->redis->sAdd($this->getKey($uid), $fd);
+        $this->redis->sAdd($this->getKey(0), $fd);
     }
 
     public function del(int $fd, int $uid): void
     {
         $this->redis->sRem($this->getKey($uid), $fd);
+        $this->redis->sRem($this->getKey(0), $fd);
     }
 
     public function size(int $uid): int
