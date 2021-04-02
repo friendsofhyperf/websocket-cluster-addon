@@ -77,7 +77,7 @@ class MemoryConnection extends AbstractConnection
         $isAdd = $method == 'add';
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
-            if ($workerId !== $this->workerId) {
+            if ($workerId !== $this->server->getWorkerId()) {
                 $server->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
                 $this->logger->debug("[WebSocketConnection] Let Worker.{$workerId} try to {$fd}.");
             }

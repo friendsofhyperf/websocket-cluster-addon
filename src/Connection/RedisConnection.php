@@ -75,7 +75,7 @@ class RedisConnection extends AbstractConnection
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->serverId,
+            $serverId ?? $this->server->getServerId(),
             $uid,
         ]);
     }

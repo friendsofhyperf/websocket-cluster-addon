@@ -28,22 +28,15 @@ abstract class AbstractConnection implements ConnectionInterface
     protected $container;
 
     /**
-     * @var string
+     * @var Server
      */
-    protected $serverId;
-
-    /**
-     * @var int
-     */
-    protected $workerId;
+    protected $server;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        /** @var Server $server */
-        $server = $container->get(Server::class);
-        $this->serverId = $server->getServerId();
-        $this->workerId = $server->getWorkerId();
+        /* @var Server $server */
+        $this->server = $container->get(Server::class);
     }
 }
