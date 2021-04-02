@@ -44,11 +44,8 @@ class InitWorkerIdListener implements ListenerInterface
 
     public function process(object $event)
     {
-        $serverId = uniqid();
-
         /** @var Server $server */
         $server = $this->container->get(Server::class);
-        $server->setServerId($serverId);
         $server->setWorkerId($event->workerId);
     }
 }

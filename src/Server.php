@@ -91,6 +91,8 @@ class Server
 
     public function start(): void
     {
+        $this->isRunning = true;
+
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {

@@ -49,8 +49,6 @@ class InitServerIdListener implements ListenerInterface
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         $server->setServerId(uniqid());
-        $server->setIsRunning(true);
-
         $server->start();
     }
 }
