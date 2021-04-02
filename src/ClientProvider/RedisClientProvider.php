@@ -29,7 +29,7 @@ class RedisClientProvider implements ClientProviderInterface
     /**
      * @var string
      */
-    protected $prefix = 'websocket-io:online';
+    protected $prefix = 'wsc:clients';
 
     /**
      * @var string

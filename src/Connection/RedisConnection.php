@@ -25,7 +25,7 @@ class RedisConnection extends AbstractConnection
     /**
      * @var string
      */
-    protected $prefix = 'websocket-io:fds';
+    protected $prefix = 'wsc:connections';
 
     /**
      * @var \Hyperf\Redis\RedisProxy|Redis|\Redis

@@ -19,7 +19,7 @@ use Psr\Container\ContainerInterface;
 
 class Server
 {
-    protected $prefix = 'websocket-io';
+    protected $prefix = 'wsc:servers';
 
     /**
      * @var int
@@ -157,7 +157,6 @@ class Server
     {
         return join(':', [
             $this->prefix,
-            'servers',
         ]);
     }
 }
