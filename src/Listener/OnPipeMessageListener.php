@@ -42,7 +42,7 @@ class OnPipeMessageListener implements ListenerInterface
      */
     private $server;
 
-    public function __construct(ContainerInterface $container, $server)
+    public function __construct(ContainerInterface $container)
     {
         $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
