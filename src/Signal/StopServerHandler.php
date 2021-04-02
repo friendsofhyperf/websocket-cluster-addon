@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Signal;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Signal\Annotation\Signal;
@@ -40,15 +40,15 @@ class StopServerHandler implements SignalHandlerInterface
     protected $logger;
 
     /**
-     * @var Server
+     * @var Addon
      */
-    protected $server;
+    protected $addon;
 
     public function __construct(ContainerInterface $container)
     {
         $this->config = $container->get(ConfigInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
+        $this->addon = $container->get(Addon::class);
     }
 
     public function listen(): array
@@ -66,7 +66,7 @@ class StopServerHandler implements SignalHandlerInterface
             sleep($time);
         }
 
-        $this->server->setIsRunning(false);
+        $this->addon->setIsRunning(false);
 
         $this->logger->info(sprintf('[WebsocketClusterAddon] stopped by %s.', __CLASS__));
     }

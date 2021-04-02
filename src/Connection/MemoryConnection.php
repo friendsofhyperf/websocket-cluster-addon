@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
-use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
@@ -94,9 +94,9 @@ class MemoryConnection implements ConnectionInterface
         $server = $this->getServer();
         $workerCount = $server->setting['worker_num'] - 1;
         $isAdd = $method == 'add';
-        /** @var Server $wsServer */
-        $wsServer = $this->container->get(Server::class);
-        $currentWorkerId = $wsServer->getWorkerId();
+        /** @var Addon $addon */
+        $addon = $this->container->get(Addon::class);
+        $currentWorkerId = $addon->getWorkerId();
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId !== $currentWorkerId) {

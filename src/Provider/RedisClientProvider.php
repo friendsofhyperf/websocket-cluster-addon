@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Server;
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Parallel;
@@ -67,9 +67,9 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function size(int $uid): int
     {
-        /** @var Server $server */
-        $server = $this->container->get(Server::class);
-        $servers = $server->all();
+        /** @var Addon $addon */
+        $addon = $this->container->get(Addon::class);
+        $servers = $addon->all();
         $parallel = new Parallel();
 
         foreach ($servers as $serverId) {
@@ -99,7 +99,7 @@ class RedisClientProvider implements ClientProviderInterface
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->container->get(Server::class)->getServerId(),
+            $serverId ?? $this->container->get(Addon::class)->getServerId(),
             $uid,
         ]);
     }

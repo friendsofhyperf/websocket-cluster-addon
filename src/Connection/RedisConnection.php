@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Server;
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
@@ -89,7 +89,7 @@ class RedisConnection implements ConnectionInterface
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->container->get(Server::class)->getServerId(),
+            $serverId ?? $this->container->get(Addon::class)->getServerId(),
             $uid,
         ]);
     }

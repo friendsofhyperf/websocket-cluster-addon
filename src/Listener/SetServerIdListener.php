@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Server;
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -51,9 +51,9 @@ class SetServerIdListener implements ListenerInterface
 
     public function process(object $event)
     {
-        /** @var Server $server */
-        $server = $this->container->get(Server::class);
-        $server->setServerId(uniqid());
+        /** @var Addon $addon */
+        $addon = $this->container->get(Addon::class);
+        $addon->setServerId(uniqid());
         $this->logger->info(sprintf('[WebsocketClusterAddon] serverId initialized by %s', __CLASS__));
     }
 }

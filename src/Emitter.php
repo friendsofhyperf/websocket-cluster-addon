@@ -27,9 +27,9 @@ class Emitter
 
     public function emit(int $uid, string $message): void
     {
-        /** @var Server $server */
-        $server = $this->container->get(Server::class);
-        $server->publish(serialize([$uid, $message]));
+        /** @var Addon $addon */
+        $addon = $this->container->get(Addon::class);
+        $addon->publish(serialize([$uid, $message]));
     }
 
     public function broadcast(string $message): void

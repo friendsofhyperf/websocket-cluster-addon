@@ -11,9 +11,9 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
-use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -38,15 +38,15 @@ class OnPipeMessageListener implements ListenerInterface
     private $logger;
 
     /**
-     * @var Server
+     * @var Addon
      */
-    private $server;
+    private $addon;
 
     public function __construct(ContainerInterface $container)
     {
         $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
+        $this->addon = $container->get(Addon::class);
     }
 
     /**
@@ -78,10 +78,10 @@ class OnPipeMessageListener implements ListenerInterface
 
             if ($isAdd) {
                 $this->connection->add($fd, $uid);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'added', __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->addon->getWorkerId(), $fd, 'added', __CLASS__));
             } else {
                 $this->connection->del($fd, $uid);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'deleted', __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->addon->getWorkerId(), $fd, 'deleted', __CLASS__));
             }
         }
     }

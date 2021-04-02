@@ -23,7 +23,7 @@ use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
-class Server
+class Addon
 {
     protected $prefix = 'wssa:servers';
 
