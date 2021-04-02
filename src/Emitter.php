@@ -28,20 +28,20 @@ class Emitter
     /**
      * @param array|object|string $data
      */
-    public function emit(int $uid, $data, bool $isLocal = false): void
+    public function emit(int $uid, $data): void
     {
         $data = $this->formatData($data);
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
-        $addon->broadcast(serialize([$uid, $data, $isLocal]));
+        $addon->broadcast(serialize([$uid, $data, $addon->getServerId()]));
     }
 
     /**
      * @param array|object|string $data
      */
-    public function broadcast($data, bool $isLocal = false): void
+    public function broadcast($data): void
     {
-        $this->emit(0, $data, $isLocal);
+        $this->emit(0, $data);
     }
 
     /**

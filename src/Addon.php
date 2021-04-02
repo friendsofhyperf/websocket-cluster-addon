@@ -123,13 +123,9 @@ class Addon
 
     public function broadcast(string $payload): void
     {
-        [$uid, $message, $isLocal] = unserialize($payload);
-
-        if ($isLocal) {
-            $this->doBroadcast($payload);
-
-            return;
-        }
+        Coroutine::create(function () use ($payload) {
+            $this->doBroadcast($payload, true);
+        });
 
         $this->publish($this->getChannelKey(), $payload);
     }
@@ -208,9 +204,13 @@ class Addon
         $this->redis->publish($channel, $payload);
     }
 
-    protected function doBroadcast(string $payload): void
+    protected function doBroadcast(string $payload, bool $isLocal = false): void
     {
-        [$uid, $message] = unserialize($payload);
+        [$uid, $message, $serverId] = unserialize($payload);
+
+        if (! $isLocal && $serverId == $this->serverId) {
+            return;
+        }
 
         $fds = $this->connection->all((int) $uid);
 
