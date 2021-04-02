@@ -15,13 +15,25 @@ interface ConnectionInterface
 {
     const FROM_WORKER_ID = 'FROM_WORKER_ID';
 
-    public function add(int $fd, int $uid): void;
+    /**
+     * @param int|string $uid
+     */
+    public function add(int $fd, $uid): void;
 
-    public function del(int $fd, int $uid): void;
+    /**
+     * @param int|string $uid
+     */
+    public function del(int $fd, $uid): void;
 
-    public function size(int $uid): int;
+    /**
+     * @param int|string $uid
+     */
+    public function size($uid): int;
 
-    public function all(int $uid): array;
+    /**
+     * @param int|string $uid
+     */
+    public function all($uid): array;
 
     public function flush(?string $serverId = null): void;
 }

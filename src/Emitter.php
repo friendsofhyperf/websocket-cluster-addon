@@ -26,9 +26,10 @@ class Emitter
     }
 
     /**
+     * @param int|string $uid
      * @param array|object|string $data
      */
-    public function emit(int $uid, $data): void
+    public function emit($uid, $data): void
     {
         $data = $this->formatData($data);
         /** @var Addon $addon */

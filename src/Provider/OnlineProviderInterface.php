@@ -13,11 +13,23 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
 interface OnlineProviderInterface
 {
-    public function add(int $uid): void;
+    /**
+     * @param int|string $uid
+     */
+    public function add($uid): void;
 
-    public function del(int $uid): void;
+    /**
+     * @param int|string $uid
+     */
+    public function del($uid): void;
 
-    public function get(int $uid): bool;
+    /**
+     * @param int|string $uid
+     */
+    public function get($uid): bool;
 
+    /**
+     * @param int[]|string[] $uid
+     */
     public function multiGet(array $uids): array;
 }

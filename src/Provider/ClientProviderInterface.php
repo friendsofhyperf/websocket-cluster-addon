@@ -13,11 +13,20 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
 interface ClientProviderInterface
 {
-    public function add(int $fd, int $uid): void;
+    /**
+     * @param int|string $uid
+     */
+    public function add(int $fd, $uid): void;
 
-    public function del(int $fd, int $uid): void;
+    /**
+     * @param int|string $uid
+     */
+    public function del(int $fd, $uid): void;
 
-    public function size(int $uid): int;
+    /**
+     * @param int|string $uid
+     */
+    public function size($uid): int;
 
     public function flush(string $serverId = null): void;
 }

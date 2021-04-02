@@ -19,7 +19,7 @@ class PipeMessage
     public $fd;
 
     /**
-     * @var int
+     * @var int|string
      */
     public $uid;
 
@@ -28,7 +28,10 @@ class PipeMessage
      */
     public $isAdd;
 
-    public function __construct(int $fd, int $uid, bool $isAdd = true)
+    /**
+     * @param int|string $uid
+     */
+    public function __construct(int $fd, $uid, bool $isAdd = true)
     {
         $this->fd = $fd;
         $this->uid = $uid;

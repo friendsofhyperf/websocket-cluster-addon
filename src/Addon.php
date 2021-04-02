@@ -158,7 +158,10 @@ class Addon
                 }
 
                 $this->redis->zAdd($this->getServerListKey(), time(), $this->serverId);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive by %s', $this->serverId, __CLASS__));
+
+                if (time() % 5 == 0) {
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive by %s', $this->serverId, __CLASS__));
+                }
 
                 sleep(1);
             }
@@ -174,22 +177,21 @@ class Addon
                     break;
                 }
 
-                $start = '-inf';
-                $end = (string) strtotime('-10 seconds');
-                $expiredServers = $this->redis->zRangeByScore($this->getServerListKey(), $start, $end);
-                /** @var ConnectionInterface $connection */
-                $connection = $this->container->get(ConnectionInterface::class);
-                $client = $this->container->get(ClientProviderInterface::class);
+                if ($expiredServers = $this->getExpiredServers()) {
+                    /** @var ConnectionInterface $connection */
+                    $connection = $this->container->get(ConnectionInterface::class);
+                    $client = $this->container->get(ClientProviderInterface::class);
 
-                foreach ($expiredServers as $serverId) {
-                    $connection->flush($serverId);
-                    $client->flush($serverId);
-                    $this->redis->zRem($this->getServerListKey(), $serverId);
+                    foreach ($expiredServers as $serverId) {
+                        $connection->flush($serverId);
+                        $client->flush($serverId);
+                        $this->redis->zRem($this->getServerListKey(), $serverId);
+                    }
+
+                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up by %s', $this->serverId, __CLASS__));
                 }
 
-                $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up by %s', $this->serverId, __CLASS__));
-
-                sleep(3);
+                sleep(5);
             }
         });
     }
@@ -197,6 +199,13 @@ class Addon
     public function getServers(): array
     {
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
+    }
+
+    protected function getExpiredServers(): array
+    {
+        $start = '-inf';
+        $end = (string) strtotime('-10 seconds');
+        return $this->redis->zRangeByScore($this->getServerListKey(), $start, $end);
     }
 
     protected function publish(string $channel, string $payload): void

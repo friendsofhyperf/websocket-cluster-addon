@@ -53,19 +53,19 @@ class RedisClientProvider implements ClientProviderInterface
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
-    public function add(int $fd, int $uid): void
+    public function add(int $fd, $uid): void
     {
         $key = $this->getKey($uid);
         $this->redis->sAdd($key, $fd);
         $this->redis->expire($key, 172800);
     }
 
-    public function del(int $fd, int $uid): void
+    public function del(int $fd, $uid): void
     {
         $this->redis->sRem($this->getKey($uid), $fd);
     }
 
-    public function size(int $uid): int
+    public function size($uid): int
     {
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
@@ -95,6 +95,9 @@ class RedisClientProvider implements ClientProviderInterface
         $this->redis->exec();
     }
 
+    /**
+     * @param int|string $uid
+     */
     protected function getKey($uid, string $serverId = null): string
     {
         return join(':', [

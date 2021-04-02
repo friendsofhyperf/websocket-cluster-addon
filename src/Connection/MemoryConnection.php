@@ -41,7 +41,7 @@ class MemoryConnection implements ConnectionInterface
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
-    public function add(int $fd, int $uid): void
+    public function add(int $fd, $uid): void
     {
         $this->getConnector($uid)->add($fd);
         $this->getConnector(0)->add($fd);
@@ -51,7 +51,7 @@ class MemoryConnection implements ConnectionInterface
         }
     }
 
-    public function del(int $fd, int $uid): void
+    public function del(int $fd, $uid): void
     {
         $this->getConnector($uid)->del($fd);
         $this->getConnector(0)->del($fd);
@@ -61,17 +61,17 @@ class MemoryConnection implements ConnectionInterface
         }
     }
 
-    public function size(int $uid): int
+    public function size($uid): int
     {
         return $this->getConnector($uid)->size();
     }
 
-    public function all(int $uid = 0): array
+    public function all($uid = 0): array
     {
         return $this->getConnector($uid)->all();
     }
 
-    public function getConnector(int $uid): MemoryConnector
+    public function getConnector($uid): MemoryConnector
     {
         if (! isset($this->connections[$uid])) {
             $this->connections[$uid] = make(MemoryConnector::class);
@@ -89,7 +89,10 @@ class MemoryConnection implements ConnectionInterface
         return $this->container->get(SwooleServer::class);
     }
 
-    protected function sendPipeMessage(int $fd, int $uid, string $method = ''): void
+    /**
+     * @param int|string $uid
+     */
+    protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
     {
         $server = $this->getServer();
         $workerCount = $server->setting['worker_num'] - 1;

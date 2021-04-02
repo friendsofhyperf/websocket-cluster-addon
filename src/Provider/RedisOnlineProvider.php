@@ -50,7 +50,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
         $this->clientProvider = $container->get(ClientProviderInterface::class);
     }
 
-    public function add(int $uid): void
+    public function add($uid): void
     {
         if ($this->get($uid)) {
             return;
@@ -60,7 +60,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
         $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
     }
 
-    public function del(int $uid): void
+    public function del($uid): void
     {
         if (! $this->get($uid)) {
             return;
@@ -74,26 +74,26 @@ class RedisOnlineProvider implements OnlineProviderInterface
         $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
     }
 
-    public function get(int $uid): bool
+    public function get($uid): bool
     {
         return $this->redis->sIsMember($this->getKey(), $uid);
     }
 
     public function multiGet(array $uids): array
     {
-        $uids = array_map('intval', $uids);
         $uids = array_filter($uids);
-        $result = array_fill_keys($uids, 0);
+        $result = array_fill_keys($uids, false);
         $tmpKey = $this->getTmpKey();
 
         try {
-            // 临时集合
+            // tmp
             $this->redis->sAdd($tmpKey, ...$uids);
 
-            // 取交集
+            // intersection
             $onlines = $this->redis->sInter($tmpKey, $this->getKey());
+            $onlines = array_fill_keys($onlines, true);
 
-            // array_merge 有坑
+            // array merge
             $result = array_replace($result, $onlines);
         } finally {
             $this->redis->del($tmpKey);

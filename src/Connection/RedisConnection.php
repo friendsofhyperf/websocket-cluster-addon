@@ -51,24 +51,24 @@ class RedisConnection implements ConnectionInterface
         $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
     }
 
-    public function add(int $fd, int $uid): void
+    public function add(int $fd, $uid): void
     {
         $this->redis->sAdd($this->getKey($uid), $fd);
         $this->redis->sAdd($this->getKey(0), $fd);
     }
 
-    public function del(int $fd, int $uid): void
+    public function del(int $fd, $uid): void
     {
         $this->redis->sRem($this->getKey($uid), $fd);
         $this->redis->sRem($this->getKey(0), $fd);
     }
 
-    public function size(int $uid): int
+    public function size($uid): int
     {
         return $this->redis->sCard($this->getKey($uid));
     }
 
-    public function all(int $uid): array
+    public function all($uid): array
     {
         return $this->redis->sMembers($this->getKey($uid));
     }
