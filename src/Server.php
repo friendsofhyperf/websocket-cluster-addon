@@ -52,11 +52,6 @@ class Server
     protected $logger;
 
     /**
-     * @var ClientProviderInterface
-     */
-    protected $client;
-
-    /**
      * @var ContainerInterface
      */
     protected $container;
@@ -66,7 +61,6 @@ class Server
         $this->container = $container;
         $this->redis = $container->get(RedisFactory::class)->get($this->connection);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->client = $container->get(ClientProviderInterface::class);
         $this->container = $container;
     }
 
@@ -143,10 +137,11 @@ class Server
         $expiredServers = $this->redis->zRangeByScore($this->getKey(), $start, $end);
         /** @var ConnectionInterface $connection */
         $connection = $this->container->get(ConnectionInterface::class);
+        $client = $this->container->get(ClientProviderInterface::class);
 
         foreach ($expiredServers as $serverId) {
             $connection->flush($serverId);
-            $this->client->flush($serverId);
+            $client->flush($serverId);
             $this->redis->zRem($this->getKey(), $serverId);
         }
     }
