@@ -149,12 +149,12 @@ class Server
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
                 $this->redis->zAdd($this->getServerListKey(), time(), $this->serverId);
-                $this->logger->info(sprintf('[WebsocketClusterAddon.%s] keepalive by %s', $this->serverId, __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive by %s', $this->serverId, __CLASS__));
 
                 sleep(1);
             }
@@ -166,7 +166,7 @@ class Server
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
