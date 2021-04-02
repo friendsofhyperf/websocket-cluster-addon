@@ -1,5 +1,5 @@
 {
-    "name": "friendsofhyperf/websocket-connection",
+    "name": "friendsofhyperf/websocket-cluster-addon",
     "type": "library",
     "license": "MIT",
     "authors": [{
@@ -31,12 +31,12 @@
     "description": "Config extension for Hyperf.",
     "autoload": {
         "psr-4": {
-            "FriendsOfHyperf\\WebsocketConnection\\": "src/"
+            "FriendsOfHyperf\\WebsocketClusterAddon\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "FriendsOfHyperf\\WebsocketConnection\\Tests\\": "tests/"
+            "FriendsOfHyperf\\WebsocketClusterAddon\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -49,7 +49,7 @@
     },
     "extra": {
         "hyperf": {
-            "config": "FriendsOfHyperf\\WebsocketConnection\\ConfigProvider"
+            "config": "FriendsOfHyperf\\WebsocketClusterAddon\\ConfigProvider"
         }
     }
 }

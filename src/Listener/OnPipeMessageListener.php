@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 /**
- * This file is part of websocket-connection.
+ * This file is part of websocket-cluster-addon.
  *
- * @link     https://github.com/friendofhyperf/websocket-connection
- * @document https://github.com/friendofhyperf/websocket-connection/blob/main/README.md
+ * @link     https://github.com/friendofhyperf/websocket-cluster-addon
+ * @document https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/README.md
  * @contact  huangdijia@gmail.com
- * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
+ * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection\Listener;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
-use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketConnection\PipeMessage;
-use FriendsOfHyperf\WebsocketConnection\Server;
+use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -78,10 +78,10 @@ class OnPipeMessageListener implements ListenerInterface
 
             if ($isAdd) {
                 $this->connection->add($fd, $uid);
-                $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'added', __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'added', __CLASS__));
             } else {
                 $this->connection->del($fd, $uid);
-                $this->logger->debug(sprintf('[WebSocketConnection.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'deleted', __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->server->getWorkerId(), $fd, 'deleted', __CLASS__));
             }
         }
     }

@@ -1,12 +1,12 @@
-# Websocket-connection
+# websocket-cluster-addon
 
-[![Latest Test](https://github.com/friendsofhyperf/websocket-connection/workflows/tests/badge.svg)](https://github.com/friendsofhyperf/websocket-connection/actions)
-[![Latest Stable Version](https://poser.pugx.org/friendsofhyperf/websocket-connection/version.png)](https://packagist.org/packages/friendsofhyperf/websocket-connection)
-[![Total Downloads](https://poser.pugx.org/friendsofhyperf/websocket-connection/d/total.png)](https://packagist.org/packages/friendsofhyperf/websocket-connection)
-[![GitHub license](https://img.shields.io/github/license/friendsofhyperf/websocket-connection)](https://github.com/friendsofhyperf/websocket-connection)
+[![Latest Test](https://github.com/friendsofhyperf/websocket-cluster-addon/workflows/tests/badge.svg)](https://github.com/friendsofhyperf/websocket-cluster-addon/actions)
+[![Latest Stable Version](https://poser.pugx.org/friendsofhyperf/websocket-cluster-addon/version.png)](https://packagist.org/packages/friendsofhyperf/websocket-cluster-addon)
+[![Total Downloads](https://poser.pugx.org/friendsofhyperf/websocket-cluster-addon/d/total.png)](https://packagist.org/packages/friendsofhyperf/websocket-cluster-addon)
+[![GitHub license](https://img.shields.io/github/license/friendsofhyperf/websocket-cluster-addon)](https://github.com/friendsofhyperf/websocket-cluster-addon)
 
 ## Installation
 
 ~~~base
-composer require friendsofhyperf/websocket-connection
+composer require friendsofhyperf/websocket-cluster-addon
 ~~~

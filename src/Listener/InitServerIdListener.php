@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 /**
- * This file is part of websocket-connection.
+ * This file is part of websocket-cluster-addon.
  *
- * @link     https://github.com/friendofhyperf/websocket-connection
- * @document https://github.com/friendofhyperf/websocket-connection/blob/main/README.md
+ * @link     https://github.com/friendofhyperf/websocket-cluster-addon
+ * @document https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/README.md
  * @contact  huangdijia@gmail.com
- * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
+ * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection\Listener;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
-use FriendsOfHyperf\WebsocketConnection\Server;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -54,6 +54,6 @@ class InitServerIdListener implements ListenerInterface
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         $server->setServerId(uniqid());
-        $this->logger->info(sprintf('[WebsocketConnection] serverId initialized by %s', __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] serverId initialized by %s', __CLASS__));
     }
 }

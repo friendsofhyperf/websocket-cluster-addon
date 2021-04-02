@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 /**
- * This file is part of websocket-connection.
+ * This file is part of websocket-cluster-addon.
  *
- * @link     https://github.com/friendofhyperf/websocket-connection
- * @document https://github.com/friendofhyperf/websocket-connection/blob/main/README.md
+ * @link     https://github.com/friendofhyperf/websocket-cluster-addon
+ * @document https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/README.md
  * @contact  huangdijia@gmail.com
- * @license  https://github.com/friendofhyperf/websocket-connection/blob/main/LICENSE
+ * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketConnection;
+namespace FriendsOfHyperf\WebsocketClusterAddon;
 
-use FriendsOfHyperf\WebsocketConnection\ClientProvider\ClientProviderInterface;
-use FriendsOfHyperf\WebsocketConnection\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketConnection\Subscriber\SubscriberInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\ClientProvider\ClientProviderInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coordinator\Constants;
@@ -149,12 +149,12 @@ class Server
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebSocketConnection.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
                 $this->redis->zAdd($this->getServerListKey(), time(), $this->serverId);
-                $this->logger->info(sprintf('[WebSocketConnection.%s] keepalive by %s', $this->serverId, __CLASS__));
+                $this->logger->info(sprintf('[WebsocketClusterAddon.%s] keepalive by %s', $this->serverId, __CLASS__));
 
                 sleep(1);
             }
@@ -166,7 +166,7 @@ class Server
         Coroutine::create(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebSocketConnection.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
@@ -183,7 +183,7 @@ class Server
                     $this->redis->zRem($this->getServerListKey(), $serverId);
                 }
 
-                $this->logger->info(sprintf('[WebSocketConnection.%s] clear up by %s', $this->serverId, __CLASS__));
+                $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up by %s', $this->serverId, __CLASS__));
 
                 sleep(3);
             }
