@@ -93,12 +93,12 @@ class Server
         co(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebSocketConnection#%s] stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebSocketConnection.%s] stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
                 $this->keepalive();
-                $this->logger->info(sprintf('[WebSocketConnection#%s] keepalive by %s', $this->serverId, __CLASS__));
+                $this->logger->info(sprintf('[WebSocketConnection.%s] keepalive by %s', $this->serverId, __CLASS__));
 
                 sleep(1);
             }
@@ -107,12 +107,12 @@ class Server
         co(function () {
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebSocketConnection#%s] stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebSocketConnection.%s] stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
                 $this->clearUp();
-                $this->logger->info(sprintf('[WebSocketConnection#%s] clear up by %s', $this->serverId, __CLASS__));
+                $this->logger->info(sprintf('[WebSocketConnection.%s] clear up by %s', $this->serverId, __CLASS__));
 
                 sleep(3);
             }
