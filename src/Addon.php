@@ -198,7 +198,7 @@ class Addon
         });
     }
 
-    public function all(): array
+    public function getServers(): array
     {
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
     }

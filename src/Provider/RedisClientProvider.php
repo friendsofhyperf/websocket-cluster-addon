@@ -69,7 +69,7 @@ class RedisClientProvider implements ClientProviderInterface
     {
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
-        $servers = $addon->all();
+        $servers = $addon->getServers();
         $parallel = new Parallel();
 
         foreach ($servers as $serverId) {
