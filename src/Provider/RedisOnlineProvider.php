@@ -52,26 +52,20 @@ class RedisOnlineProvider implements OnlineProviderInterface
 
     public function add($uid): void
     {
-        if ($this->get($uid)) {
-            return;
+        if ($this->redis->sAdd($this->getKey(), $uid)) {
+            $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
         }
-
-        $this->redis->sAdd($this->getKey(), $uid);
-        $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
     }
 
     public function del($uid): void
     {
-        if (! $this->get($uid)) {
-            return;
-        }
-
         if ($this->clientProvider->size($uid) > 0) {
             return;
         }
 
-        $this->redis->sRem($this->getKey(), $uid);
-        $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
+        if ($this->redis->sRem($this->getKey(), $uid)) {
+            $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
+        }
     }
 
     public function get($uid): bool
