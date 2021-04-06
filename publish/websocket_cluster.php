@@ -14,7 +14,7 @@ return [
         'prefix' => 'wssa:clients',
         'pool' => 'default',
     ],
-    'online' => [
+    'connections' => [
         'prefix' => 'wssa:connections',
         'pool' => 'default',
     ],
