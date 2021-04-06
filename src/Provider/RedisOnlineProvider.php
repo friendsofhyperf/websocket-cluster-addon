@@ -30,18 +30,18 @@ class RedisOnlineProvider implements OnlineProviderInterface
     protected $prefix;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    /**
      * @var ClientProviderInterface
      */
     protected $clientProvider;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     public function __construct(ContainerInterface $container)
     {
-        $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
+        $this->container = $container;
         $this->clientProvider = $container->get(ClientProviderInterface::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
@@ -52,7 +52,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
     public function add($uid): void
     {
         if ($this->redis->sAdd($this->getKey(), $uid)) {
-            $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
+            $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
         }
     }
 
@@ -63,7 +63,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
         }
 
         if ($this->redis->sRem($this->getKey(), $uid)) {
-            $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
+            $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 0));
         }
     }
 
