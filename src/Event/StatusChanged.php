@@ -23,6 +23,9 @@ class StatusChanged
      */
     public $status;
 
+    /**
+     * @param int|string $uid
+     */
     public function __construct($uid, int $status)
     {
         $this->uid = $uid;
