@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Addon;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
@@ -22,12 +23,7 @@ class RedisConnection implements ConnectionInterface
     /**
      * @var string
      */
-    protected $redisPool = 'default';
-
-    /**
-     * @var string
-     */
-    protected $prefix = 'wssa:connections';
+    protected $prefix;
 
     /**
      * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
@@ -48,7 +44,10 @@ class RedisConnection implements ConnectionInterface
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
+        /** @var ConfigInterface $config */
+        $config = $container->get(ConfigInterface::class);
+        $this->prefix = $config->get('websocket_cluster.connection.prefix', 'wssa:connections');
+        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.connection.pool', 'default'));
     }
 
     public function add(int $fd, $uid): void

@@ -33,7 +33,14 @@ class ConfigProvider
                     ],
                 ],
             ],
-            'publish' => [],
+            'publish' => [
+                [
+                    'id' => 'config',
+                    'description' => 'The config for websocket-cluster-addon.',
+                    'source' => __DIR__ . '/../publish/websocket_cluster.php',
+                    'destination' => BASE_PATH . '/config/autoload/websocket_cluster.php',
+                ],
+            ],
         ];
     }
 }

@@ -12,17 +12,13 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Event\StatusChanged;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class RedisOnlineProvider implements OnlineProviderInterface
 {
-    /**
-     * @var string
-     */
-    protected $redisPool = 'default';
-
     /**
      * @var \Redis
      */
@@ -31,7 +27,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
     /**
      * @var string
      */
-    protected $prefix = 'wssa:online';
+    protected $prefix;
 
     /**
      * @var EventDispatcherInterface
@@ -41,13 +37,16 @@ class RedisOnlineProvider implements OnlineProviderInterface
     /**
      * @var ClientProviderInterface
      */
-    private $clientProvider;
+    protected $clientProvider;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
         $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
         $this->clientProvider = $container->get(ClientProviderInterface::class);
+        /** @var ConfigInterface $config */
+        $config = $container->get(ConfigInterface::class);
+        $this->prefix = $config->get('websocket_cluster.online.prefix', 'wssa:online');
+        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.online.pool', 'default'));
     }
 
     public function add($uid): void

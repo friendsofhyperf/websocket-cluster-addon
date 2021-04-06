@@ -14,6 +14,7 @@ namespace FriendsOfHyperf\WebsocketClusterAddon;
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coordinator\Constants;
@@ -25,7 +26,10 @@ use Throwable;
 
 class Addon
 {
-    protected $prefix = 'wssa:servers';
+    /**
+     * @var string
+     */
+    protected $prefix;
 
     /**
      * @var int
@@ -36,11 +40,6 @@ class Addon
      * @var \Redis
      */
     protected $redis;
-
-    /**
-     * @var string
-     */
-    protected $redisPool = 'default';
 
     /**
      * @var string
@@ -77,14 +76,23 @@ class Addon
      */
     protected $sender;
 
+    /**
+     * @var string
+     */
+    protected $channel;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
         $this->sender = $container->get(Sender::class);
         $this->subscriber = $container->get(SubscriberInterface::class);
+        /** @var ConfigInterface $config */
+        $config = $container->get(ConfigInterface::class);
+        $this->prefix = $config->get('websocket_cluster.server.prefix', 'wssa:servers');
+        $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wssa:channel');
+        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.server.pool', 'default'));
     }
 
     public function setServerId(string $serverId): void
@@ -230,10 +238,7 @@ class Addon
 
     protected function getChannelKey(): string
     {
-        return join(':', [
-            $this->prefix,
-            'channel',
-        ]);
+        return $this->channel;
     }
 
     protected function getServerListKey(): string
