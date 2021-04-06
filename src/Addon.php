@@ -152,7 +152,7 @@ class Addon
 
             retry(PHP_INT_MAX, function () {
                 try {
-                    $this->subscriber->subscribe($this->getChannelKey(), function ($payload) {
+                    $this->subscriber->subscribe($this->getChannelKey(), function ($channel, $payload) {
                         $this->doBroadcast($payload);
                     });
                 } catch (Throwable $e) {

@@ -17,6 +17,7 @@ use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coordinator\Constants;
 use Hyperf\Utils\Coordinator\CoordinatorManager;
 use Hyperf\Utils\Coroutine;
+use Mix\Redis\Subscribe\Message;
 use Mix\Redis\Subscribe\Subscriber;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -74,18 +75,19 @@ class MixSubscriber implements SubscriberInterface
         });
 
         while (true) {
-            $payload = $chan->pop();
+            /** @var Message $data */
+            $data = $chan->pop();
 
-            if (empty($payload)) { // 手动close与redis异常断开都会导致返回false
+            if (empty($data)) { // 手动close与redis异常断开都会导致返回false
                 if (! $sub->closed) {
                     throw new RuntimeException('Redis subscriber disconnected from Redis.');
                 }
                 break;
             }
 
-            Coroutine::create(function () use ($payload, $callback) {
-                $callback($payload);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon] %s by %s', json_encode(unserialize($payload), JSON_UNESCAPED_UNICODE), __CLASS__));
+            Coroutine::create(function () use ($callback, $data) {
+                $callback($data->channel, $data->payload);
+                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $data->channel, json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE), __CLASS__));
             });
         }
     }
