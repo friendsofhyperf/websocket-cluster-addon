@@ -28,5 +28,6 @@ return [
     ],
     'subscriber' => [
         'channel' => 'wssa:channel',
+        'retry_interval' => 1000,
     ],
 ];

@@ -81,6 +81,12 @@ class Addon
      */
     protected $channel;
 
+    /**
+     * Milliseconds.
+     * @var int
+     */
+    protected $retryInterval = 1000;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -90,8 +96,9 @@ class Addon
         $this->subscriber = $container->get(SubscriberInterface::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
-        $this->prefix = $config->get('websocket_cluster.server.prefix', 'wssa:servers');
         $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wssa:channel');
+        $this->prefix = $config->get('websocket_cluster.server.prefix', 'wssa:servers');
+        $this->retryInterval = (int) $config->get('websocket_cluster.subscriber.retry_interval', 1000);
         $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.server.pool', 'default'));
     }
 
@@ -152,7 +159,7 @@ class Addon
                     $this->logger->error((string) $e);
                     throw $e;
                 }
-            }, 1000);
+            }, $this->retryInterval);
         });
     }
 
