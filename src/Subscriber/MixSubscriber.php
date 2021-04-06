@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coordinator\Constants;
@@ -41,7 +42,9 @@ class MixSubscriber implements SubscriberInterface
     {
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sub = value(function () use ($container) {
-            $redis = $container->get(RedisFactory::class)->get($this->redisPool);
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+            $redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.subscriber.pool', 'default'));
             $host = $redis->getHost();
             $port = $redis->getPort();
             $pass = $redis->getAuth();

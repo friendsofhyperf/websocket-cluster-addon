@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coroutine;
@@ -18,11 +19,6 @@ use Psr\Container\ContainerInterface;
 
 class PhpRedisSubscriber implements SubscriberInterface
 {
-    /**
-     * @var string
-     */
-    protected $redisPool = 'default';
-
     /**
      * @var \Redis
      */
@@ -35,7 +31,9 @@ class PhpRedisSubscriber implements SubscriberInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $this->redis = $container->get(RedisFactory::class)->get($this->redisPool);
+        /** @var ConfigInterface $config */
+        $config = $container->get(ConfigInterface::class);
+        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.subscriber.pool', 'default'));
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 

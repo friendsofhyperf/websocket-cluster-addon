@@ -28,6 +28,7 @@ return [
     ],
     'subscriber' => [
         'channel' => 'wssa:channel',
+        'pool' => 'default',
         'retry_interval' => 1000,
     ],
 ];
