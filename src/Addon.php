@@ -166,6 +166,8 @@ class Addon
     public function keepalive(): void
     {
         Coroutine::create(function () {
+            CoordinatorManager::until(Constants::WORKER_START)->yield();
+
             while (true) {
                 if (! $this->isRunning) {
                     $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
@@ -186,6 +188,8 @@ class Addon
     public function clearUpExpired(): void
     {
         Coroutine::create(function () {
+            CoordinatorManager::until(Constants::WORKER_START)->yield();
+
             while (true) {
                 if (! $this->isRunning) {
                     $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
