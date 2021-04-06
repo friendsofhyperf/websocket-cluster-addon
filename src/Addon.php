@@ -236,7 +236,7 @@ class Addon
             return;
         }
 
-        $fds = $this->connection->all((int) $uid);
+        $fds = $this->connection->all($uid);
 
         foreach ($fds as $fd) {
             $this->sender->push($fd, $message);
