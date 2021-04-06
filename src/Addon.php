@@ -87,11 +87,6 @@ class Addon
         $this->subscriber = $container->get(SubscriberInterface::class);
     }
 
-    public function setIsRunning(bool $isRunning): void
-    {
-        $this->isRunning = $isRunning;
-    }
-
     public function setServerId(string $serverId): void
     {
         $this->serverId = $serverId;
@@ -119,6 +114,11 @@ class Addon
         $this->subscribe();
         $this->keepalive();
         $this->clearUpExpired();
+    }
+
+    public function stop(): void
+    {
+        $this->isRunning = false;
     }
 
     public function broadcast(string $payload): void

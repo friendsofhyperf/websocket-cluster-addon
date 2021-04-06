@@ -66,7 +66,7 @@ class StopServerHandler implements SignalHandlerInterface
             sleep($time);
         }
 
-        $this->addon->setIsRunning(false);
+        $this->addon->stop();
 
         $this->logger->info(sprintf('[WebsocketClusterAddon] stopped by %s.', __CLASS__));
     }
