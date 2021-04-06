@@ -22,7 +22,7 @@ use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
 /**
- * @Controller(prefix="websocket-cluster")
+ * @Controller(prefix="websocket")
  */
 class InfoController
 {
