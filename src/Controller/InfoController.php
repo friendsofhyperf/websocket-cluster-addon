@@ -88,9 +88,10 @@ class InfoController
 
         $redis = $this->redis;
         $servers = $this->addon->getServers();
+        $callbacks = [];
 
-        return collect($servers)
-            ->transform(function ($pod) use ($redis) {
+        foreach ($servers as $pod) {
+            $callbacks[$pod] = function ($pod) use ($redis) {
                 $connections = 0;
                 $pattern = sprintf('%s:%s:%s', $this->config->get('websocket_cluster.client.prefix'), $pod, '*');
 
@@ -105,6 +106,9 @@ class InfoController
                     'users' => $users,
                     'connections' => $connections,
                 ];
-            });
+            };
+        }
+
+        return parallel($callbacks);
     }
 }
