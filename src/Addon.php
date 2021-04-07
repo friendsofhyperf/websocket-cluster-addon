@@ -62,11 +62,6 @@ class Addon
     protected $container;
 
     /**
-     * @var SubscriberInterface
-     */
-    protected $subscriber;
-
-    /**
      * @var ConnectionInterface
      */
     protected $connection;
@@ -93,7 +88,6 @@ class Addon
         $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sender = $container->get(Sender::class);
-        $this->subscriber = $container->get(SubscriberInterface::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
         $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wssa:channel');
@@ -150,9 +144,12 @@ class Addon
         Coroutine::create(function () {
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
-            retry(PHP_INT_MAX, function () {
+            // fix Uncaught Swoole\Error: API must be called in the coroutine when $subscriber instanceof \Mix\Redis\Subscribe\Subscriber
+            $subscriber = $this->container->get(SubscriberInterface::class);
+
+            retry(PHP_INT_MAX, function () use ($subscriber) {
                 try {
-                    $this->subscriber->subscribe($this->getChannelKey(), function ($channel, $payload) {
+                    $subscriber->subscribe($this->getChannelKey(), function ($channel, $payload) {
                         $this->doBroadcast($payload);
                     });
                 } catch (Throwable $e) {
