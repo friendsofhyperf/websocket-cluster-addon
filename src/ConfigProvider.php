@@ -22,7 +22,7 @@ class ConfigProvider
                 Connection\ConnectionInterface::class => Connection\MemoryConnection::class,
                 Provider\ClientProviderInterface::class => Provider\RedisClientProvider::class,
                 Provider\OnlineProviderInterface::class => Provider\RedisOnlineProvider::class,
-                Subscriber\SubscriberInterface::class => Subscriber\PhpRedisSubscriber::class,
+                Subscriber\SubscriberInterface::class => class_exists('Mix\Redis\Subscribe\Subscriber') ? Subscriber\MixSubscriber::class : Subscriber\PhpRedisSubscriber::class,
             ],
             'processes' => [],
             'listeners' => [],
