@@ -91,15 +91,18 @@ class InfoController
 
         return collect($servers)
             ->transform(function ($pod) use ($redis) {
-                $connections = collect($redis->keys(sprintf('%s:%s:%s', $this->config->get('websocket_cluster.client.prefix'), $pod, '*')))
-                    ->transform(function ($key) use ($redis) {
-                        return $redis->sCard($key);
+                $connections = 0;
+                $pattern = sprintf('%s:%s:%s', $this->config->get('websocket_cluster.client.prefix'), $pod, '*');
+
+                $users = collect($redis->keys($pattern))
+                    ->each(function ($key) use ($redis, &$connections) {
+                        $connections += $redis->sCard($key);
                     })
-                    ->values()
-                    ->sum();
+                    ->count();
 
                 return [
                     'pod' => $pod,
+                    'users' => $users,
                     'connections' => $connections,
                 ];
             });
