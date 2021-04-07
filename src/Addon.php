@@ -144,11 +144,11 @@ class Addon
         Coroutine::create(function () {
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
-            // fix Uncaught Swoole\Error: API must be called in the coroutine when $subscriber instanceof \Mix\Redis\Subscribe\Subscriber
-            $subscriber = $this->container->get(SubscriberInterface::class);
-
-            retry(PHP_INT_MAX, function () use ($subscriber) {
+            retry(PHP_INT_MAX, function () {
                 try {
+                    // fix Uncaught Swoole\Error: API must be called in the coroutine when $subscriber instanceof \Mix\Redis\Subscribe\Subscriber
+                    $subscriber = make(SubscriberInterface::class);
+
                     $subscriber->subscribe($this->getChannelKey(), function ($channel, $payload) {
                         $this->doBroadcast($payload);
                     });
