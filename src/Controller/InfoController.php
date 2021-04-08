@@ -91,7 +91,7 @@ class InfoController
         $callbacks = [];
 
         foreach ($servers as $pod) {
-            $callbacks[$pod] = function () use ($redis, $pod) {
+            $callbacks[] = function () use ($redis, $pod) {
                 $connections = 0;
                 $pattern = sprintf('%s:%s:%s', $this->config->get('websocket_cluster.client.prefix'), $pod, '*');
 
