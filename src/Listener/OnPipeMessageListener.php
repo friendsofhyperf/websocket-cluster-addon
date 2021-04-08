@@ -78,11 +78,11 @@ class OnPipeMessageListener implements ListenerInterface
 
             if ($isAdd) {
                 $this->connection->add($fd, $uid);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->addon->getWorkerId(), $fd, 'added', __CLASS__));
             } else {
                 $this->connection->del($fd, $uid);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->addon->getWorkerId(), $fd, 'deleted', __CLASS__));
             }
+
+            $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->addon->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', __CLASS__));
         }
     }
 }

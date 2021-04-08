@@ -101,7 +101,7 @@ class Addon
         $this->serverId = $serverId;
     }
 
-    public function getServerId(): string
+    public function getServerId(): ?string
     {
         return $this->serverId;
     }
@@ -111,7 +111,7 @@ class Addon
         $this->workerId = $workerId;
     }
 
-    public function getWorkerId(): int
+    public function getWorkerId(): ?int
     {
         return $this->workerId;
     }
@@ -167,7 +167,7 @@ class Addon
 
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
@@ -189,7 +189,7 @@ class Addon
 
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
