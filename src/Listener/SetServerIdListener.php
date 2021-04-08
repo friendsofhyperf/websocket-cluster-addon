@@ -16,6 +16,7 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BeforeMainServerStart;
+use Hyperf\Utils\Str;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -53,7 +54,7 @@ class SetServerIdListener implements ListenerInterface
     {
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
-        $serverId = gethostname() ?: uniqid();
+        $serverId = Str::slug(gethostname() ?: uniqid());
         $addon->setServerId($serverId);
         $this->logger->info(sprintf('[WebsocketClusterAddon.%s] serverId initialized by %s', $serverId, __CLASS__));
     }
