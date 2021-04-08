@@ -53,7 +53,8 @@ class SetServerIdListener implements ListenerInterface
     {
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
-        $addon->setServerId(uniqid());
-        $this->logger->info(sprintf('[WebsocketClusterAddon] serverId initialized by %s', __CLASS__));
+        $serverId = gethostname() ?: uniqid();
+        $addon->setServerId($serverId);
+        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] serverId initialized by %s', $serverId, __CLASS__));
     }
 }
