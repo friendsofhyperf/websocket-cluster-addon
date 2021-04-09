@@ -232,15 +232,15 @@ class Addon
                     break;
                 }
 
-                $data = [
+                $data = json_encode([
                     'users' => $this->connectionProvider->users(),
                     'clients' => $this->connectionProvider->size(0),
-                ];
+                ]);
 
-                $this->redis->hSet($this->getMonitorKey(), $this->serverId, json_encode($data));
+                $this->redis->hSet($this->getMonitorKey(), $this->serverId, $data);
 
                 if (time() % 5 == 0) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s monitoring by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s monitoring data: %s by %s', $this->serverId, $data, __CLASS__));
                 }
 
                 sleep(1);
