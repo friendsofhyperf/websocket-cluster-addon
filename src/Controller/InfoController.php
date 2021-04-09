@@ -14,9 +14,11 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Controller;
 use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\OnlineProviderInterface;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -49,7 +51,7 @@ class InfoController
      */
     protected $clientProvider;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, $redis)
     {
         $this->container = $container;
         $this->request = $container->get(RequestInterface::class);
@@ -72,6 +74,32 @@ class InfoController
             ];
         }
 
-        return $this->addon->getMonitors();
+        $config = $this->container->get(ConfigInterface::class);
+        $keyPrefix = $config->get('websocket_cluster.client.prefix', 'wssa:clients');
+        $pool = $config->get('websocket_cluster.client.pool', 'default');
+        /** @var \Redis $redis */
+        $redis = $this->container->get(RedisFactory::class)->get($pool);
+
+        return collect($this->addon->getServers())
+            ->transform(function ($serverId) use ($keyPrefix, $redis) {
+                $key = join(':', [$keyPrefix, $serverId]);
+                $clients = 0;
+                $users = collect($redis->zRange($key, 0, -1))
+                    ->tap(function ($items) use (&$clients) {
+                        $clients = $items->count();
+                    })
+                    ->transform(function ($sid) {
+                        return explode('#', $sid)[0] ?? '';
+                    })
+                    ->unique()
+                    ->count();
+
+                return [
+                    'node' => $serverId,
+                    'users' => $users,
+                    'clients' => $clients,
+                ];
+            })
+            ->toArray();
     }
 }

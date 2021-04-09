@@ -50,28 +50,17 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function add(int $fd, $uid): void
     {
-        $key = $this->getKey($uid);
-
-        $this->redis->multi();
-        $this->redis->sAdd($key, $fd);
-        $this->redis->expire($key, 172800);
-        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
-        $this->redis->exec();
+        $this->redis->zAdd($this->getKey(), time(), $this->getSid($uid, $fd));
     }
 
     public function del(int $fd, $uid): void
     {
-        $key = $this->getKey($uid);
-        $this->redis->sRem($key, $fd);
-
-        if ($this->redis->sCard($key) == 0) {
-            $this->redis->zRem($this->getExpireKey(), $uid);
-        }
+        $this->redis->zRem($this->getKey(), $this->getSid($uid, $fd));
     }
 
-    public function renew($uid): void
+    public function renew(int $fd, $uid): void
     {
-        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
+        $this->redis->zAdd($this->getKey(), time(), $this->getSid($uid, $fd));
     }
 
     public function size($uid): int
@@ -83,7 +72,11 @@ class RedisClientProvider implements ClientProviderInterface
 
         foreach ($servers as $serverId) {
             $parallel->add(function () use ($serverId, $uid) {
-                return $this->redis->sCard($this->getKey($uid, $serverId));
+                return collect($this->redis->zRange($this->getKey($serverId), 0, -1))
+                    ->reject(function ($sid) use ($uid) {
+                        return $this->getUid($sid) != $uid;
+                    })
+                    ->count();
             });
         }
 
@@ -94,26 +87,12 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function clearUpExpired(): void
     {
-        $uids = $this->redis->zRangeByScore($this->getExpireKey(), '-inf', (string) strtotime('-60 seconds'));
-        $this->redis->multi();
-
-        foreach ($uids as $uid) {
-            $this->redis->del($this->getKey($uid));
-        }
-
-        $this->redis->exec();
+        $this->redis->zRemRangeByScore($this->getKey(), '-inf', (string) strtotime('-60 seconds'));
     }
 
     public function flush(string $serverId = null): void
     {
-        $keys = $this->redis->keys($this->getKey('*', $serverId));
-        $this->redis->multi();
-
-        foreach ($keys as $key) {
-            $this->redis->del($key);
-        }
-
-        $this->redis->exec();
+        $this->redis->del($this->getKey($serverId));
     }
 
     protected function getServerId(): string
@@ -128,17 +107,29 @@ class RedisClientProvider implements ClientProviderInterface
     /**
      * @param int|string $uid
      */
-    protected function getKey($uid, string $serverId = null): string
+    protected function getKey(string $serverId = null): string
     {
         return join(':', [
             $this->prefix,
             $serverId ?? $this->getServerId(),
-            $uid,
         ]);
     }
 
-    protected function getExpireKey(string $serverId = null): string
+    protected function getSid($uid, int $fd): string
     {
-        return join(':', [$this->prefix, $serverId ?? $this->getServerId(), 'expire']);
+        return join('#', [$uid, $fd]);
+    }
+
+    /**
+     * @return int|string
+     */
+    protected function getUid(string $sid)
+    {
+        return explode('#', $sid)[0] ?? '';
+    }
+
+    protected function getFd(string $sid): int
+    {
+        return explode('#', $sid)[1] ?? 0;
     }
 }

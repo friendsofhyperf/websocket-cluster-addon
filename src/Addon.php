@@ -135,7 +135,6 @@ class Addon
 
         $this->subscribe();
         $this->keepalive();
-        $this->monitoring();
         $this->clearUpExpired();
     }
 
@@ -221,45 +220,9 @@ class Addon
         });
     }
 
-    public function monitoring(): void
-    {
-        Coroutine::create(function () {
-            CoordinatorManager::until(Constants::WORKER_START)->yield();
-
-            while (true) {
-                if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s monitoring stopped by %s', $this->serverId, __CLASS__));
-                    break;
-                }
-
-                $data = json_encode([
-                    'users' => $this->connectionProvider->users(),
-                    'clients' => $this->connectionProvider->size(0),
-                ]);
-
-                $this->redis->hSet($this->getMonitorKey(), $this->serverId, $data);
-
-                if (time() % 5 == 0) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s monitoring data: %s by %s', $this->serverId, $data, __CLASS__));
-                }
-
-                sleep(1);
-            }
-        });
-    }
-
     public function getServers(): array
     {
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
-    }
-
-    public function getMonitors(): array
-    {
-        return collect($this->redis->hGetAll($this->getMonitorKey()))
-            ->transform(function ($item) {
-                return json_decode($item, true);
-            })
-            ->toArray();
     }
 
     protected function clearUpExpiredServers(): void

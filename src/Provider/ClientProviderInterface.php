@@ -26,7 +26,7 @@ interface ClientProviderInterface
     /**
      * @param int|string $uid
      */
-    public function renew($uid): void;
+    public function renew(int $fd, $uid): void;
 
     /**
      * @param int|string $uid
