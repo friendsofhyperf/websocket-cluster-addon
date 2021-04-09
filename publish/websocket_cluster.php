@@ -10,17 +10,19 @@ declare(strict_types=1);
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
 return [
-    'client' => [
-        'prefix' => 'wssa:clients',
-        'pool' => 'default',
-    ],
     'connections' => [
         'prefix' => 'wssa:connections',
         'pool' => 'default',
     ],
+    'client' => [
+        'prefix' => 'wssa:clients',
+        'pool' => 'default',
+        'auto_clear_up' => false,
+    ],
     'online' => [
         'prefix' => 'wssa:online',
         'pool' => 'default',
+        'auto_clear_up' => false,
     ],
     'server' => [
         'prefix' => 'wssa:servers',

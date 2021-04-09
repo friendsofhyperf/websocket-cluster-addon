@@ -93,6 +93,11 @@ class Addon
      */
     protected $clientProvider;
 
+    /**
+     * @var ConfigInterface
+     */
+    protected $config;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -103,6 +108,7 @@ class Addon
         $this->sender = $container->get(Sender::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
+        $this->config = $config;
         $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wssa:channel');
         $this->prefix = $config->get('websocket_cluster.server.prefix', 'wssa:servers');
         $this->retryInterval = (int) $config->get('websocket_cluster.subscriber.retry_interval', 1000);
@@ -210,10 +216,14 @@ class Addon
                 $this->clearUpExpiredServers();
 
                 // Clear up expired users
-                $this->onlineProvider->clearUpExpired();
+                if ($this->config->get('websocket_cluster.online.auto_clear_up', false)) {
+                    $this->onlineProvider->clearUpExpired();
+                }
 
                 // Clear up expired clients
-                $this->clientProvider->clearUpExpired();
+                if ($this->config->get('websocket_cluster.client.auto_clear_up', false)) {
+                    $this->clientProvider->clearUpExpired();
+                }
 
                 sleep(5);
             }
