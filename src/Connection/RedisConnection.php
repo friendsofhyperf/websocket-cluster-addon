@@ -64,7 +64,9 @@ class RedisConnection implements ConnectionInterface
 
     public function users(): int
     {
-        return count($this->redis->keys($this->getKey('*')));
+        $num = count($this->redis->keys($this->getKey('*')));
+
+        return $num > 0 ? ($num - 1) : $num;
     }
 
     public function size($uid): int

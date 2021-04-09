@@ -63,7 +63,9 @@ class MemoryConnection implements ConnectionInterface
 
     public function users(): int
     {
-        return count($this->connections);
+        $num = count($this->connections);
+
+        return $num > 0 ? ($num - 1) : $num;
     }
 
     public function size($uid): int
