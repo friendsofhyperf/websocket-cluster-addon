@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Controller;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Addon;
+use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\OnlineProviderInterface;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
@@ -43,12 +44,18 @@ class InfoController
      */
     protected $onlineProvider;
 
+    /**
+     * @var ClientProviderInterface
+     */
+    protected $clientProvider;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->request = $container->get(RequestInterface::class);
         $this->addon = $container->get(Addon::class);
         $this->onlineProvider = $container->get(OnlineProviderInterface::class);
+        $this->clientProvider = $container->get(ClientProviderInterface::class);
     }
 
     /**
@@ -61,6 +68,7 @@ class InfoController
 
             return [
                 'online' => $this->onlineProvider->get($uid),
+                'clients' => $this->clientProvider->size($uid),
             ];
         }
 
