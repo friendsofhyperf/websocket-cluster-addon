@@ -49,11 +49,14 @@ class SetWorkerIdListener implements ListenerInterface
         ];
     }
 
+    /**
+     * @param AfterWorkerStart $event
+     */
     public function process(object $event)
     {
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
         $addon->setWorkerId($event->workerId);
-        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] workerId#%s initialized by %s', $addon->getServerId(), $event->workerId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s initialized by %s', $addon->getServerId(), $event->workerId, __CLASS__));
     }
 }

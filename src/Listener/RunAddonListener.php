@@ -49,11 +49,14 @@ class RunAddonListener implements ListenerInterface
         ];
     }
 
+    /**
+     * @param MainWorkerStart $event
+     */
     public function process(object $event)
     {
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
         $addon->start();
-        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] started by %s', $addon->getServerId(), __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s started by %s', $addon->getServerId(), $event->workerId, __CLASS__));
     }
 }

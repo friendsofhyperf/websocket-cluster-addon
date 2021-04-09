@@ -180,14 +180,14 @@ class Addon
 
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] keepalive stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
                 $this->redis->zAdd($this->getServerListKey(), time(), $this->serverId);
 
                 if (time() % 5 == 0) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon.%s] keepalive by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
                 }
 
                 sleep(1);
@@ -202,7 +202,7 @@ class Addon
 
             while (true) {
                 if (! $this->isRunning) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clearUpExpired stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
 
@@ -242,7 +242,7 @@ class Addon
 
         $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up expired servers by %s', $this->serverId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
     }
 
     protected function publish(string $channel, string $payload): void

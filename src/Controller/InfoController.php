@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Controller;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Addon;
+use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\OnlineProviderInterface;
 use Hyperf\Contract\ConfigInterface;
@@ -60,6 +61,12 @@ class InfoController
      * @var ClientProviderInterface
      */
     protected $client;
+
+    /**
+     * @Inject
+     * @var ConnectionInterface
+     */
+    protected $connectionProvider;
 
     public function __construct(ContainerInterface $container)
     {
@@ -110,5 +117,17 @@ class InfoController
         }
 
         return parallel($callbacks);
+    }
+
+    /**
+     * @GetMapping(path="node")
+     */
+    public function node()
+    {
+        return [
+            'name' => gethostname(),
+            'users' => $this->connectionProvider->users(),
+            'clients' => $this->connectionProvider->clients(0),
+        ];
     }
 }

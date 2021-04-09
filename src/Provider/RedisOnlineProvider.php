@@ -125,7 +125,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
         $this->redis->zRem($this->getExpireKey(), ...$uids);
         $this->redis->exec();
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up expired online by %s', $this->container->get(Addon::class)->getServerId(), __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired online by %s', $this->container->get(Addon::class)->getServerId(), __CLASS__));
     }
 
     protected function getKey(): string

@@ -61,14 +61,24 @@ class MemoryConnection implements ConnectionInterface
         }
     }
 
+    public function users(): int
+    {
+        return count($this->connections);
+    }
+
     public function size($uid): int
     {
         return $this->getConnector($uid)->size();
     }
 
-    public function all($uid = 0): array
+    public function clients($uid): array
     {
-        return $this->getConnector($uid)->all();
+        return $this->getConnector($uid)->clients();
+    }
+
+    public function all($uid): array
+    {
+        return $this->clients($uid);
     }
 
     public function getConnector($uid): MemoryConnector

@@ -63,6 +63,7 @@ class OnPipeMessageListener implements ListenerInterface
     /**
      * Handle the Event when the event is triggered, all listeners will
      * complete before the event is returned to the EventDispatcher.
+     * @param OnPipeMessage|UserProcessPipMessage $event
      */
     public function process(object $event)
     {
@@ -82,7 +83,7 @@ class OnPipeMessageListener implements ListenerInterface
                 $this->connection->del($fd, $uid);
             }
 
-            $this->logger->debug(sprintf('[WebsocketClusterAddon.%s][%s] is %s by %s listener.', $this->addon->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', __CLASS__));
+            $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.', $this->addon->getServerId(), $this->addon->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', __CLASS__));
         }
     }
 }

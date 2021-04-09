@@ -27,10 +27,15 @@ class MemoryConnector
 
     public function size(): int
     {
-        return count($this->all());
+        return count($this->clients());
     }
 
     public function all(): array
+    {
+        return $this->clients();
+    }
+
+    public function clients(): array
     {
         return array_keys($this->container);
     }

@@ -30,8 +30,16 @@ interface ConnectionInterface
      */
     public function size($uid): int;
 
+    public function users(): int;
+
     /**
      * @param int|string $uid
+     */
+    public function clients($uid): array;
+
+    /**
+     * @param int|string $uid
+     * @deprecated
      */
     public function all($uid): array;
 

@@ -62,14 +62,24 @@ class RedisConnection implements ConnectionInterface
         $this->redis->sRem($this->getKey(0), $fd);
     }
 
+    public function users(): int
+    {
+        return count($this->redis->keys($this->getKey('*')));
+    }
+
     public function size($uid): int
     {
         return $this->redis->sCard($this->getKey($uid));
     }
 
-    public function all($uid): array
+    public function clients($uid): array
     {
         return $this->redis->sMembers($this->getKey($uid));
+    }
+
+    public function all($uid): array
+    {
+        return $this->clients($uid);
     }
 
     public function flush(?string $serverId = null): void
