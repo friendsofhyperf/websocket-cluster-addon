@@ -240,8 +240,10 @@ class Addon
             $this->clientProvider->flush($serverId);
         }
 
+        $this->redis->multi();
         $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
+        $this->redis->exec();
 
         $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
     }
