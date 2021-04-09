@@ -81,6 +81,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
 
     public function renew($uid): void
     {
+        $this->redis->sAdd($this->getKey(), $uid);
         $this->redis->zAdd($this->getExpireKey(), time(), $uid);
     }
 
