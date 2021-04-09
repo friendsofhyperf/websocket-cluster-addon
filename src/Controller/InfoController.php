@@ -127,7 +127,7 @@ class InfoController
         return [
             'name' => gethostname(),
             'users' => $this->connectionProvider->users(),
-            'clients' => $this->connectionProvider->clients(0),
+            'connections' => $this->connectionProvider->size(0),
         ];
     }
 }
