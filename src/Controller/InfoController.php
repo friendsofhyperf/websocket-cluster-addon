@@ -51,7 +51,7 @@ class InfoController
      */
     protected $clientProvider;
 
-    public function __construct(ContainerInterface $container, $redis)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->request = $container->get(RequestInterface::class);
