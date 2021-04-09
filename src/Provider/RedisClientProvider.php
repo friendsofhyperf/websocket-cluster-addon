@@ -94,7 +94,7 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function clearUpExpired(): void
     {
-        $deleted = $this->redis->zRemRangeByScore($this->getKey(), '-inf', (string) strtotime('-60 seconds'));
+        $deleted = $this->redis->zRemRangeByScore($this->getKey(), '-inf', (string) strtotime('-120 seconds'));
 
         if ($deleted) {
             $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired clients by %s', $this->container->get(Addon::class)->getServerId(), __CLASS__));

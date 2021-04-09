@@ -114,7 +114,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
 
     public function clearUpExpired(): void
     {
-        $uids = $this->redis->zRangeByScore($this->getExpireKey(), '-inf', (string) strtotime('-60 seconds'));
+        $uids = $this->redis->zRangeByScore($this->getExpireKey(), '-inf', (string) strtotime('-120 seconds'));
 
         if (! $uids) {
             return;
