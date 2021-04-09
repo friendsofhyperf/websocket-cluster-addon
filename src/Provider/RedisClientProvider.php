@@ -34,6 +34,11 @@ class RedisClientProvider implements ClientProviderInterface
      */
     protected $container;
 
+    /**
+     * @var string
+     */
+    protected $serverId;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -46,13 +51,27 @@ class RedisClientProvider implements ClientProviderInterface
     public function add(int $fd, $uid): void
     {
         $key = $this->getKey($uid);
+
+        $this->redis->multi();
         $this->redis->sAdd($key, $fd);
         $this->redis->expire($key, 172800);
+        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
+        $this->redis->exec();
     }
 
     public function del(int $fd, $uid): void
     {
-        $this->redis->sRem($this->getKey($uid), $fd);
+        $key = $this->getKey($uid);
+        $this->redis->sRem($key, $fd);
+
+        if ($this->redis->sCard($key) == 0) {
+            $this->redis->zRem($this->getExpireKey(), $uid);
+        }
+    }
+
+    public function renew($uid): void
+    {
+        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
     }
 
     public function size($uid): int
@@ -73,6 +92,18 @@ class RedisClientProvider implements ClientProviderInterface
         return array_sum(array_values($result));
     }
 
+    public function clearUpExpired(): void
+    {
+        $uids = $this->redis->zRangeByScore($this->getExpireKey(), '-inf', (string) strtotime('-60 seconds'));
+        $this->redis->multi();
+
+        foreach ($uids as $uid) {
+            $this->redis->del($this->getKey($uid));
+        }
+
+        $this->redis->exec();
+    }
+
     public function flush(string $serverId = null): void
     {
         $keys = $this->redis->keys($this->getKey('*', $serverId));
@@ -85,6 +116,15 @@ class RedisClientProvider implements ClientProviderInterface
         $this->redis->exec();
     }
 
+    protected function getServerId(): string
+    {
+        if (is_null($this->serverId)) {
+            $this->serverId = $this->container->get(Addon::class)->getServerId();
+        }
+
+        return $this->serverId;
+    }
+
     /**
      * @param int|string $uid
      */
@@ -92,8 +132,13 @@ class RedisClientProvider implements ClientProviderInterface
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->container->get(Addon::class)->getServerId(),
+            $serverId ?? $this->getServerId(),
             $uid,
         ]);
+    }
+
+    protected function getExpireKey(string $serverId = null): string
+    {
+        return join(':', [$this->prefix, $serverId ?? $this->getServerId(), 'expire']);
     }
 }

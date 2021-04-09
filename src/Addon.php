@@ -65,7 +65,7 @@ class Addon
     /**
      * @var ConnectionInterface
      */
-    protected $connection;
+    protected $connectionProvider;
 
     /**
      * @var Sender
@@ -88,10 +88,16 @@ class Addon
      */
     protected $onlineProvider;
 
+    /**
+     * @var ClientProviderInterface
+     */
+    protected $clientProvider;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->connection = $container->get(ConnectionInterface::class);
+        $this->connectionProvider = $container->get(ConnectionInterface::class);
+        $this->clientProvider = $container->get(ClientProviderInterface::class);
         $this->onlineProvider = $container->get(OnlineProviderInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sender = $container->get(Sender::class);
@@ -206,6 +212,9 @@ class Addon
                 // Clear up expired users
                 $this->onlineProvider->clearUpExpired();
 
+                // Clear up expired clients
+                $this->clientProvider->clearUpExpired();
+
                 sleep(5);
             }
         });
@@ -226,14 +235,9 @@ class Addon
             return;
         }
 
-        /** @var ConnectionInterface $connectionProvider */
-        $connectionProvider = $this->container->get(ConnectionInterface::class);
-        /** @var ClientProviderInterface $clientProvider */
-        $clientProvider = $this->container->get(ClientProviderInterface::class);
-
         foreach ($expiredServers as $serverId) {
-            $connectionProvider->flush($serverId);
-            $clientProvider->flush($serverId);
+            $this->connectionProvider->flush($serverId);
+            $this->clientProvider->flush($serverId);
         }
 
         $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
@@ -254,7 +258,7 @@ class Addon
             return;
         }
 
-        $fds = $this->connection->all($uid);
+        $fds = $this->connectionProvider->all($uid);
 
         foreach ($fds as $fd) {
             $this->sender->push($fd, $message);

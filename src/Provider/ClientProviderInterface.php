@@ -26,7 +26,14 @@ interface ClientProviderInterface
     /**
      * @param int|string $uid
      */
+    public function renew($uid): void;
+
+    /**
+     * @param int|string $uid
+     */
     public function size($uid): int;
+
+    public function clearUpExpired(): void;
 
     public function flush(string $serverId = null): void;
 }
