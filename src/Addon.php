@@ -135,6 +135,7 @@ class Addon
 
         $this->subscribe();
         $this->keepalive();
+        $this->monitoring();
         $this->clearUpExpired();
     }
 
@@ -220,6 +221,33 @@ class Addon
         });
     }
 
+    public function monitoring(): void
+    {
+        Coroutine::create(function () {
+            CoordinatorManager::until(Constants::WORKER_START)->yield();
+
+            while (true) {
+                if (! $this->isRunning) {
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s monitoring stopped by %s', $this->serverId, __CLASS__));
+                    break;
+                }
+
+                $data = [
+                    'users' => $this->connectionProvider->users(),
+                    'clients' => $this->connectionProvider->size(0),
+                ];
+
+                $this->redis->sAdd($this->getMonitorKey(), $this->serverId, json_encode($data));
+
+                if (time() % 5 == 0) {
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s monitoring by %s', $this->serverId, __CLASS__));
+                }
+
+                sleep(1);
+            }
+        });
+    }
+
     public function getServers(): array
     {
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
@@ -241,6 +269,7 @@ class Addon
         }
 
         $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
+        $this->redis->sRem($this->getMonitorKey(), ...$expiredServers);
 
         $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
     }
@@ -258,9 +287,9 @@ class Addon
             return;
         }
 
-        $fds = $this->connectionProvider->all($uid);
+        $clients = $this->connectionProvider->clients($uid);
 
-        foreach ($fds as $fd) {
+        foreach ($clients as $fd) {
             $this->sender->push($fd, $message);
         }
     }
@@ -275,5 +304,10 @@ class Addon
         return join(':', [
             $this->prefix,
         ]);
+    }
+
+    protected function getMonitorKey(): string
+    {
+        return join(':', [$this->prefix, 'monitoring']);
     }
 }
