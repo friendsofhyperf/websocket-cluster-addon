@@ -55,15 +55,14 @@ class InfoController
     /**
      * @var OnlineProviderInterface
      */
-    protected $online;
+    protected $onlineProvider;
 
     /**
      * @var ClientProviderInterface
      */
-    protected $client;
+    protected $clientProvider;
 
     /**
-     * @Inject
      * @var ConnectionInterface
      */
     protected $connectionProvider;
@@ -75,8 +74,9 @@ class InfoController
         $this->redis = $container->get(RedisFactory::class)->get($this->config->get('websocket_cluster.server.pool', 'default'));
         $this->request = $container->get(RequestInterface::class);
         $this->addon = $container->get(Addon::class);
-        $this->online = $container->get(OnlineProviderInterface::class);
-        $this->client = $container->get(ClientProviderInterface::class);
+        $this->onlineProvider = $container->get(OnlineProviderInterface::class);
+        $this->clientProvider = $container->get(ClientProviderInterface::class);
+        $this->connectionProvider = $container->get(ConnectionInterface::class);
     }
 
     /**
@@ -88,8 +88,8 @@ class InfoController
             $uid = (int) $uid;
 
             return [
-                'online' => $this->online->get($uid),
-                'clients' => $this->client->size($uid),
+                'online' => $this->onlineProvider->get($uid),
+                'clients' => $this->clientProvider->size($uid),
             ];
         }
 
