@@ -19,6 +19,7 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Redis\RedisFactory;
+use Hyperf\Utils\Parallel;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -79,9 +80,11 @@ class InfoController
         $pool = $config->get('websocket_cluster.client.pool', 'default');
         /** @var \Redis $redis */
         $redis = $this->container->get(RedisFactory::class)->get($pool);
+        $servers = $this->addon->getServers();
+        $callbacks = [];
 
-        return collect($this->addon->getServers())
-            ->transform(function ($serverId) use ($keyPrefix, $redis) {
+        foreach ($servers as $serverId) {
+            $callbacks[] = function () use ($serverId, $keyPrefix, $redis) {
                 $key = join(':', [$keyPrefix, $serverId]);
                 $clients = 0;
                 $users = collect($redis->zRange($key, 0, -1))
@@ -99,7 +102,9 @@ class InfoController
                     'users' => $users,
                     'clients' => $clients,
                 ];
-            })
-            ->toArray();
+            };
+        }
+
+        return parallel($callbacks);
     }
 }
