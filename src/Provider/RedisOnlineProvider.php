@@ -11,8 +11,10 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Event\StatusChanged;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -39,10 +41,16 @@ class RedisOnlineProvider implements OnlineProviderInterface
      */
     protected $container;
 
+    /**
+     * @var StdoutLoggerInterface
+     */
+    protected $logger;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->clientProvider = $container->get(ClientProviderInterface::class);
+        $this->logger = $container->get(StdoutLoggerInterface::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
         $this->prefix = $config->get('websocket_cluster.online.prefix', 'wssa:online');
@@ -54,6 +62,8 @@ class RedisOnlineProvider implements OnlineProviderInterface
         if ($this->redis->sAdd($this->getKey(), $uid)) {
             $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
         }
+
+        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
     }
 
     public function del($uid): void
@@ -65,6 +75,13 @@ class RedisOnlineProvider implements OnlineProviderInterface
         if ($this->redis->sRem($this->getKey(), $uid)) {
             $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 0));
         }
+
+        $this->redis->zRem($this->getExpireKey(), $uid);
+    }
+
+    public function renew($uid): void
+    {
+        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
     }
 
     public function get($uid): bool
@@ -95,13 +112,34 @@ class RedisOnlineProvider implements OnlineProviderInterface
         return $result;
     }
 
-    protected function getTmpKey(): string
+    public function clearUpExpired(): void
     {
-        return join(':', [$this->prefix, uniqid()]);
+        $uids = $this->redis->zRangeByScore($this->getExpireKey(), '-inf', (string) strtotime('-60 seconds'));
+
+        if (! $uids) {
+            return;
+        }
+
+        $this->redis->multi();
+        $this->redis->sRem($this->getKey(), ...$uids);
+        $this->redis->zRem($this->getExpireKey(), ...$uids);
+        $this->redis->exec();
+
+        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up expired online by %s', $this->container->get(Addon::class)->getServerId(), __CLASS__));
     }
 
     protected function getKey(): string
     {
         return $this->prefix;
+    }
+
+    protected function getTmpKey(): string
+    {
+        return join(':', [$this->prefix, uniqid()]);
+    }
+
+    protected function getExpireKey(): string
+    {
+        return join(':', [$this->prefix, 'expire']);
     }
 }

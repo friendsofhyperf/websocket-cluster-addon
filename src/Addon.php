@@ -13,6 +13,7 @@ namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Provider\OnlineProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -82,10 +83,16 @@ class Addon
      */
     protected $retryInterval = 1000;
 
+    /**
+     * @var OnlineProviderInterface
+     */
+    protected $onlineProvider;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->connection = $container->get(ConnectionInterface::class);
+        $this->onlineProvider = $container->get(OnlineProviderInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sender = $container->get(Sender::class);
         /** @var ConfigInterface $config */
@@ -193,19 +200,11 @@ class Addon
                     break;
                 }
 
-                if ($expiredServers = $this->getExpiredServers()) {
-                    /** @var ConnectionInterface $connection */
-                    $connection = $this->container->get(ConnectionInterface::class);
-                    $client = $this->container->get(ClientProviderInterface::class);
+                // Clear up expired servers
+                $this->clearUpExpiredServers();
 
-                    foreach ($expiredServers as $serverId) {
-                        $connection->flush($serverId);
-                        $client->flush($serverId);
-                        $this->redis->zRem($this->getServerListKey(), $serverId);
-                    }
-
-                    $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up by %s', $this->serverId, __CLASS__));
-                }
+                // Clear up expired users
+                $this->onlineProvider->clearUpExpired();
 
                 sleep(5);
             }
@@ -217,11 +216,29 @@ class Addon
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
     }
 
-    protected function getExpiredServers(): array
+    protected function clearUpExpiredServers(): void
     {
         $start = '-inf';
         $end = (string) strtotime('-10 seconds');
-        return $this->redis->zRangeByScore($this->getServerListKey(), $start, $end);
+        $expiredServers = $this->redis->zRangeByScore($this->getServerListKey(), $start, $end);
+
+        if (! $expiredServers) {
+            return;
+        }
+
+        /** @var ConnectionInterface $connectionProvider */
+        $connectionProvider = $this->container->get(ConnectionInterface::class);
+        /** @var ClientProviderInterface $clientProvider */
+        $clientProvider = $this->container->get(ClientProviderInterface::class);
+
+        foreach ($expiredServers as $serverId) {
+            $connectionProvider->flush($serverId);
+            $clientProvider->flush($serverId);
+        }
+
+        $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
+
+        $this->logger->info(sprintf('[WebsocketClusterAddon.%s] clear up expired servers by %s', $this->serverId, __CLASS__));
     }
 
     protected function publish(string $channel, string $payload): void

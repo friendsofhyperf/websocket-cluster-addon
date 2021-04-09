@@ -24,6 +24,11 @@ interface OnlineProviderInterface
     public function del($uid): void;
 
     /**
+     * @param array|int $uid
+     */
+    public function renew($uid): void;
+
+    /**
      * @param int|string $uid
      */
     public function get($uid): bool;
@@ -32,4 +37,6 @@ interface OnlineProviderInterface
      * @param int[]|string[] $uid
      */
     public function multiGet(array $uids): array;
+
+    public function clearUpExpired(): void;
 }
