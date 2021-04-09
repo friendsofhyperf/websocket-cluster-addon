@@ -237,7 +237,7 @@ class Addon
                     'clients' => $this->connectionProvider->size(0),
                 ];
 
-                $this->redis->sAdd($this->getMonitorKey(), $this->serverId, json_encode($data));
+                $this->redis->hSet($this->getMonitorKey(), $this->serverId, json_encode($data));
 
                 if (time() % 5 == 0) {
                     $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s monitoring by %s', $this->serverId, __CLASS__));
@@ -269,7 +269,7 @@ class Addon
         }
 
         $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
-        $this->redis->sRem($this->getMonitorKey(), ...$expiredServers);
+        $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
 
         $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
     }
