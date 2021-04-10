@@ -13,7 +13,6 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Parallel;
 use Psr\Container\ContainerInterface;
@@ -35,16 +34,6 @@ class RedisClientProvider implements ClientProviderInterface
      */
     protected $container;
 
-    /**
-     * @var string
-     */
-    protected $serverId;
-
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -52,22 +41,22 @@ class RedisClientProvider implements ClientProviderInterface
         $config = $container->get(ConfigInterface::class);
         $this->prefix = $config->get('websocket_cluster.client.prefix', 'wssa:clients');
         $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.client.pool', 'default'));
-        $this->logger = $config->get(StdoutLoggerInterface::class);
     }
 
     public function add(int $fd, $uid): void
     {
-        $this->redis->zAdd($this->getKey(), time(), $this->getSid($uid, $fd));
+        $key = $this->getKey($uid);
+        $this->redis->sAdd($key, $fd);
+        $this->redis->expire($key, 172800);
     }
 
     public function del(int $fd, $uid): void
     {
-        $this->redis->zRem($this->getKey(), $this->getSid($uid, $fd));
+        $this->redis->sRem($this->getKey($uid), $fd);
     }
 
     public function renew(int $fd, $uid): void
     {
-        $this->redis->zAdd($this->getKey(), time(), $this->getSid($uid, $fd));
     }
 
     public function size($uid): int
@@ -79,11 +68,7 @@ class RedisClientProvider implements ClientProviderInterface
 
         foreach ($servers as $serverId) {
             $parallel->add(function () use ($serverId, $uid) {
-                return collect($this->redis->zRange($this->getKey($serverId), 0, -1))
-                    ->reject(function ($sid) use ($uid) {
-                        return $this->getUid($sid) != $uid;
-                    })
-                    ->count();
+                return $this->redis->sCard($this->getKey($uid, $serverId));
             });
         }
 
@@ -94,53 +79,29 @@ class RedisClientProvider implements ClientProviderInterface
 
     public function clearUpExpired(): void
     {
-        $deleted = $this->redis->zRemRangeByScore($this->getKey(), '-inf', (string) strtotime('-120 seconds'));
-
-        if ($deleted) {
-            $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired clients by %s', $this->container->get(Addon::class)->getServerId(), __CLASS__));
-        }
     }
 
     public function flush(string $serverId = null): void
     {
-        $this->redis->del($this->getKey($serverId));
-    }
+        $keys = $this->redis->keys($this->getKey('*', $serverId));
+        $this->redis->multi();
 
-    protected function getServerId(): string
-    {
-        if (is_null($this->serverId)) {
-            $this->serverId = $this->container->get(Addon::class)->getServerId();
+        foreach ($keys as $key) {
+            $this->redis->del($key);
         }
 
-        return $this->serverId;
+        $this->redis->exec();
     }
 
     /**
      * @param int|string $uid
      */
-    protected function getKey(string $serverId = null): string
+    protected function getKey($uid, string $serverId = null): string
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->getServerId(),
+            $serverId ?? $this->container->get(Addon::class)->getServerId(),
+            $uid,
         ]);
-    }
-
-    protected function getSid($uid, int $fd): string
-    {
-        return join('#', [$uid, $fd]);
-    }
-
-    /**
-     * @return int|string
-     */
-    protected function getUid(string $sid)
-    {
-        return explode('#', $sid)[0] ?? '';
-    }
-
-    protected function getFd(string $sid): int
-    {
-        return explode('#', $sid)[1] ?? 0;
     }
 }

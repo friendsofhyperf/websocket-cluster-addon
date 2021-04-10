@@ -63,7 +63,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
             $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
         }
 
-        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
+        // $this->redis->zAdd($this->getExpireKey(), time(), $uid);
     }
 
     public function del($uid): void
@@ -76,14 +76,14 @@ class RedisOnlineProvider implements OnlineProviderInterface
             $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 0));
         }
 
-        $this->redis->zRem($this->getExpireKey(), $uid);
+        // $this->redis->zRem($this->getExpireKey(), $uid);
     }
 
     public function renew($uid): void
     {
         $this->redis->multi();
         $this->redis->sAdd($this->getKey(), $uid);
-        $this->redis->zAdd($this->getExpireKey(), time(), $uid);
+        // $this->redis->zAdd($this->getExpireKey(), time(), $uid);
         $this->redis->exec();
     }
 
@@ -117,6 +117,7 @@ class RedisOnlineProvider implements OnlineProviderInterface
 
     public function clearUpExpired(): void
     {
+        return;
         $uids = $this->redis->zRangeByScore($this->getExpireKey(), '-inf', (string) strtotime('-120 seconds'));
 
         if (! $uids) {
