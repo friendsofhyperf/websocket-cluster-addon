@@ -39,4 +39,15 @@ interface ClientInterface
      * @param (int|string)[] $uids
      */
     public function multiGetOnlineStatus(array $uids): array;
+
+    /**
+     * @param int|string $uid
+     */
+    public function clientsOfUser($uid): array;
+
+    public function clientsOfNode(?string $serverId = null): array;
+
+    public function usersOfNode(?string $serverId = null): array;
+
+    public function cleanupClientsOfNode(?string $serverId = null): void;
 }

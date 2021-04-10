@@ -52,49 +52,47 @@ class RedisClient implements ClientInterface
 
     public function add(int $fd, $uid): void
     {
-        if ($this->redis->sAdd($this->getOnlineKey(), $uid)) {
+        if ($this->redis->sAdd($this->getUserOnlineKey(), $uid)) {
             $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
         }
 
         $this->redis->multi();
-        $this->redis->sAdd($this->getClientKey($uid), $this->getSid($uid, $fd));
-        $this->redis->zAdd($this->getActiveKey(), time(), $uid);
-        $this->redis->sAdd($this->getServerUserKey(), $uid);
+        $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
+        $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
         $this->redis->sAdd($this->getServerClientKey(), $this->getSid($uid, $fd));
         $this->redis->exec();
     }
 
     public function renew(int $fd, $uid): void
     {
-        $this->redis->zAdd($this->getActiveKey(), time(), $uid);
+        $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
     }
 
     public function del(int $fd, $uid): void
     {
-        $this->redis->sRem($this->getClientKey($uid), $this->getSid($uid, $fd));
+        $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
+        $this->redis->sRem($this->getServerClientKey(), $this->getSid($uid, $fd));
 
-        if ($this->redis->sCard($this->getClientKey($uid)) == 0) {
-            $this->redis->sRem($this->getOnlineKey(), $uid);
-            $this->redis->zRem($this->getActiveKey(), $uid);
+        if ($this->redis->sCard($this->getUserClientKey($uid)) == 0) {
+            $this->redis->sRem($this->getUserOnlineKey(), $uid);
+            $this->redis->zRem($this->getUserActiveKey(), $uid);
 
             $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
         }
-
-        // todo
-        $this->redis->sRem($this->getServerClientKey(), $this->getSid($uid, $fd));
-        $this->redis->sRem($this->getServerUserKey(), $uid);
     }
 
     public function cleanup(): void
     {
-        $uids = $this->redis->zRangeByScore($this->getActiveKey(), '-inf', (string) strtotime('-60 seconds'));
+        $uids = $this->redis->zRangeByScore($this->getUserActiveKey(), '-inf', (string) strtotime('-60 seconds'));
 
         $this->redis->multi();
 
         foreach ($uids as $uid) {
-            $this->redis->del($this->getClientKey($uid));
-            $this->redis->sRem($this->getOnlineKey(), $uid);
-            $this->redis->zRem($this->getActiveKey(), $uid);
+            $sids = $this->redis->sMembers($this->getUserClientKey($uid));
+            // todo remove sids from all nodes
+            $this->redis->del($this->getUserClientKey($uid));
+            $this->redis->sRem($this->getUserOnlineKey(), $uid);
+            $this->redis->zRem($this->getUserActiveKey(), $uid);
         }
 
         $this->redis->exec();
@@ -102,7 +100,7 @@ class RedisClient implements ClientInterface
 
     public function getOnlineStatus($uid): bool
     {
-        return $this->redis->sIsMember($this->getOnlineKey(), $uid);
+        return $this->redis->sIsMember($this->getUserOnlineKey(), $uid);
     }
 
     public function multiGetOnlineStatus(array $uids): array
@@ -116,7 +114,7 @@ class RedisClient implements ClientInterface
             $this->redis->sAdd($tmpKey, ...$uids);
 
             // intersection
-            $onlines = $this->redis->sInter($tmpKey, $this->getOnlineKey());
+            $onlines = $this->redis->sInter($tmpKey, $this->getUserOnlineKey());
             $onlines = array_fill_keys($onlines, true);
 
             // array merge
@@ -128,14 +126,38 @@ class RedisClient implements ClientInterface
         return $result;
     }
 
-    public function getServerClientKey(?string $serverId = null)
+    public function clientsOfUser($uid): array
     {
-        return join(':', [$this->getOnlineKey(), $serverId ?? $this->getServerId(), 'clients']);
+        return $this->redis->sMembers($this->getUserClientKey($uid));
     }
 
-    public function getServerUserKey(?string $serverId = null)
+    public function usersOfNode(?string $serverId = null): array
     {
-        return join(':', [$this->getOnlineKey(), $serverId ?? $this->getServerId(), 'users']);
+        $users = [];
+
+        foreach ($this->clientsOfNode($serverId) as $sid) {
+            $users[$this->getUid($sid)] = true;
+        }
+
+        return array_keys($users);
+    }
+
+    public function clientsOfNode(?string $serverId = null): array
+    {
+        return $this->redis->sMembers($this->getServerClientKey($serverId));
+    }
+
+    public function cleanupClientsOfNode(?string $serverId = null): void
+    {
+        $this->redis->del($this->getServerClientKey($serverId));
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getUid(string $sid)
+    {
+        return explode('#', $sid)[0] ?? null;
     }
 
     protected function getSid($uid, int $fd)
@@ -148,23 +170,28 @@ class RedisClient implements ClientInterface
         return $this->container->get(Addon::class)->getServerId();
     }
 
-    protected function getOnlineKey(): string
+    protected function getUserOnlineKey(): string
     {
         return join(':', [$this->prefix, 'online_users']);
     }
 
-    protected function getActiveKey(): string
+    protected function getUserActiveKey(): string
     {
-        return join(':', [$this->getOnlineKey(), 'active']);
+        return join(':', [$this->getUserOnlineKey(), 'active']);
     }
 
-    protected function getClientKey($uid): string
+    protected function getUserClientKey($uid): string
     {
-        return join(':', [$this->getOnlineKey(), $uid]);
+        return join(':', [$this->getUserOnlineKey(), $uid]);
     }
 
     protected function getOnlineTmpKey(): string
     {
-        return join(':', [$this->getOnlineKey(), uniqid()]);
+        return join(':', [$this->getUserOnlineKey(), uniqid()]);
+    }
+
+    protected function getServerClientKey(?string $serverId = null)
+    {
+        return join(':', [$this->getUserOnlineKey(), $serverId ?? $this->getServerId()]);
     }
 }
