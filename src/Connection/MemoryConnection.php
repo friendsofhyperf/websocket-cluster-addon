@@ -64,8 +64,8 @@ class MemoryConnection implements ConnectionInterface
     public function users(): int
     {
         return collect($this->connections)
-            ->reject(function ($connector) {
-                return $connector->size() <= 0;
+            ->reject(function ($connector, $uid) {
+                return $uid == 0 || $connector->size() <= 0;
             })
             ->count();
     }
