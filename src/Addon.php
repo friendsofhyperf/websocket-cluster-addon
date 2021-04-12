@@ -184,7 +184,7 @@ class Addon
                 }
 
                 // Keep server alive
-                $this->redis->zAdd($this->getServerListKey(), time(), $this->serverId);
+                $this->redis->zAdd($this->getServerNodeKey(), time(), $this->serverId);
 
                 // Sync server info
                 $data = json_encode([
@@ -229,7 +229,7 @@ class Addon
 
     public function getServers(): array
     {
-        return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
+        return $this->redis->zRangeByScore($this->getServerNodeKey(), '-inf', '+inf');
     }
 
     public function getMonitors(): array
@@ -246,14 +246,14 @@ class Addon
     {
         $start = '-inf';
         $end = (string) strtotime('-10 seconds');
-        $expiredServers = $this->redis->zRangeByScore($this->getServerListKey(), $start, $end);
+        $expiredServers = $this->redis->zRangeByScore($this->getServerNodeKey(), $start, $end);
 
         if (! $expiredServers) {
             return;
         }
 
         $this->redis->multi();
-        $this->redis->zRem($this->getServerListKey(), ...$expiredServers);
+        $this->redis->zRem($this->getServerNodeKey(), ...$expiredServers);
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
         $this->redis->exec();
 
@@ -285,7 +285,7 @@ class Addon
         return $this->channel;
     }
 
-    protected function getServerListKey(): string
+    protected function getServerNodeKey(): string
     {
         return join(':', [
             $this->prefix,
