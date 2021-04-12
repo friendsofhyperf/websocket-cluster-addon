@@ -9,34 +9,39 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\Provider;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
-interface OnlineProviderInterface
+interface ClientInterface
 {
     /**
      * @param int|string $uid
      */
-    public function add($uid): void;
+    public function add(int $fd, $uid): void;
 
     /**
      * @param int|string $uid
      */
-    public function del($uid): void;
-
-    /**
-     * @param array|int $uid
-     */
-    public function renew($uid): void;
+    public function renew(int $fd, $uid): void;
 
     /**
      * @param int|string $uid
      */
-    public function get($uid): bool;
-
-    /**
-     * @param int[]|string[] $uid
-     */
-    public function multiGet(array $uids): array;
+    public function del(int $fd, $uid): void;
 
     public function clearUpExpired(): void;
+
+    /**
+     * @param int|string $uid
+     */
+    public function getOnlineStatus($uid): bool;
+
+    /**
+     * @param (int|string)[] $uids
+     */
+    public function multiGetOnlineStatus(array $uids): array;
+
+    /**
+     * @param int|string $uid
+     */
+    public function clientsOfUser($uid): array;
 }

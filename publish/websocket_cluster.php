@@ -11,25 +11,20 @@ declare(strict_types=1);
  */
 return [
     'connections' => [
-        'prefix' => 'wssa:connections',
+        'prefix' => 'wsca:connections',
         'pool' => 'default',
     ],
     'client' => [
-        'prefix' => 'wssa:clients',
+        'prefix' => 'wsca:clients',
         'pool' => 'default',
         'auto_clear_up' => false,
     ],
-    'online' => [
-        'prefix' => 'wssa:online',
-        'pool' => 'default',
-        'auto_clear_up' => false,
-    ],
-    'server' => [
-        'prefix' => 'wssa:servers',
+    'node' => [
+        'prefix' => 'wsca:nodes',
         'pool' => 'default',
     ],
     'subscriber' => [
-        'channel' => 'wssa:channel',
+        'channel' => 'wsca:channel',
         'pool' => 'default',
         'retry_interval' => 1000,
     ],
