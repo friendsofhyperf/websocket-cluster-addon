@@ -61,7 +61,7 @@ class InfoController
 
             return [
                 'online' => $this->client->getOnlineStatus($uid),
-                'clients' => count($this->client->clientsOfUser($uid)),
+                'clients' => $this->client->size($uid),
             ];
         }
 

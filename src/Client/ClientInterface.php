@@ -28,6 +28,16 @@ interface ClientInterface
      */
     public function del(int $fd, $uid): void;
 
+    /**
+     * @param int|string $uid
+     */
+    public function clients($uid): array;
+
+    /**
+     * @param int|string $uid
+     */
+    public function size($uid): int;
+
     public function clearUpExpired(): void;
 
     /**
@@ -39,9 +49,4 @@ interface ClientInterface
      * @param (int|string)[] $uids
      */
     public function multiGetOnlineStatus(array $uids): array;
-
-    /**
-     * @param int|string $uid
-     */
-    public function clientsOfUser($uid): array;
 }

@@ -69,19 +69,14 @@ class RedisConnection implements ConnectionInterface
         return $num > 0 ? ($num - 1) : $num;
     }
 
-    public function size($uid): int
-    {
-        return $this->redis->sCard($this->getKey($uid));
-    }
-
     public function clients($uid): array
     {
         return $this->redis->sMembers($this->getKey($uid));
     }
 
-    public function all($uid): array
+    public function size($uid): int
     {
-        return $this->clients($uid);
+        return $this->redis->sCard($this->getKey($uid));
     }
 
     public function flush(?string $serverId = null): void

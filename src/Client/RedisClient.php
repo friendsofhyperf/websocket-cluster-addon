@@ -66,7 +66,7 @@ class RedisClient implements ClientInterface
     {
         $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
 
-        if ($this->redis->sCard($this->getUserClientKey($uid)) == 0) {
+        if ($this->size($uid) == 0) {
             $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
 
@@ -117,9 +117,14 @@ class RedisClient implements ClientInterface
         return $result;
     }
 
-    public function clientsOfUser($uid): array
+    public function clients($uid): array
     {
         return $this->redis->sMembers($this->getUserClientKey($uid));
+    }
+
+    public function size($uid): int
+    {
+        return $this->redis->sCard($this->getUserClientKey($uid));
     }
 
     /**

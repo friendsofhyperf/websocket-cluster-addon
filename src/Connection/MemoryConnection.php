@@ -70,19 +70,14 @@ class MemoryConnection implements ConnectionInterface
             ->count();
     }
 
-    public function size($uid): int
-    {
-        return $this->getConnector($uid)->size();
-    }
-
     public function clients($uid): array
     {
         return $this->getConnector($uid)->clients();
     }
 
-    public function all($uid): array
+    public function size($uid): int
     {
-        return $this->clients($uid);
+        return $this->getConnector($uid)->size();
     }
 
     public function flush(?string $serverId = null): void

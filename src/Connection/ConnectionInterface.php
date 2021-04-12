@@ -25,11 +25,6 @@ interface ConnectionInterface
      */
     public function del(int $fd, $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function size($uid): int;
-
     public function users(): int;
 
     /**
@@ -39,9 +34,8 @@ interface ConnectionInterface
 
     /**
      * @param int|string $uid
-     * @deprecated
      */
-    public function all($uid): array;
+    public function size($uid): int;
 
     public function flush(?string $serverId = null): void;
 }
