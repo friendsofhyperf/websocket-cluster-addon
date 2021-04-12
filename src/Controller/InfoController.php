@@ -64,5 +64,7 @@ class InfoController
                 'clients' => count($this->client->clientsOfUser($uid)),
             ];
         }
+
+        return $this->addon->getMonitors();
     }
 }

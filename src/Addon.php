@@ -232,6 +232,15 @@ class Addon
         return $this->redis->zRangeByScore($this->getServerListKey(), '-inf', '+inf');
     }
 
+    public function getMonitors(): array
+    {
+        return collect($this->redis->hGetAll($this->getMonitorKey()))
+            ->transform(function ($item) {
+                return json_decode($item, true);
+            })
+            ->toArray();
+    }
+
     protected function clearUpExpiredServers(): void
     {
         $start = '-inf';
