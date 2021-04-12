@@ -190,7 +190,7 @@ class Addon
                 $data = json_encode([
                     'node' => $this->getServerId(),
                     'users' => $this->connectionProvider->users(),
-                    'connections' => count($this->connectionProvider->clients(0)),
+                    'connections' => $this->connectionProvider->size(0),
                 ], JSON_UNESCAPED_UNICODE);
                 $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
