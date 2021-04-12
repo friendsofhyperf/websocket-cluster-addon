@@ -11,9 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Provider\ClientProviderInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Provider\OnlineProviderInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -84,14 +83,9 @@ class Addon
     protected $retryInterval = 1000;
 
     /**
-     * @var OnlineProviderInterface
+     * @var ClientInterface
      */
-    protected $onlineProvider;
-
-    /**
-     * @var ClientProviderInterface
-     */
-    protected $clientProvider;
+    protected $client;
 
     /**
      * @var ConfigInterface
@@ -102,17 +96,16 @@ class Addon
     {
         $this->container = $container;
         $this->connectionProvider = $container->get(ConnectionInterface::class);
-        $this->clientProvider = $container->get(ClientProviderInterface::class);
-        $this->onlineProvider = $container->get(OnlineProviderInterface::class);
+        $this->client = $container->get(ClientInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sender = $container->get(Sender::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
         $this->config = $config;
-        $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wssa:channel');
-        $this->prefix = $config->get('websocket_cluster.server.prefix', 'wssa:servers');
+        $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wsca:channels');
+        $this->prefix = $config->get('websocket_cluster.node.prefix', 'wsca:nodes');
         $this->retryInterval = (int) $config->get('websocket_cluster.subscriber.retry_interval', 1000);
-        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.server.pool', 'default'));
+        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.node.pool', 'default'));
     }
 
     public function setServerId(string $serverId): void
@@ -190,7 +183,16 @@ class Addon
                     break;
                 }
 
+                // Keep server alive
                 $this->redis->zAdd($this->getServerListKey(), time(), $this->serverId);
+
+                // Sync server info
+                $data = json_encode([
+                    'node' => $this->getServerId(),
+                    'users' => $this->connectionProvider->users(),
+                    'connections' => $this->connectionProvider->clients(0),
+                ], JSON_UNESCAPED_UNICODE);
+                $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
                 if (time() % 5 == 0) {
                     $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
@@ -215,14 +217,9 @@ class Addon
                 // Clear up expired servers
                 $this->clearUpExpiredServers();
 
-                // Clear up expired users
-                if ($this->config->get('websocket_cluster.online.auto_clear_up', false)) {
-                    $this->onlineProvider->clearUpExpired();
-                }
-
                 // Clear up expired clients
                 if ($this->config->get('websocket_cluster.client.auto_clear_up', false)) {
-                    $this->clientProvider->clearUpExpired();
+                    $this->client->clearUpExpired();
                 }
 
                 sleep(5);
@@ -243,11 +240,6 @@ class Addon
 
         if (! $expiredServers) {
             return;
-        }
-
-        foreach ($expiredServers as $serverId) {
-            $this->connectionProvider->flush($serverId);
-            $this->clientProvider->flush($serverId);
         }
 
         $this->redis->multi();

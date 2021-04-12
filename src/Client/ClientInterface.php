@@ -28,7 +28,7 @@ interface ClientInterface
      */
     public function del(int $fd, $uid): void;
 
-    public function cleanup(): void;
+    public function clearUpExpired(): void;
 
     /**
      * @param int|string $uid
@@ -44,10 +44,4 @@ interface ClientInterface
      * @param int|string $uid
      */
     public function clientsOfUser($uid): array;
-
-    public function clientsOfNode(?string $serverId = null): array;
-
-    public function usersOfNode(?string $serverId = null): array;
-
-    public function cleanupClientsOfNode(?string $serverId = null): void;
 }

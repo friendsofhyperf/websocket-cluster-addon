@@ -45,7 +45,8 @@ class RedisClient implements ClientInterface
         $this->container = $container;
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
-        $pool = $config->get('websocket_cluster.client.pool', '');
+        $pool = $config->get('websocket_cluster.client.pool', 'default');
+        $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:clients');
         $this->redis = $container->get(RedisFactory::class)->get($pool);
         $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
     }
@@ -59,7 +60,6 @@ class RedisClient implements ClientInterface
         $this->redis->multi();
         $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
         $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
-        $this->redis->sAdd($this->getServerClientKey(), $this->getSid($uid, $fd));
         $this->redis->exec();
     }
 
@@ -71,7 +71,6 @@ class RedisClient implements ClientInterface
     public function del(int $fd, $uid): void
     {
         $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
-        $this->redis->sRem($this->getServerClientKey(), $this->getSid($uid, $fd));
 
         if ($this->redis->sCard($this->getUserClientKey($uid)) == 0) {
             $this->redis->sRem($this->getUserOnlineKey(), $uid);
@@ -81,15 +80,13 @@ class RedisClient implements ClientInterface
         }
     }
 
-    public function cleanup(): void
+    public function clearUpExpired(): void
     {
         $uids = $this->redis->zRangeByScore($this->getUserActiveKey(), '-inf', (string) strtotime('-60 seconds'));
 
         $this->redis->multi();
 
         foreach ($uids as $uid) {
-            $sids = $this->redis->sMembers($this->getUserClientKey($uid));
-            // todo remove sids from all nodes
             $this->redis->del($this->getUserClientKey($uid));
             $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
@@ -131,27 +128,6 @@ class RedisClient implements ClientInterface
         return $this->redis->sMembers($this->getUserClientKey($uid));
     }
 
-    public function usersOfNode(?string $serverId = null): array
-    {
-        $users = [];
-
-        foreach ($this->clientsOfNode($serverId) as $sid) {
-            $users[$this->getUid($sid)] = true;
-        }
-
-        return array_keys($users);
-    }
-
-    public function clientsOfNode(?string $serverId = null): array
-    {
-        return $this->redis->sMembers($this->getServerClientKey($serverId));
-    }
-
-    public function cleanupClientsOfNode(?string $serverId = null): void
-    {
-        $this->redis->del($this->getServerClientKey($serverId));
-    }
-
     /**
      * @return null|string
      */
@@ -188,10 +164,5 @@ class RedisClient implements ClientInterface
     protected function getOnlineTmpKey(): string
     {
         return join(':', [$this->getUserOnlineKey(), uniqid()]);
-    }
-
-    protected function getServerClientKey(?string $serverId = null)
-    {
-        return join(':', [$this->getUserOnlineKey(), $serverId ?? $this->getServerId()]);
     }
 }
