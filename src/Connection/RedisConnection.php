@@ -46,7 +46,7 @@ class RedisConnection implements ConnectionInterface
         $this->logger = $container->get(StdoutLoggerInterface::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
-        $this->prefix = $config->get('websocket_cluster.connection.prefix', 'wssa:connections');
+        $this->prefix = $config->get('websocket_cluster.connection.prefix', 'wsca:connections');
         $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.connection.pool', 'default'));
     }
 
