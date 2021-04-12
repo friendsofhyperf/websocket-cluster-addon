@@ -238,6 +238,7 @@ class Addon
             ->transform(function ($item) {
                 return json_decode($item, true);
             })
+            ->values()
             ->toArray();
     }
 

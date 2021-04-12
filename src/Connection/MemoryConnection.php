@@ -54,9 +54,6 @@ class MemoryConnection implements ConnectionInterface
     public function del(int $fd, $uid): void
     {
         $this->getConnector($uid)->del($fd);
-        if ($this->getConnector($uid)->size() == 0) {
-            $this->unsetConnector($uid);
-        }
         $this->getConnector(0)->del($fd);
 
         if (! Context::get(self::FROM_WORKER_ID)) {
@@ -66,9 +63,11 @@ class MemoryConnection implements ConnectionInterface
 
     public function users(): int
     {
-        $num = count($this->connections);
-
-        return $num > 0 ? ($num - 1) : $num;
+        return collect($this->connections)
+            ->reject(function ($connector) {
+                return $connector->size() <= 0;
+            })
+            ->count();
     }
 
     public function size($uid): int
@@ -97,13 +96,6 @@ class MemoryConnection implements ConnectionInterface
         }
 
         return $this->connections[$uid];
-    }
-
-    protected function unsetConnector($uid): void
-    {
-        if (isset($this->connections[$uid])) {
-            unset($this->connections[$uid]);
-        }
     }
 
     protected function getServer(): SwooleServer
