@@ -144,7 +144,9 @@ class Addon
 
     public function broadcast(string $payload): void
     {
-        Coroutine::create(function () use ($payload) {
+        [$uid, $message, $serverId] = unserialize($payload);
+
+        $serverId && Coroutine::create(function () use ($payload) {
             $this->doBroadcast($payload, true);
         });
 

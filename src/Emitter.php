@@ -34,8 +34,7 @@ class Emitter
         $data = $this->formatData($data);
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
-        // $serverId = $addon->getWorkerId() ? $addon->getServerId() : null;
-        $serverId = $addon->getServerId();
+        $serverId = $addon->getWorkerId() ? $addon->getServerId() : null;
         $addon->broadcast(serialize([$uid, $data, $serverId]));
     }
 
