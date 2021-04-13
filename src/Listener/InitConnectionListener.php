@@ -23,22 +23,12 @@ use Psr\Container\ContainerInterface;
 /**
  * @Listener
  */
-class SetServerIdListener implements ListenerInterface
+class InitConnectionListener implements ListenerInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
     /**
      * @var StdoutLoggerInterface
      */
     private $logger;
-
-    /**
-     * @var bool
-     */
-    private $enable;
 
     /**
      * @var TableConnection
@@ -52,13 +42,10 @@ class SetServerIdListener implements ListenerInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
-
-        $this->connection = $this->container->get(ConnectionInterface::class);
-        $this->enable = $this->connection instanceof TableConnection;
+        $this->connection = $container->get(ConnectionInterface::class);
         /** @var ConfigInterface $config */
-        $config = $this->container->get(ConfigInterface::class);
+        $config = $container->get(ConfigInterface::class);
         $this->size = (int) $config->get('websocket_cluster.connection.table.size', 10240);
     }
 
@@ -77,7 +64,7 @@ class SetServerIdListener implements ListenerInterface
      */
     public function process(object $event)
     {
-        if ($this->enable) {
+        if ($this->connection instanceof TableConnection) {
             $this->connection->initTable($this->size);
             $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', __CLASS__));
         }
