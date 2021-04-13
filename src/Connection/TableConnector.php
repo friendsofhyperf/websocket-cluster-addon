@@ -18,7 +18,10 @@ use Swoole\Table;
 
 class TableConnector implements ArrayAccess, Countable, Arrayable
 {
-    private array $data = [];
+    /**
+     * @var array
+     */
+    private $data = [];
 
     public function __construct(string $data)
     {
