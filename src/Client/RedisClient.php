@@ -124,6 +124,10 @@ class RedisClient implements ClientInterface
 
     public function size($uid): int
     {
+        if ($uid == 0) {
+            return $this->redis->sCard($this->getUserOnlineKey());
+        }
+
         return $this->redis->sCard($this->getUserClientKey($uid));
     }
 
