@@ -35,10 +35,31 @@ class SetServerIdListener implements ListenerInterface
      */
     private $logger;
 
+    /**
+     * @var bool
+     */
+    private $enable;
+
+    /**
+     * @var TableConnection
+     */
+    private $connection;
+
+    /**
+     * @var int
+     */
+    private $size;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
+
+        $this->connection = $this->container->get(ConnectionInterface::class);
+        $this->enable = $this->connection instanceof TableConnection;
+        /** @var ConfigInterface $config */
+        $config = $this->container->get(ConfigInterface::class);
+        $this->size = (int) $config->get('websocket_cluster.connection.table.size', 10240);
     }
 
     /**
@@ -56,13 +77,8 @@ class SetServerIdListener implements ListenerInterface
      */
     public function process(object $event)
     {
-        /** @var ConnectionInterface $connection */
-        $connection = $this->container->get(ConnectionInterface::class);
-
-        if ($connection instanceof TableConnection) {
-            /** @var ConfigInterface $config */
-            $config = $this->container->get(ConfigInterface::class);
-            $connection->initTable((int) $config->get('websocket_cluster.connection.table.size', 10240));
+        if ($this->enable) {
+            $this->connection->initTable($this->size);
             $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', __CLASS__));
         }
     }
