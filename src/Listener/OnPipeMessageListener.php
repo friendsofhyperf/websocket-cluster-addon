@@ -13,6 +13,7 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Connection\MemoryConnection;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
@@ -42,11 +43,17 @@ class OnPipeMessageListener implements ListenerInterface
      */
     private $addon;
 
+    /**
+     * @var bool
+     */
+    private $enable;
+
     public function __construct(ContainerInterface $container)
     {
         $this->connection = $container->get(ConnectionInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->addon = $container->get(Addon::class);
+        $this->enable = $this->connection instanceof MemoryConnection;
     }
 
     /**
@@ -67,6 +74,10 @@ class OnPipeMessageListener implements ListenerInterface
      */
     public function process(object $event)
     {
+        if (! $this->enable) {
+            return;
+        }
+
         if (property_exists($event, 'data') && $event->data instanceof PipeMessage) {
             /** @var PipeMessage $data */
             $data = $event->data;

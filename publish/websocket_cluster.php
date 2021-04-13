@@ -13,6 +13,9 @@ return [
     'connections' => [
         'prefix' => 'wsca:connections',
         'pool' => 'default',
+        'table' => [
+            'size' => 10240,
+        ],
     ],
     'client' => [
         'prefix' => 'wsca:clients',
