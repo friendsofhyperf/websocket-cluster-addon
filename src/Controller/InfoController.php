@@ -69,9 +69,9 @@ class InfoController
 
         return [
             'instances' => [
-                get_class($this->container->get(ConnectionInterface::class)),
-                get_class($this->container->get(ClientInterface::class)),
-                get_class($this->container->get(SubscriberInterface::class)),
+                ConnectionInterface::class => get_class($this->container->get(ConnectionInterface::class)),
+                ClientInterface::class => get_class($this->container->get(ClientInterface::class)),
+                SubscriberInterface::class => get_class($this->container->get(SubscriberInterface::class)),
             ],
             'online' => $this->client->size(0),
             'nodes' => $this->addon->getMonitors(),
