@@ -146,9 +146,11 @@ class Addon
     {
         [$uid, $message, $serverId] = unserialize($payload);
 
-        $serverId && Coroutine::create(function () use ($payload) {
-            $this->doBroadcast($payload, true);
-        });
+        if ($serverId) { // fix cannot send when executed by custom process
+            Coroutine::create(function () use ($payload) {
+                $this->doBroadcast($payload, true);
+            });
+        }
 
         $this->publish($this->getChannelKey(), $payload);
     }
