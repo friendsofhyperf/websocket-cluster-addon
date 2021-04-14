@@ -21,7 +21,7 @@ php bin/hyperf.php vendor:publish friendsofhyperf/websocket-cluster-addon
 
 ## Usage
 
-### Send message
+- Send message
 
 ~~~php
 use FriendsOfHyperf\WebsocketClusterAddon\Emitter;
@@ -29,7 +29,7 @@ $emitter = $container->get(Emitter::class);
 $emitter->emit($contactId, $message);
 ~~~
 
-### Broadcast message
+- Broadcast message
 
 ~~~php
 use FriendsOfHyperf\WebsocketClusterAddon\Emitter;
