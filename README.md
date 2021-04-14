@@ -11,6 +11,12 @@
 composer require friendsofhyperf/websocket-cluster-addon
 ~~~
 
+## Publish
+
+~~~bash
+php bin/hyperf.php vendor:publish friendsofhyperf/websocket-cluster-addon
+~~~
+
 ## Example
 
 - [Controller](examples/Controller/WebSocketController.php)
