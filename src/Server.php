@@ -169,6 +169,7 @@ class Server
 
             while (true) {
                 $this->logger->debug(__METHOD__);
+                $this->logger->debug($this->stopped ? 'stopped' : 'running');
 
                 if ($this->stopped) {
                     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, __CLASS__));
