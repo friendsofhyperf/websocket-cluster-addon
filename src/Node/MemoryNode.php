@@ -21,7 +21,7 @@ use Swoole\Server as SwooleServer;
 class MemoryNode implements NodeInterface
 {
     /**
-     * @var MemoryConnector[]
+     * @var MemoryAdapter[]
      */
     protected $connections = [];
 
@@ -77,17 +77,17 @@ class MemoryNode implements NodeInterface
 
     public function size($uid): int
     {
-        return $this->getConnector($uid)->size();
+        return $this->getConnector($uid)->count();
     }
 
     public function flush(?string $serverId = null): void
     {
     }
 
-    protected function getConnector($uid): MemoryConnector
+    protected function getConnector($uid): MemoryAdapter
     {
         if (! isset($this->connections[$uid])) {
-            $this->connections[$uid] = make(MemoryConnector::class);
+            $this->connections[$uid] = make(MemoryAdapter::class);
         }
 
         return $this->connections[$uid];

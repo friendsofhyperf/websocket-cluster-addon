@@ -11,7 +11,9 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
-class MemoryConnector
+use Countable;
+
+class MemoryAdapter implements Countable
 {
     protected $container = [];
 
@@ -25,14 +27,9 @@ class MemoryConnector
         unset($this->container[$fd]);
     }
 
-    public function size(): int
+    public function count(): int
     {
-        return count($this->clients());
-    }
-
-    public function all(): array
-    {
-        return $this->clients();
+        return count($this->container);
     }
 
     public function clients(): array

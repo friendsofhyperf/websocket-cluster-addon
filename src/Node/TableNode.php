@@ -43,7 +43,7 @@ class TableNode implements NodeInterface
      */
     public function add(int $fd, $uid): void
     {
-        $fds = TableConnector::make($this->userTable, (string) $uid)
+        $fds = TableAdapter::make($this->userTable, (string) $uid)
             ->add($fd)
             ->__toString();
         $this->userTable->set((string) $uid, ['fds' => $fds]);
@@ -55,7 +55,7 @@ class TableNode implements NodeInterface
      */
     public function del(int $fd, $uid): void
     {
-        $fds = TableConnector::make($this->userTable, (string) $uid)
+        $fds = TableAdapter::make($this->userTable, (string) $uid)
             ->del($fd)
             ->__toString();
 
@@ -72,7 +72,7 @@ class TableNode implements NodeInterface
             return $this->connTable->count();
         }
 
-        return TableConnector::make($this->userTable, (string) $uid)
+        return TableAdapter::make($this->userTable, (string) $uid)
             ->count();
     }
 
@@ -96,7 +96,7 @@ class TableNode implements NodeInterface
             return $fds;
         }
 
-        return TableConnector::make($this->userTable, (string) $uid)
+        return TableAdapter::make($this->userTable, (string) $uid)
             ->toArray();
     }
 

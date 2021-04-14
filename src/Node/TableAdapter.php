@@ -15,25 +15,25 @@ use Countable;
 use Hyperf\Utils\Contracts\Arrayable;
 use Swoole\Table;
 
-class TableConnector implements Countable, Arrayable
+class TableAdapter implements Countable, Arrayable
 {
     /**
      * @var array
      */
-    private $data = [];
+    private $container = [];
 
     public function __construct(string $data)
     {
         $data = unserialize($data);
 
         if (is_array($data)) {
-            $this->data = $data;
+            $this->container = $data;
         }
     }
 
     public function __toString(): string
     {
-        return serialize($this->data);
+        return serialize($this->container);
     }
 
     public static function make(Table $table, string $uid, string $field = 'fds'): self
@@ -45,31 +45,31 @@ class TableConnector implements Countable, Arrayable
 
     public function add(int $fd): self
     {
-        $this->data[] = $fd;
+        $this->container[] = $fd;
 
         return $this;
     }
 
     public function del(int $fd): self
     {
-        $array = array_fill_keys($this->data, 1);
+        $array = array_fill_keys($this->container, 1);
 
         if (isset($array[$fd])) {
             unset($array[$fd]);
         }
 
-        $this->data = array_keys($array);
+        $this->container = array_keys($array);
 
         return $this;
     }
 
-    public function toArray(): array
+    public function count(): int
     {
-        return $this->data;
+        return count($this->container);
     }
 
-    public function count()
+    public function toArray(): array
     {
-        return count($this->data);
+        return $this->container;
     }
 }
