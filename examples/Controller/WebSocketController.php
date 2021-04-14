@@ -53,7 +53,7 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
         Context::set('uid', $uid);
 
         $this->node->add($fd, $uid);
-        $this->node->add($fd, $uid);
+        $this->client->add($fd, $uid);
     }
 
     public function onMessage($server, Frame $frame): void
@@ -71,6 +71,6 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
         $uid = Context::get('uid');
 
         $this->node->add($fd, $uid);
-        $this->node->add($fd, $uid);
+        $this->client->add($fd, $uid);
     }
 }
