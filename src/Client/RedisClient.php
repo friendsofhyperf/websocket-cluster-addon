@@ -40,7 +40,7 @@ class RedisClient implements ClientInterface
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
         $pool = $config->get('websocket_cluster.client.pool', 'default');
-        $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:clients');
+        $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:client');
         $this->redis = $container->get(RedisFactory::class)->get($pool);
     }
 

@@ -10,21 +10,17 @@ declare(strict_types=1);
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
 return [
-    'connections' => [
-        'prefix' => 'wsca:connections',
-        'pool' => 'default',
-        'table' => [
-            'size' => 10240,
-        ],
-    ],
     'client' => [
-        'prefix' => 'wsca:clients',
+        'prefix' => 'wsca:client',
         'pool' => 'default',
         'auto_clear_up' => false,
     ],
     'node' => [
-        'prefix' => 'wsca:nodes',
+        'prefix' => 'wsca:node',
         'pool' => 'default',
+        'table' => [
+            'size' => 10240,
+        ],
     ],
     'subscriber' => [
         'channel' => 'wsca:channel',

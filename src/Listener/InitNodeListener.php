@@ -63,7 +63,7 @@ class InitNodeListener implements ListenerInterface
     public function process(object $event)
     {
         if ($this->node instanceof TableNode) {
-            $size = (int) $this->config->get('websocket_cluster.connection.table.size', 10240);
+            $size = (int) $this->config->get('websocket_cluster.node.table.size', 10240);
             $this->node->initTable($size);
             $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', __CLASS__));
         }

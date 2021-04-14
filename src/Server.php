@@ -186,7 +186,7 @@ class Server
                 }
 
                 // Keep server alive
-                $this->redis->zAdd($this->getServerNodeKey(), time(), $this->serverId);
+                $this->redis->zAdd($this->getNodeKey(), time(), $this->serverId);
 
                 // Sync server info
                 $data = json_encode([
@@ -217,7 +217,7 @@ class Server
                 }
 
                 // Clear up expired servers
-                $this->clearUpExpiredServers();
+                $this->clearUpExpiredNodes();
 
                 // Clear up expired clients
                 if ($this->config->get('websocket_cluster.client.auto_clear_up', false)) {
@@ -229,9 +229,9 @@ class Server
         });
     }
 
-    public function getServers(): array
+    public function getNodes(): array
     {
-        return $this->redis->zRangeByScore($this->getServerNodeKey(), '-inf', '+inf');
+        return $this->redis->zRangeByScore($this->getNodeKey(), '-inf', '+inf');
     }
 
     public function getMonitors(): array
@@ -244,18 +244,18 @@ class Server
             ->toArray();
     }
 
-    protected function clearUpExpiredServers(): void
+    protected function clearUpExpiredNodes(): void
     {
         $start = '-inf';
         $end = (string) strtotime('-10 seconds');
-        $expiredServers = $this->redis->zRangeByScore($this->getServerNodeKey(), $start, $end);
+        $expiredServers = $this->redis->zRangeByScore($this->getNodeKey(), $start, $end);
 
         if (! $expiredServers) {
             return;
         }
 
         $this->redis->multi();
-        $this->redis->zRem($this->getServerNodeKey(), ...$expiredServers);
+        $this->redis->zRem($this->getNodeKey(), ...$expiredServers);
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
         $this->redis->exec();
 
@@ -287,7 +287,7 @@ class Server
         return $this->channel;
     }
 
-    protected function getServerNodeKey(): string
+    protected function getNodeKey(): string
     {
         return join(':', [
             $this->prefix,
