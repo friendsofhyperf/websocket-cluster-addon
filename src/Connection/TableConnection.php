@@ -27,12 +27,12 @@ class TableConnection implements ConnectionInterface
 
     public function initTable(int $size = 10240): void
     {
-        $this->userTable = tap(new Table($size), function ($table) {
-            $table->column('fds', Table::TYPE_STRING, 1024000);
+        $this->userTable = tap(new Table($size), function (Table $table) {
+            $table->column('fds', Table::TYPE_STRING, 102400);
             $table->create();
         });
 
-        $this->connTable = tap(new Table($size * 20), function ($table) {
+        $this->connTable = tap(new Table($size * 20), function (Table $table) {
             $table->column('fd', Table::TYPE_INT);
             $table->create();
         });
@@ -96,10 +96,8 @@ class TableConnection implements ConnectionInterface
             return $fds;
         }
 
-        $array = TableConnector::make($this->userTable, (string) $uid)
+        return TableConnector::make($this->userTable, (string) $uid)
             ->toArray();
-
-        return array_keys($array);
     }
 
     public function flush(?string $serverId = null): void

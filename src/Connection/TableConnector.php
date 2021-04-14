@@ -11,12 +11,11 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
 
-use ArrayAccess;
 use Countable;
 use Hyperf\Utils\Contracts\Arrayable;
 use Swoole\Table;
 
-class TableConnector implements ArrayAccess, Countable, Arrayable
+class TableConnector implements Countable, Arrayable
 {
     /**
      * @var array
@@ -37,23 +36,29 @@ class TableConnector implements ArrayAccess, Countable, Arrayable
         return serialize($this->data);
     }
 
-    public static function make(Table $table, string $key, string $field = 'fds'): self
+    public static function make(Table $table, string $uid, string $field = 'fds'): self
     {
-        $json = (string) ($table->get($key, $field) ?: '');
+        $json = (string) ($table->get($uid, $field) ?: '');
 
         return new self($json);
     }
 
     public function add(int $fd): self
     {
-        $this->data[$fd] = 1;
+        $this->data[] = $fd;
 
         return $this;
     }
 
     public function del(int $fd): self
     {
-        unset($this->data[$fd]);
+        $array = array_fill_keys($this->data, 1);
+
+        if (isset($array[$fd])) {
+            unset($array[$fd]);
+        }
+
+        $this->data = array_keys($array);
 
         return $this;
     }
@@ -61,28 +66,6 @@ class TableConnector implements ArrayAccess, Countable, Arrayable
     public function toArray(): array
     {
         return $this->data;
-    }
-
-    public function offsetExists($offset)
-    {
-        return isset($this->data);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->data[$offset] ?? null;
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        $this->data[$offset] = $value;
-    }
-
-    public function offsetUnset($offset)
-    {
-        if (isset($this->data[$offset])) {
-            unset($this->data[$offset]);
-        }
     }
 
     public function count()
