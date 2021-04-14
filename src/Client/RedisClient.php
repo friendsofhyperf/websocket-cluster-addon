@@ -77,6 +77,10 @@ class RedisClient implements ClientInterface
     {
         $uids = $this->redis->zRangeByScore($this->getUserActiveKey(), '-inf', (string) strtotime('-60 seconds'));
 
+        if (! $uids) {
+            return;
+        }
+
         $this->redis->multi();
 
         foreach ($uids as $uid) {

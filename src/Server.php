@@ -185,7 +185,7 @@ class Server
                 $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
                 if (time() % 5 == 0) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
                 }
 
                 sleep(1);
