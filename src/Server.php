@@ -13,7 +13,6 @@ namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Node\RedisNode;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -246,10 +245,8 @@ class Server
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
         $this->redis->exec();
 
-        if ($this->node instanceof RedisNode) {
-            foreach ($expiredServers as $serverId) {
-                $this->node->flush($serverId);
-            }
+        foreach ($expiredServers as $serverId) {
+            $this->node->flush($serverId);
         }
 
         $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
