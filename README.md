@@ -37,7 +37,7 @@ $emitter = $container->get(Emitter::class);
 $emitter->broadcast($message);
 ~~~
 
-## Example
+## Examples
 
 - [Controller](examples/Controller/WebSocketController.php)
 - [Listener](examples/Listener/StatusChangedListener.php)
