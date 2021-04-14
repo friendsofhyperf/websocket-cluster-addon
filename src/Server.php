@@ -83,16 +83,10 @@ class Server
      */
     protected $client;
 
-    /**
-     * @var ConfigInterface
-     */
-    protected $config;
-
     public function __construct(ContainerInterface $container)
     {
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
-        $this->config = $config;
         $this->channel = $config->get('websocket_cluster.subscriber.channel', 'wsca:channels');
         $this->prefix = $config->get('websocket_cluster.node.prefix', 'wsca:nodes');
         $this->retryInterval = (int) $config->get('websocket_cluster.subscriber.retry_interval', 1000);
