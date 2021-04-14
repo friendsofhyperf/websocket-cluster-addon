@@ -13,7 +13,6 @@ return [
     'client' => [
         'prefix' => 'wsca:client',
         'pool' => 'default',
-        'auto_clear_up' => false,
     ],
     'node' => [
         'prefix' => 'wsca:node',
