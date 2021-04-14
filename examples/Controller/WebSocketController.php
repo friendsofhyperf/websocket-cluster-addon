@@ -17,6 +17,7 @@ use Hyperf\Contract\OnCloseInterface;
 use Hyperf\Contract\OnMessageInterface;
 use Hyperf\Contract\OnOpenInterface;
 use Hyperf\WebSocketServer\Context;
+use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerInterface;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
@@ -38,11 +39,17 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
      */
     private $node;
 
+    /**
+     * @var Sender
+     */
+    private $sender;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->client = $container->get(ClientInterface::class);
         $this->node = $container->get(NodeInterface::class);
+        $this->sender = $container->get(Sender::class);
     }
 
     public function onOpen($server, Request $request): void
@@ -54,6 +61,8 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
 
         $this->node->add($fd, $uid);
         $this->client->add($fd, $uid);
+
+        $this->sender->push($fd, 'Welcome!');
     }
 
     public function onMessage($server, Frame $frame): void
@@ -63,6 +72,7 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
 
         if ($frame->data == 'ping') {
             $this->client->renew($fd, $uid);
+            $this->sender->push($fd, 'pong!');
         }
     }
 
@@ -72,5 +82,7 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
 
         $this->node->add($fd, $uid);
         $this->client->add($fd, $uid);
+
+        $this->sender->push($fd, 'Bye!');
     }
 }
