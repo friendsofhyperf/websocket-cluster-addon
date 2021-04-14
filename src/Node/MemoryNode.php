@@ -98,17 +98,20 @@ class MemoryNode implements NodeInterface
         return $this->container->get(SwooleServer::class);
     }
 
+    protected function getServer(): Server
+    {
+        return $this->container->get(Server::class);
+    }
+
     /**
      * @param int|string $uid
      */
     protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
     {
+        $isAdd = $method == 'add';
         $swooleServer = $this->getSwooleServer();
         $workerCount = $swooleServer->setting['worker_num'] - 1;
-        $isAdd = $method == 'add';
-        /** @var Server $server */
-        $server = $this->container->get(Server::class);
-        $currentWorkerId = $server->getWorkerId();
+        $currentWorkerId = $this->getServer()->getWorkerId();
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId !== $currentWorkerId) {
