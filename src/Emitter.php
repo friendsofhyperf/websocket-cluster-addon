@@ -32,11 +32,11 @@ class Emitter
     public function emit($uid, $data): void
     {
         $data = $this->formatData($data);
-        /** @var Addon $addon */
-        $addon = $this->container->get(Addon::class);
+        /** @var Server $server */
+        $server = $this->container->get(Server::class);
         // Set serverId for null when executed on custom process
-        $serverId = $addon->getWorkerId() ? $addon->getServerId() : null;
-        $addon->broadcast(serialize([$uid, $data, $serverId]));
+        $serverId = $server->getWorkerId() ? $server->getServerId() : null;
+        $server->broadcast(serialize([$uid, $data, $serverId]));
     }
 
     /**

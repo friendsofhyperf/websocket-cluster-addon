@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -33,10 +33,16 @@ class SetWorkerIdListener implements ListenerInterface
      */
     private $logger;
 
+    /**
+     * @var Server
+     */
+    private $server;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
+        $this->server = $container->get(Server::class);
     }
 
     /**
@@ -54,9 +60,7 @@ class SetWorkerIdListener implements ListenerInterface
      */
     public function process(object $event)
     {
-        /** @var Addon $addon */
-        $addon = $this->container->get(Addon::class);
-        $addon->setWorkerId($event->workerId);
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s initialized by %s', $addon->getServerId(), $event->workerId, __CLASS__));
+        $this->server->setWorkerId($event->workerId);
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s initialized by %s', $this->server->getServerId(), $event->workerId, __CLASS__));
     }
 }

@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -24,7 +24,7 @@ use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
-class Addon
+class Server
 {
     /**
      * @var string
@@ -62,9 +62,9 @@ class Addon
     protected $container;
 
     /**
-     * @var ConnectionInterface
+     * @var NodeInterface
      */
-    protected $connectionProvider;
+    protected $node;
 
     /**
      * @var Sender
@@ -95,7 +95,7 @@ class Addon
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->connectionProvider = $container->get(ConnectionInterface::class);
+        $this->node = $container->get(NodeInterface::class);
         $this->client = $container->get(ClientInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sender = $container->get(Sender::class);
@@ -193,8 +193,8 @@ class Addon
                 // Sync server info
                 $data = json_encode([
                     'node' => $this->getServerId(),
-                    'users' => $this->connectionProvider->users(),
-                    'connections' => $this->connectionProvider->size(0),
+                    'users' => $this->node->users(),
+                    'connections' => $this->node->size(0),
                 ], JSON_UNESCAPED_UNICODE);
                 $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
@@ -277,7 +277,7 @@ class Addon
             return;
         }
 
-        $clients = $this->connectionProvider->clients($uid);
+        $clients = $this->node->clients($uid);
 
         foreach ($clients as $fd) {
             $this->sender->push($fd, $message);

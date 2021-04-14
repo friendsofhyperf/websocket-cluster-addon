@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Countable;
 use Hyperf\Utils\Contracts\Arrayable;

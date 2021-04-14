@@ -11,10 +11,10 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
-use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Connection\MemoryConnection;
+use FriendsOfHyperf\WebsocketClusterAddon\Node\MemoryNode;
+use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -29,9 +29,9 @@ use Psr\Container\ContainerInterface;
 class OnPipeMessageListener implements ListenerInterface
 {
     /**
-     * @var ConnectionInterface
+     * @var NodeInterface
      */
-    private $connection;
+    private $node;
 
     /**
      * @var StdoutLoggerInterface
@@ -39,9 +39,9 @@ class OnPipeMessageListener implements ListenerInterface
     private $logger;
 
     /**
-     * @var Addon
+     * @var Server
      */
-    private $addon;
+    private $server;
 
     /**
      * @var bool
@@ -50,10 +50,10 @@ class OnPipeMessageListener implements ListenerInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $this->connection = $container->get(ConnectionInterface::class);
+        $this->node = $container->get(NodeInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->addon = $container->get(Addon::class);
-        $this->enable = $this->connection instanceof MemoryConnection;
+        $this->server = $container->get(Server::class);
+        $this->enable = $this->node instanceof MemoryNode;
     }
 
     /**
@@ -86,15 +86,15 @@ class OnPipeMessageListener implements ListenerInterface
             $uid = $data->uid;
             $isAdd = $data->isAdd;
 
-            Context::set(ConnectionInterface::FROM_WORKER_ID, $event->fromWorkerId);
+            Context::set(NodeInterface::FROM_WORKER_ID, $event->fromWorkerId);
 
             if ($isAdd) {
-                $this->connection->add($fd, $uid);
+                $this->node->add($fd, $uid);
             } else {
-                $this->connection->del($fd, $uid);
+                $this->node->del($fd, $uid);
             }
 
-            $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.', $this->addon->getServerId(), $this->addon->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', __CLASS__));
+            $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.', $this->server->getServerId(), $this->server->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', __CLASS__));
         }
     }
 }

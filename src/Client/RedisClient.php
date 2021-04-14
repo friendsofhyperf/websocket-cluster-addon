@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Event\StatusChanged;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Redis\RedisFactory;
@@ -142,11 +141,6 @@ class RedisClient implements ClientInterface
     protected function getSid($uid, int $fd)
     {
         return join('#', [$uid, $fd]);
-    }
-
-    protected function getServerId(): string
-    {
-        return $this->container->get(Addon::class)->getServerId();
     }
 
     protected function getUserOnlineKey(): string

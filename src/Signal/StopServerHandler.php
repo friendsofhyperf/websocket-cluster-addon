@@ -11,8 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Signal;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
-use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Signal\Annotation\Signal;
@@ -30,9 +30,9 @@ class StopServerHandler implements SignalHandlerInterface
     protected $config;
 
     /**
-     * @var ConnectionInterface
+     * @var NodeInterface
      */
-    protected $connection;
+    protected $node;
 
     /**
      * @var StdoutLoggerInterface
@@ -40,15 +40,15 @@ class StopServerHandler implements SignalHandlerInterface
     protected $logger;
 
     /**
-     * @var Addon
+     * @var Server
      */
-    protected $addon;
+    protected $server;
 
     public function __construct(ContainerInterface $container)
     {
         $this->config = $container->get(ConfigInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->addon = $container->get(Addon::class);
+        $this->server = $container->get(Server::class);
     }
 
     public function listen(): array
@@ -66,8 +66,8 @@ class StopServerHandler implements SignalHandlerInterface
             sleep($time);
         }
 
-        $this->addon->stop();
+        $this->server->stop();
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s stopped by %s.', $this->addon->getServerId(), $this->addon->getWorkerId(), __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s stopped by %s.', $this->server->getServerId(), $this->server->getWorkerId(), __CLASS__));
     }
 }

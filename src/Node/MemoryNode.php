@@ -9,16 +9,16 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
 use Swoole\Server as SwooleServer;
 
-class MemoryConnection implements ConnectionInterface
+class MemoryNode implements NodeInterface
 {
     /**
      * @var MemoryConnector[]
@@ -93,7 +93,7 @@ class MemoryConnection implements ConnectionInterface
         return $this->connections[$uid];
     }
 
-    protected function getServer(): SwooleServer
+    protected function getSwooleServer(): SwooleServer
     {
         return $this->container->get(SwooleServer::class);
     }
@@ -103,16 +103,16 @@ class MemoryConnection implements ConnectionInterface
      */
     protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
     {
-        $server = $this->getServer();
-        $workerCount = $server->setting['worker_num'] - 1;
+        $swooleServer = $this->getSwooleServer();
+        $workerCount = $swooleServer->setting['worker_num'] - 1;
         $isAdd = $method == 'add';
-        /** @var Addon $addon */
-        $addon = $this->container->get(Addon::class);
-        $currentWorkerId = $addon->getWorkerId();
+        /** @var Server $server */
+        $server = $this->container->get(Server::class);
+        $currentWorkerId = $server->getWorkerId();
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId !== $currentWorkerId) {
-                $server->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
+                $swooleServer->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
                 $this->logger->debug("[WebsocketClusterAddon] Let Worker.{$workerId} try to {$fd}.");
             }
         }

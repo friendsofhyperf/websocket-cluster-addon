@@ -9,11 +9,11 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Swoole\Table;
 
-class TableConnection implements ConnectionInterface
+class TableNode implements NodeInterface
 {
     /**
      * @var Table

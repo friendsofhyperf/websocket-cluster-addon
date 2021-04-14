@@ -11,9 +11,9 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Controller;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\Connection\ConnectionInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
@@ -36,9 +36,9 @@ class InfoController
     protected $request;
 
     /**
-     * @var Addon
+     * @var Server
      */
-    protected $addon;
+    protected $server;
 
     /**
      * @var ClientInterface
@@ -49,7 +49,7 @@ class InfoController
     {
         $this->container = $container;
         $this->request = $container->get(RequestInterface::class);
-        $this->addon = $container->get(Addon::class);
+        $this->server = $container->get(Server::class);
         $this->client = $container->get(ClientInterface::class);
     }
 
@@ -69,12 +69,12 @@ class InfoController
 
         return [
             'instances' => [
-                ConnectionInterface::class => get_class($this->container->get(ConnectionInterface::class)),
+                NodeInterface::class => get_class($this->container->get(NodeInterface::class)),
                 ClientInterface::class => get_class($this->container->get(ClientInterface::class)),
                 SubscriberInterface::class => get_class($this->container->get(SubscriberInterface::class)),
             ],
             'online' => $this->client->size(0),
-            'nodes' => $this->addon->getMonitors(),
+            'nodes' => $this->server->getMonitors(),
         ];
     }
 }

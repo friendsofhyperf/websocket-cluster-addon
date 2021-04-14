@@ -9,16 +9,16 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\Connection;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Addon;
+use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
-class RedisConnection implements ConnectionInterface
+class RedisNode implements NodeInterface
 {
     /**
      * @var string
@@ -95,7 +95,7 @@ class RedisConnection implements ConnectionInterface
     {
         return join(':', [
             $this->prefix,
-            $serverId ?? $this->container->get(Addon::class)->getServerId(),
+            $serverId ?? $this->container->get(Server::class)->getServerId(),
             $uid,
         ]);
     }
