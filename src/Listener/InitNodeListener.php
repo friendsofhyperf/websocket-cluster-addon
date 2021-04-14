@@ -23,7 +23,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @Listener
  */
-class InitConnectionListener implements ListenerInterface
+class InitNodeListener implements ListenerInterface
 {
     /**
      * @var StdoutLoggerInterface
