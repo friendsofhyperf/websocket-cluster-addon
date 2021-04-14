@@ -234,7 +234,7 @@ class Server
     protected function clearUpExpiredNodes(): void
     {
         $start = '-inf';
-        $end = (string) strtotime('-10 seconds');
+        $end = (string) strtotime('-30 seconds');
         $expiredServers = $this->redis->zRangeByScore($this->getNodeKey(), $start, $end);
 
         if (! $expiredServers) {
