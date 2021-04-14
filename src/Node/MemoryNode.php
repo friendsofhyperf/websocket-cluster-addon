@@ -24,7 +24,7 @@ class MemoryNode implements NodeInterface
     /**
      * @var MemoryAdapter[]
      */
-    protected $connections = [];
+    protected $adapters = [];
 
     /**
      * @var StdoutLoggerInterface
@@ -44,8 +44,8 @@ class MemoryNode implements NodeInterface
 
     public function add(int $fd, $uid): void
     {
-        $this->getConnector($uid)->add($fd);
-        $this->getConnector(0)->add($fd);
+        $this->getAdapter($uid)->add($fd);
+        $this->getAdapter(0)->add($fd);
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -54,8 +54,8 @@ class MemoryNode implements NodeInterface
 
     public function del(int $fd, $uid): void
     {
-        $this->getConnector($uid)->del($fd);
-        $this->getConnector(0)->del($fd);
+        $this->getAdapter($uid)->del($fd);
+        $this->getAdapter(0)->del($fd);
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -64,34 +64,34 @@ class MemoryNode implements NodeInterface
 
     public function users(): int
     {
-        return collect($this->connections)
-            ->reject(function ($connector, $uid) {
-                return $uid == 0 || $connector->size() <= 0;
+        return collect($this->adapters)
+            ->reject(function (MemoryAdapter $adapter, $uid) {
+                return $uid == 0 || $adapter->count() <= 0;
             })
             ->count();
     }
 
     public function clients($uid): array
     {
-        return $this->getConnector($uid)->toArray();
+        return $this->getAdapter($uid)->toArray();
     }
 
     public function size($uid): int
     {
-        return $this->getConnector($uid)->count();
+        return $this->getAdapter($uid)->count();
     }
 
     public function flush(?string $serverId = null): void
     {
     }
 
-    protected function getConnector($uid): MemoryAdapter
+    protected function getAdapter($uid): MemoryAdapter
     {
-        if (! isset($this->connections[$uid])) {
-            $this->connections[$uid] = make(MemoryAdapter::class);
+        if (! isset($this->adapters[$uid])) {
+            $this->adapters[$uid] = make(MemoryAdapter::class);
         }
 
-        return $this->connections[$uid];
+        return $this->adapters[$uid];
     }
 
     protected function getSwooleServer(): SwooleServer
