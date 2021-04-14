@@ -106,6 +106,7 @@ class TableNode implements NodeInterface
     {
         $value = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
         $data = unserialize($value);
+        $data = is_array($data) ? $data : [];
 
         return new TableAdapter($data);
     }
