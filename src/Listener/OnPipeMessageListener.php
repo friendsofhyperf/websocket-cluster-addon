@@ -43,17 +43,11 @@ class OnPipeMessageListener implements ListenerInterface
      */
     private $server;
 
-    /**
-     * @var bool
-     */
-    private $enable;
-
     public function __construct(ContainerInterface $container)
     {
         $this->node = $container->get(NodeInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->server = $container->get(Server::class);
-        $this->enable = $this->node instanceof MemoryNode;
     }
 
     /**
@@ -74,7 +68,7 @@ class OnPipeMessageListener implements ListenerInterface
      */
     public function process(object $event)
     {
-        if (! $this->enable) {
+        if (! ($this->node instanceof MemoryNode)) {
             return;
         }
 

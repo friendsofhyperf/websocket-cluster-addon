@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Signal;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -28,11 +27,6 @@ class StopServerHandler implements SignalHandlerInterface
      * @var ConfigInterface
      */
     protected $config;
-
-    /**
-     * @var NodeInterface
-     */
-    protected $node;
 
     /**
      * @var StdoutLoggerInterface

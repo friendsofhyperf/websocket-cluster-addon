@@ -36,17 +36,15 @@ class InitNodeListener implements ListenerInterface
     private $node;
 
     /**
-     * @var int
+     * @var ConfigInterface
      */
-    private $size;
+    private $config;
 
     public function __construct(ContainerInterface $container)
     {
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->node = $container->get(NodeInterface::class);
-        /** @var ConfigInterface $config */
-        $config = $container->get(ConfigInterface::class);
-        $this->size = (int) $config->get('websocket_cluster.connection.table.size', 10240);
+        $this->config = $container->get(ConfigInterface::class);
     }
 
     /**
@@ -65,7 +63,8 @@ class InitNodeListener implements ListenerInterface
     public function process(object $event)
     {
         if ($this->node instanceof TableNode) {
-            $this->node->initTable($this->size);
+            $size = (int) $this->config->get('websocket_cluster.connection.table.size', 10240);
+            $this->node->initTable($size);
             $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', __CLASS__));
         }
     }

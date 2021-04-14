@@ -49,7 +49,7 @@ class Server
     /**
      * @var bool
      */
-    protected $isRunning;
+    protected $stopped = false;
 
     /**
      * @var StdoutLoggerInterface
@@ -130,8 +130,6 @@ class Server
 
     public function start(): void
     {
-        $this->isRunning = true;
-
         $this->subscribe();
         $this->keepalive();
         $this->clearUpExpired();
@@ -139,7 +137,7 @@ class Server
 
     public function stop(): void
     {
-        $this->isRunning = false;
+        $this->stopped = true;
     }
 
     public function broadcast(string $payload): void
@@ -182,7 +180,7 @@ class Server
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             while (true) {
-                if (! $this->isRunning) {
+                if ($this->stopped) {
                     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
@@ -213,7 +211,7 @@ class Server
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             while (true) {
-                if (! $this->isRunning) {
+                if ($this->stopped) {
                     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, __CLASS__));
                     break;
                 }
