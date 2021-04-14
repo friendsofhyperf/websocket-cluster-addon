@@ -1,5 +1,7 @@
 # websocket-cluster-addon
 
+Websocket cluster addon base redis subscribe.
+
 [![Latest Test](https://github.com/friendsofhyperf/websocket-cluster-addon/workflows/tests/badge.svg)](https://github.com/friendsofhyperf/websocket-cluster-addon/actions)
 [![Latest Stable Version](https://poser.pugx.org/friendsofhyperf/websocket-cluster-addon/version.png)](https://packagist.org/packages/friendsofhyperf/websocket-cluster-addon)
 [![Total Downloads](https://poser.pugx.org/friendsofhyperf/websocket-cluster-addon/d/total.png)](https://packagist.org/packages/friendsofhyperf/websocket-cluster-addon)

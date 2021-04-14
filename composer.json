@@ -1,5 +1,6 @@
 {
     "name": "friendsofhyperf/websocket-cluster-addon",
+    "description": "Websocket cluster addon base redis subscribe.",
     "type": "library",
     "license": "MIT",
     "authors": [{
@@ -28,7 +29,6 @@
         "phpunit/phpunit": "^7.0|^8.0|^9.0|^10.0",
         "swoole/ide-helper": "^4.5"
     },
-    "description": "Config extension for Hyperf.",
     "autoload": {
         "psr-4": {
             "FriendsOfHyperf\\WebsocketClusterAddon\\": "src/"
