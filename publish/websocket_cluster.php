@@ -13,6 +13,9 @@ return [
     'client' => [
         'prefix' => 'wsca:client',
         'pool' => 'default',
+        'table' => [
+            'size' => 10240,
+        ],
     ],
     'node' => [
         'prefix' => 'wsca:node',

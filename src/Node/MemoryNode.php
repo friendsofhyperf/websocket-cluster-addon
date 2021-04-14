@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Adapter\MemoryAdapter;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;

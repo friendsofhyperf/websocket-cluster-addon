@@ -9,12 +9,12 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Adapter\TableAdapter;
 use Swoole\Table;
 
-class TableNode implements NodeInterface
+class TableClient implements ClientInterface
 {
     /**
      * @var Table
@@ -25,6 +25,60 @@ class TableNode implements NodeInterface
      * @var Table
      */
     private $connTable;
+
+    public function add(int $fd, $uid): void
+    {
+        $fds = $this->makeAdapter($uid)->add($fd)->__toString();
+
+        $this->userTable->set((string) $uid, ['fds', $fds]);
+        $this->connTable->set((string) $fd, ['fd' => $fd]);
+    }
+
+    public function renew(int $fd, $uid): void
+    {
+    }
+
+    public function del(int $fd, $uid): void
+    {
+        $fds = $this->makeAdapter($uid)->del($fd)->__toString();
+
+        $this->userTable->set((string) $uid, ['fds' => $fds]);
+        $this->connTable->del((string) $fd);
+    }
+
+    public function clients($uid): array
+    {
+        return $this->makeAdapter($uid)->toArray();
+    }
+
+    public function size($uid): int
+    {
+        if ($uid == 0) {
+            return $this->connTable->count();
+        }
+
+        return $this->makeAdapter($uid)->count();
+    }
+
+    public function clearUpExpired(): void
+    {
+    }
+
+    public function getOnlineStatus($uid): bool
+    {
+        return $this->size($uid) > 0;
+    }
+
+    public function multiGetOnlineStatus(array $uids): array
+    {
+        $result = [];
+
+        foreach ($uids as $uid) {
+            $result[$uid] = $this->size($uid) > 0;
+        }
+
+        return $result;
+    }
 
     public function initTable(int $size = 10240): void
     {
@@ -37,67 +91,6 @@ class TableNode implements NodeInterface
             $table->column('fd', Table::TYPE_INT);
             $table->create();
         });
-    }
-
-    /**
-     * @param int|string $uid
-     */
-    public function add(int $fd, $uid): void
-    {
-        $fds = $this->makeAdapter($uid)->add($fd)->__toString();
-
-        $this->userTable->set((string) $uid, ['fds' => $fds]);
-        $this->connTable->set((string) $fd, ['fd' => $fd]);
-    }
-
-    /**
-     * @param int|string $uid
-     */
-    public function del(int $fd, $uid): void
-    {
-        $fds = $this->makeAdapter($uid)->del($fd)->__toString();
-
-        $this->userTable->set((string) $uid, ['fds' => $fds]);
-        $this->connTable->del((string) $fd);
-    }
-
-    /**
-     * @param int|string $uid
-     */
-    public function size($uid): int
-    {
-        if ($uid == 0) {
-            return $this->connTable->count();
-        }
-
-        return $this->makeAdapter($uid)->count();
-    }
-
-    public function users(): int
-    {
-        return $this->userTable->count();
-    }
-
-    /**
-     * @param int|string $uid
-     */
-    public function clients($uid): array
-    {
-        if ($uid == 0) {
-            $fds = [];
-
-            foreach ($this->connTable as $row) {
-                $fds[] = $row['fd'];
-            }
-
-            return $fds;
-        }
-
-        return $this->makeAdapter($uid)->toArray();
-    }
-
-    public function flush(?string $serverId = null): void
-    {
     }
 
     /**
