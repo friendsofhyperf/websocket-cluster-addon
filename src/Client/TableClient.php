@@ -30,7 +30,7 @@ class TableClient implements ClientInterface
     {
         $fds = $this->makeAdapter($uid)->add($fd)->__toString();
 
-        $this->userTable->set((string) $uid, ['fds', $fds]);
+        $this->userTable->set((string) $uid, ['fds' => $fds]);
         $this->connTable->set((string) $fd, ['fd' => $fd]);
     }
 
@@ -98,10 +98,8 @@ class TableClient implements ClientInterface
      */
     protected function makeAdapter($uid): TableAdapter
     {
-        $value = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
-        $data = unserialize($value);
-        $data = is_array($data) ? $data : [];
+        $serialized = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
 
-        return new TableAdapter($data);
+        return new TableAdapter($serialized);
     }
 }

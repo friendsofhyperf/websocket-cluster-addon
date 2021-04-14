@@ -21,8 +21,10 @@ class TableAdapter implements Countable, Arrayable
      */
     private $container = [];
 
-    public function __construct(array $data)
+    public function __construct(string $serialized)
     {
+        $data = unserialize($serialized);
+
         if (is_array($data)) {
             $this->container = $data;
         }

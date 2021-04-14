@@ -105,10 +105,8 @@ class TableNode implements NodeInterface
      */
     protected function makeAdapter($uid): TableAdapter
     {
-        $value = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
-        $data = unserialize($value);
-        $data = is_array($data) ? $data : [];
+        $serialized = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
 
-        return new TableAdapter($data);
+        return new TableAdapter($serialized);
     }
 }
