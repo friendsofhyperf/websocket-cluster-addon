@@ -12,8 +12,9 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Countable;
+use Hyperf\Utils\Contracts\Arrayable;
 
-class MemoryAdapter implements Countable
+class MemoryAdapter implements Countable, Arrayable
 {
     protected $container = [];
 
@@ -32,7 +33,7 @@ class MemoryAdapter implements Countable
         return count($this->container);
     }
 
-    public function clients(): array
+    public function toArray(): array
     {
         return array_keys($this->container);
     }

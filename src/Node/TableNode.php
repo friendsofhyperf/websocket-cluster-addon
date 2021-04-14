@@ -43,9 +43,8 @@ class TableNode implements NodeInterface
      */
     public function add(int $fd, $uid): void
     {
-        $fds = TableAdapter::make($this->userTable, (string) $uid)
-            ->add($fd)
-            ->__toString();
+        $fds = $this->makeAdapter($uid)->add($fd)->__toString();
+
         $this->userTable->set((string) $uid, ['fds' => $fds]);
         $this->connTable->set((string) $fd, ['fd' => $fd]);
     }
@@ -55,9 +54,7 @@ class TableNode implements NodeInterface
      */
     public function del(int $fd, $uid): void
     {
-        $fds = TableAdapter::make($this->userTable, (string) $uid)
-            ->del($fd)
-            ->__toString();
+        $fds = $this->makeAdapter($uid)->del($fd)->__toString();
 
         $this->userTable->set((string) $uid, ['fds' => $fds]);
         $this->connTable->del((string) $fd);
@@ -72,8 +69,7 @@ class TableNode implements NodeInterface
             return $this->connTable->count();
         }
 
-        return TableAdapter::make($this->userTable, (string) $uid)
-            ->count();
+        return $this->makeAdapter($uid)->count();
     }
 
     public function users(): int
@@ -96,11 +92,21 @@ class TableNode implements NodeInterface
             return $fds;
         }
 
-        return TableAdapter::make($this->userTable, (string) $uid)
-            ->toArray();
+        return $this->makeAdapter($uid)->toArray();
     }
 
     public function flush(?string $serverId = null): void
     {
+    }
+
+    /**
+     * @param int|string $uid
+     */
+    protected function makeAdapter($uid): TableAdapter
+    {
+        $value = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
+        $data = unserialize($value);
+
+        return new TableAdapter($data);
     }
 }

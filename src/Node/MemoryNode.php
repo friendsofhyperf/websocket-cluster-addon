@@ -72,7 +72,7 @@ class MemoryNode implements NodeInterface
 
     public function clients($uid): array
     {
-        return $this->getConnector($uid)->clients();
+        return $this->getConnector($uid)->toArray();
     }
 
     public function size($uid): int

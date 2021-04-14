@@ -13,7 +13,6 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Countable;
 use Hyperf\Utils\Contracts\Arrayable;
-use Swoole\Table;
 
 class TableAdapter implements Countable, Arrayable
 {
@@ -22,10 +21,8 @@ class TableAdapter implements Countable, Arrayable
      */
     private $container = [];
 
-    public function __construct(string $data)
+    public function __construct(array $data)
     {
-        $data = unserialize($data);
-
         if (is_array($data)) {
             $this->container = $data;
         }
@@ -34,13 +31,6 @@ class TableAdapter implements Countable, Arrayable
     public function __toString(): string
     {
         return serialize($this->container);
-    }
-
-    public static function make(Table $table, string $uid, string $field = 'fds'): self
-    {
-        $json = (string) ($table->get($uid, $field) ?: '');
-
-        return new self($json);
     }
 
     public function add(int $fd): self
