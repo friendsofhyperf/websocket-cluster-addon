@@ -168,9 +168,6 @@ class Server
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             while (true) {
-                $this->logger->debug(__METHOD__);
-                $this->logger->debug($this->stopped ? 'stopped' : 'running');
-
                 if ($this->stopped) {
                     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, __CLASS__));
                     break;
@@ -188,7 +185,7 @@ class Server
                 $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
                 if (time() % 5 == 0) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
                 }
 
                 sleep(1);
