@@ -33,7 +33,7 @@ class StartServerListener implements ListenerInterface
      */
     private $server;
 
-    public function __construct(ContainerInterface $container, $server)
+    public function __construct(ContainerInterface $container)
     {
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->server = $container->get(Server::class);
