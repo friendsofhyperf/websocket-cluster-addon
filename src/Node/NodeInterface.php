@@ -13,7 +13,7 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 interface NodeInterface
 {
-    const FROM_WORKER_ID = 'FROM_WORKER_ID';
+    public const FROM_WORKER_ID = 'FROM_WORKER_ID';
 
     /**
      * @param int|string $uid
