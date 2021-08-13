@@ -17,8 +17,8 @@ use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coordinator\Constants;
 use Hyperf\Utils\Coordinator\CoordinatorManager;
 use Hyperf\Utils\Coroutine;
-use Mix\Redis\Subscribe\Message;
-use Mix\Redis\Subscribe\Subscriber;
+use Mix\Redis\Subscriber\Message;
+use Mix\Redis\Subscriber\Subscriber;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
 

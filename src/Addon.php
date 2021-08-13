@@ -162,7 +162,7 @@ class Addon
 
             retry(PHP_INT_MAX, function () {
                 try {
-                    // fix Uncaught Swoole\Error: API must be called in the coroutine when $subscriber instanceof \Mix\Redis\Subscribe\Subscriber
+                    // fix Uncaught Swoole\Error: API must be called in the coroutine when $subscriber instanceof \Mix\Redis\Subscriber\Subscriber
                     $subscriber = make(SubscriberInterface::class);
 
                     $subscriber->subscribe($this->getChannelKey(), function ($channel, $payload) {
