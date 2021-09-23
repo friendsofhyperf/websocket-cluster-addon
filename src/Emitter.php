@@ -56,6 +56,8 @@ class Emitter
             $data = json_encode($data, JSON_UNESCAPED_UNICODE);
         } elseif (is_callable([$data, '__toString'])) {
             $data = $data->__toString();
+        } elseif (is_callable([$data, 'toArray'])) {
+            $data = json_encode($data->toArray(), JSON_UNESCAPED_UNICODE);
         }
 
         return $data;
