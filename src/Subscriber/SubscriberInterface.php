@@ -16,5 +16,5 @@ interface SubscriberInterface
     /**
      * @param string|string[] $channel
      */
-    public function subscribe($channel, callable $callback): void;
+    public function subscribe(array|string $channel, callable $callback): void;
 }

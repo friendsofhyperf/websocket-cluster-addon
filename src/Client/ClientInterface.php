@@ -13,37 +13,19 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
 interface ClientInterface
 {
-    /**
-     * @param int|string $uid
-     */
-    public function add(int $fd, $uid): void;
+    public function add(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function renew(int $fd, $uid): void;
+    public function renew(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function del(int $fd, $uid): void;
+    public function del(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function clients($uid): array;
+    public function clients(int|string $uid): array;
 
-    /**
-     * @param int|string $uid
-     */
-    public function size($uid): int;
+    public function size(int|string $uid): int;
 
     public function clearUpExpired(): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function getOnlineStatus($uid): bool;
+    public function getOnlineStatus(int|string $uid): bool;
 
     /**
      * @param (int|string)[] $uids

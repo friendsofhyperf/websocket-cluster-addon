@@ -23,24 +23,12 @@ use Psr\Container\ContainerInterface;
  */
 class SetWorkerIdListener implements ListenerInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private \Hyperf\Contract\StdoutLoggerInterface $logger;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private \FriendsOfHyperf\WebsocketClusterAddon\Server $server;
 
-    /**
-     * @var Server
-     */
-    private $server;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->server = $container->get(Server::class);
     }
@@ -61,6 +49,6 @@ class SetWorkerIdListener implements ListenerInterface
     public function process(object $event)
     {
         $this->server->setWorkerId($event->workerId);
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s initialized by %s', $this->server->getServerId(), $event->workerId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s initialized by %s', $this->server->getServerId(), $event->workerId, self::class));
     }
 }

@@ -24,24 +24,12 @@ use Psr\Container\ContainerInterface;
  */
 class SetServerIdListener implements ListenerInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private \Hyperf\Contract\StdoutLoggerInterface $logger;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private \FriendsOfHyperf\WebsocketClusterAddon\Server $server;
 
-    /**
-     * @var Server
-     */
-    private $server;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->server = $container->get(Server::class);
     }
@@ -63,6 +51,6 @@ class SetServerIdListener implements ListenerInterface
     {
         $serverId = Str::slug(gethostname() ?: uniqid());
         $this->server->setServerId($serverId);
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s serverId initialized by %s', -1, $serverId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s serverId initialized by %s', -1, $serverId, self::class));
     }
 }

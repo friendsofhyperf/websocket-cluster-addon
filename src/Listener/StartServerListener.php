@@ -23,15 +23,9 @@ use Psr\Container\ContainerInterface;
  */
 class StartServerListener implements ListenerInterface
 {
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private \Hyperf\Contract\StdoutLoggerInterface $logger;
 
-    /**
-     * @var Server
-     */
-    private $server;
+    private \FriendsOfHyperf\WebsocketClusterAddon\Server $server;
 
     public function __construct(ContainerInterface $container)
     {
@@ -55,6 +49,6 @@ class StartServerListener implements ListenerInterface
     public function process(object $event)
     {
         $this->server->start();
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s started by %s', $this->server->getServerId(), $event->workerId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s started by %s', $this->server->getServerId(), $event->workerId, self::class));
     }
 }

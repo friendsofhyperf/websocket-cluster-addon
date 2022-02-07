@@ -16,15 +16,9 @@ use Swoole\Table;
 
 class TableClient implements ClientInterface
 {
-    /**
-     * @var Table
-     */
-    private $userTable;
+    private \Swoole\Table $userTable;
 
-    /**
-     * @var Table
-     */
-    private $connTable;
+    private \Swoole\Table $connTable;
 
     public function add(int $fd, $uid): void
     {
@@ -93,10 +87,7 @@ class TableClient implements ClientInterface
         });
     }
 
-    /**
-     * @param int|string $uid
-     */
-    protected function makeAdapter($uid): TableAdapter
+    protected function makeAdapter(int|string $uid): TableAdapter
     {
         $serialized = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
 

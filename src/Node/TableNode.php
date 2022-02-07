@@ -16,15 +16,9 @@ use Swoole\Table;
 
 class TableNode implements NodeInterface
 {
-    /**
-     * @var Table
-     */
-    private $userTable;
+    private \Swoole\Table $userTable;
 
-    /**
-     * @var Table
-     */
-    private $connTable;
+    private \Swoole\Table $connTable;
 
     public function initTable(int $size = 10240): void
     {
@@ -100,10 +94,7 @@ class TableNode implements NodeInterface
     {
     }
 
-    /**
-     * @param int|string $uid
-     */
-    protected function makeAdapter($uid): TableAdapter
+    protected function makeAdapter(int|string $uid): TableAdapter
     {
         $serialized = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
 

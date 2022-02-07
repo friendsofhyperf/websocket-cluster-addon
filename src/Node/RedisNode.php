@@ -35,14 +35,8 @@ class RedisNode implements NodeInterface
      */
     protected $logger;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);

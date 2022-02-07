@@ -26,11 +26,6 @@ use Psr\Container\ContainerInterface;
 class InfoController
 {
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var RequestInterface
      */
     protected $request;
@@ -45,9 +40,8 @@ class InfoController
      */
     protected $client;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
         $this->request = $container->get(RequestInterface::class);
         $this->server = $container->get(Server::class);
         $this->client = $container->get(ClientInterface::class);
@@ -69,9 +63,9 @@ class InfoController
 
         return [
             'instances' => [
-                NodeInterface::class => get_class($this->container->get(NodeInterface::class)),
-                ClientInterface::class => get_class($this->container->get(ClientInterface::class)),
-                SubscriberInterface::class => get_class($this->container->get(SubscriberInterface::class)),
+                NodeInterface::class => $this->container->get(NodeInterface::class)::class,
+                ClientInterface::class => $this->container->get(ClientInterface::class)::class,
+                SubscriberInterface::class => $this->container->get(SubscriberInterface::class)::class,
             ],
             'online' => $this->client->size(0),
             'nodes' => $this->server->getMonitors(),

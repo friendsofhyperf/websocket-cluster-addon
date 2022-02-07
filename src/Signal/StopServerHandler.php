@@ -62,6 +62,6 @@ class StopServerHandler implements SignalHandlerInterface
 
         $this->server->stop();
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s stopped by %s.', $this->server->getServerId(), $this->server->getWorkerId(), __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s stopped by %s.', $this->server->getServerId(), $this->server->getWorkerId(), self::class));
     }
 }

@@ -29,14 +29,8 @@ class RedisClient implements ClientInterface
      */
     protected $redis;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
         $pool = $config->get('websocket_cluster.client.pool', 'default');

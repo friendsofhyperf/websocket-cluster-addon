@@ -14,21 +14,9 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Event;
 class StatusChanged
 {
     /**
-     * @var int|string
-     */
-    public $uid;
-
-    /**
-     * @var int
-     */
-    public $status;
-
-    /**
      * @param int|string $uid
      */
-    public function __construct($uid, int $status)
+    public function __construct(public $uid, public int $status)
     {
-        $this->uid = $uid;
-        $this->status = $status;
     }
 }

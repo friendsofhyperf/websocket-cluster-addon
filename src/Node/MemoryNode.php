@@ -31,14 +31,8 @@ class MemoryNode implements NodeInterface
      */
     protected $logger;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container)
     {
-        $this->container = $container;
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
@@ -65,9 +59,7 @@ class MemoryNode implements NodeInterface
     public function users(): int
     {
         return collect($this->adapters)
-            ->reject(function (MemoryAdapter $adapter, $uid) {
-                return $uid == 0 || $adapter->count() <= 0;
-            })
+            ->reject(fn(MemoryAdapter $adapter, $uid) => $uid == 0 || $adapter->count() <= 0)
             ->count();
     }
 
@@ -104,10 +96,7 @@ class MemoryNode implements NodeInterface
         return $this->container->get(Server::class);
     }
 
-    /**
-     * @param int|string $uid
-     */
-    protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
+    protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
     {
         $isAdd = $method == 'add';
         $swooleServer = $this->getSwooleServer();

@@ -169,7 +169,7 @@ class Server
 
             while (true) {
                 if ($this->stopped) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, self::class));
                     break;
                 }
 
@@ -185,7 +185,7 @@ class Server
                 $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
                 if (time() % 5 == 0) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, self::class));
                 }
 
                 sleep(1);
@@ -200,7 +200,7 @@ class Server
 
             while (true) {
                 if ($this->stopped) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, self::class));
                     break;
                 }
 
@@ -223,9 +223,7 @@ class Server
     public function getMonitors(): array
     {
         return collect($this->redis->hGetAll($this->getMonitorKey()))
-            ->transform(function ($item) {
-                return json_decode($item, true);
-            })
+            ->transform(fn($item) => json_decode($item, true, 512, JSON_THROW_ON_ERROR))
             ->values()
             ->toArray();
     }
@@ -249,7 +247,7 @@ class Server
             $this->node->flush($serverId);
         }
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, self::class));
     }
 
     protected function publish(string $channel, string $payload): void

@@ -25,20 +25,11 @@ use Psr\Container\ContainerInterface;
  */
 class InitClientListener implements ListenerInterface
 {
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private \Hyperf\Contract\StdoutLoggerInterface $logger;
 
-    /**
-     * @var TableClient
-     */
-    private $client;
+    private \FriendsOfHyperf\WebsocketClusterAddon\Client\TableClient $client;
 
-    /**
-     * @var ConfigInterface
-     */
-    private $config;
+    private \Hyperf\Contract\ConfigInterface $config;
 
     public function __construct(ContainerInterface $container)
     {
@@ -65,7 +56,7 @@ class InitClientListener implements ListenerInterface
         if ($this->client instanceof TableClient) {
             $size = (int) $this->config->get('websocket_cluster.client.table.size', 10240);
             $this->client->initTable($size);
-            $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', __CLASS__));
+            $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', self::class));
         }
     }
 }

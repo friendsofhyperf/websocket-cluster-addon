@@ -34,10 +34,7 @@ class MixSubscriber implements SubscriberInterface
      */
     protected $redisPool = 'default';
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private \Hyperf\Contract\StdoutLoggerInterface $logger;
 
     public function __construct(ContainerInterface $container)
     {
@@ -56,7 +53,7 @@ class MixSubscriber implements SubscriberInterface
                     $sub->close();
                 });
                 return $sub;
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 return null;
             }
         });
@@ -87,7 +84,7 @@ class MixSubscriber implements SubscriberInterface
 
             Coroutine::create(function () use ($callback, $data) {
                 $callback($data->channel, $data->payload);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $data->channel, json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE), __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $data->channel, json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE), self::class));
             });
         }
     }

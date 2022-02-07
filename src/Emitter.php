@@ -15,21 +15,14 @@ use Psr\Container\ContainerInterface;
 
 class Emitter
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     /**
-     * @param int|string $uid
      * @param array|object|string $data
      */
-    public function emit($uid, $data): void
+    public function emit(int|string $uid, $data): void
     {
         $data = $this->formatData($data);
         /** @var Server $server */

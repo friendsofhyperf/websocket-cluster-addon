@@ -14,12 +14,9 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Adapter;
 use Countable;
 use Hyperf\Utils\Contracts\Arrayable;
 
-class TableAdapter implements Countable, Arrayable
+class TableAdapter implements Countable, Arrayable, \Stringable
 {
-    /**
-     * @var array
-     */
-    private $container = [];
+    private array $container = [];
 
     public function __construct(string $serialized)
     {
