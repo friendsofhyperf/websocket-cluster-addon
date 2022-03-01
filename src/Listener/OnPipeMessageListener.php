@@ -15,12 +15,12 @@ use FriendsOfHyperf\WebsocketClusterAddon\Node\MemoryNode;
 use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
+use Hyperf\Context\Context;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\OnPipeMessage;
 use Hyperf\Process\Event\PipeMessage as UserProcessPipMessage;
-use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
 
 /**

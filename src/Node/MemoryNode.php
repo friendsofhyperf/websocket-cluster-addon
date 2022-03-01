@@ -14,8 +14,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 use FriendsOfHyperf\WebsocketClusterAddon\Adapter\MemoryAdapter;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
+use Hyperf\Context\Context;
 use Hyperf\Contract\StdoutLoggerInterface;
-use Hyperf\Utils\Context;
 use Psr\Container\ContainerInterface;
 use Swoole\Server as SwooleServer;
 
@@ -59,7 +59,7 @@ class MemoryNode implements NodeInterface
     public function users(): int
     {
         return collect($this->adapters)
-            ->reject(fn(MemoryAdapter $adapter, $uid) => $uid == 0 || $adapter->count() <= 0)
+            ->reject(fn (MemoryAdapter $adapter, $uid) => $uid == 0 || $adapter->count() <= 0)
             ->count();
     }
 

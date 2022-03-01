@@ -19,8 +19,6 @@ use Hyperf\Contract\OnOpenInterface;
 use Hyperf\WebSocketServer\Context;
 use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerInterface;
-use Swoole\Http\Request;
-use Swoole\WebSocket\Frame;
 
 class WebSocketController implements OnMessageInterface, OnOpenInterface, OnCloseInterface
 {
@@ -52,7 +50,7 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
         $this->sender = $container->get(Sender::class);
     }
 
-    public function onOpen($server, Request $request): void
+    public function onOpen($server, $request): void
     {
         $fd = (int) $request->fd;
         $uid = 1;
@@ -65,7 +63,7 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
         $this->sender->push($fd, 'Welcome!');
     }
 
-    public function onMessage($server, Frame $frame): void
+    public function onMessage($server, $frame): void
     {
         $uid = Context::get('uid');
         $fd = (int) $frame->fd;
