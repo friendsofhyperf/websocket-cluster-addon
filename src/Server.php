@@ -223,7 +223,7 @@ class Server
     public function getMonitors(): array
     {
         return collect($this->redis->hGetAll($this->getMonitorKey()))
-            ->transform(fn($item) => json_decode($item, true, 512, JSON_THROW_ON_ERROR))
+            ->transform(fn ($item) => json_decode($item, true, 512, JSON_THROW_ON_ERROR))
             ->values()
             ->toArray();
     }

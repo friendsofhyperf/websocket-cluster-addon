@@ -47,7 +47,7 @@ class SetServerIdListener implements ListenerInterface
     /**
      * @param BeforeMainServerStart $event
      */
-    public function process(object $event)
+    public function process(object $event): void
     {
         $serverId = Str::slug(gethostname() ?: uniqid());
         $this->server->setServerId($serverId);

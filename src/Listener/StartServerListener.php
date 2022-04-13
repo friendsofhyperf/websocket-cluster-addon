@@ -46,7 +46,7 @@ class StartServerListener implements ListenerInterface
     /**
      * @param MainWorkerStart $event
      */
-    public function process(object $event)
+    public function process(object $event): void
     {
         $this->server->start();
         $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s started by %s', $this->server->getServerId(), $event->workerId, self::class));

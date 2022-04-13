@@ -51,7 +51,7 @@ class InitClientListener implements ListenerInterface
     /**
      * @param BeforeMainServerStart $event
      */
-    public function process(object $event)
+    public function process(object $event): void
     {
         if ($this->client instanceof TableClient) {
             $size = (int) $this->config->get('websocket_cluster.client.table.size', 10240);
