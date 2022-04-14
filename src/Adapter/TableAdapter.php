@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Adapter;
 
 use Countable;
-use Hyperf\Utils\Contracts\Arrayable;
+use Hyperf\Contract\Arrayable;
 
 class TableAdapter implements Countable, Arrayable, \Stringable
 {
