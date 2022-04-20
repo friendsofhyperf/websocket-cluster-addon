@@ -13,9 +13,9 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Coordinator\Constants;
+use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Redis\RedisFactory;
-use Hyperf\Utils\Coordinator\Constants;
-use Hyperf\Utils\Coordinator\CoordinatorManager;
 use Hyperf\Utils\Coroutine;
 use Mix\Redis\Subscriber\Message;
 use Mix\Redis\Subscriber\Subscriber;
