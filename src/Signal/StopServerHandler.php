@@ -16,33 +16,14 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Signal\Annotation\Signal;
 use Hyperf\Signal\SignalHandlerInterface;
-use Psr\Container\ContainerInterface;
 
 /**
  * @Signal(priority=-1)
  */
 class StopServerHandler implements SignalHandlerInterface
 {
-    /**
-     * @var ConfigInterface
-     */
-    protected $config;
-
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var Server
-     */
-    protected $server;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ConfigInterface $config, protected Server $server, protected StdoutLoggerInterface $logger)
     {
-        $this->config = $container->get(ConfigInterface::class);
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
     }
 
     public function listen(): array

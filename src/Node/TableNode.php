@@ -16,9 +16,9 @@ use Swoole\Table;
 
 class TableNode implements NodeInterface
 {
-    private \Swoole\Table $userTable;
+    private Table $userTable;
 
-    private \Swoole\Table $connTable;
+    private Table $connTable;
 
     public function initTable(int $size = 10240): void
     {

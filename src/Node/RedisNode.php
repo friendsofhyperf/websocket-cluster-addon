@@ -20,26 +20,12 @@ use Psr\Container\ContainerInterface;
 
 class RedisNode implements NodeInterface
 {
-    /**
-     * @var string
-     */
-    protected $prefix;
+    protected string $prefix;
 
-    /**
-     * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
-     */
-    protected $redis;
+    protected Redis $redis;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
-
-    public function __construct(protected ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger, ConfigInterface $config)
     {
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-        /** @var ConfigInterface $config */
-        $config = $container->get(ConfigInterface::class);
         $this->prefix = $config->get('websocket_cluster.node.prefix', 'wsca:node');
         $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.node.pool', 'default'));
     }

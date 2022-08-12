@@ -24,16 +24,10 @@ class MemoryNode implements NodeInterface
     /**
      * @var MemoryAdapter[]
      */
-    protected $adapters = [];
+    protected array $adapters = [];
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
-
-    public function __construct(protected ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger)
     {
-        $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
     public function add(int $fd, $uid): void

@@ -24,21 +24,10 @@ use RuntimeException;
 
 class MixSubscriber implements SubscriberInterface
 {
-    /**
-     * @var Subscriber
-     */
-    protected $sub;
+    protected Subscriber $sub;
 
-    /**
-     * @var string
-     */
-    protected $redisPool = 'default';
-
-    private \Hyperf\Contract\StdoutLoggerInterface $logger;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, protected StdoutLoggerInterface $logger)
     {
-        $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->sub = value(function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);

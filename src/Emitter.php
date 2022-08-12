@@ -15,7 +15,7 @@ use Psr\Container\ContainerInterface;
 
 class Emitter
 {
-    public function __construct(private ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container, protected Server $server)
     {
     }
 
@@ -25,11 +25,9 @@ class Emitter
     public function emit(int|string $uid, $data): void
     {
         $data = $this->formatData($data);
-        /** @var Server $server */
-        $server = $this->container->get(Server::class);
         // Set serverId for null when executed on custom process
-        $serverId = $server->getWorkerId() ? $server->getServerId() : null;
-        $server->broadcast(serialize([$uid, $data, $serverId]));
+        $serverId = $this->server->getWorkerId() ? $this->server->getServerId() : null;
+        $this->server->broadcast(serialize([$uid, $data, $serverId]));
     }
 
     /**

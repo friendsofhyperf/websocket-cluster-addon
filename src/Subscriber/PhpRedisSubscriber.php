@@ -13,25 +13,18 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coroutine;
 use Psr\Container\ContainerInterface;
 
 class PhpRedisSubscriber implements SubscriberInterface
 {
-    /**
-     * @var \Redis
-     */
-    protected $redis;
+    protected Redis $redis;
 
-    private \Hyperf\Contract\StdoutLoggerInterface $logger;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, ConfigInterface $config, protected StdoutLoggerInterface $logger)
     {
-        /** @var ConfigInterface $config */
-        $config = $container->get(ConfigInterface::class);
         $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.subscriber.pool', 'default'));
-        $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
     public function subscribe($channel, callable $callback): void

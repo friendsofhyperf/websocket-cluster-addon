@@ -19,19 +19,11 @@ use Hyperf\Framework\Event\BeforeMainServerStart;
 use Hyperf\Utils\Str;
 use Psr\Container\ContainerInterface;
 
-/**
- * @Listener
- */
+#[Listener]
 class SetServerIdListener implements ListenerInterface
 {
-    private \Hyperf\Contract\StdoutLoggerInterface $logger;
-
-    private \FriendsOfHyperf\WebsocketClusterAddon\Server $server;
-
-    public function __construct(private ContainerInterface $container)
+    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger, protected Server $server)
     {
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
     }
 
     /**

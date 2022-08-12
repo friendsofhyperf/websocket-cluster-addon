@@ -21,24 +21,12 @@ use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\OnPipeMessage;
 use Hyperf\Process\Event\PipeMessage as UserProcessPipMessage;
-use Psr\Container\ContainerInterface;
 
-/**
- * @Listener
- */
+#[Listener]
 class OnPipeMessageListener implements ListenerInterface
 {
-    private \FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface $node;
-
-    private \Hyperf\Contract\StdoutLoggerInterface $logger;
-
-    private \FriendsOfHyperf\WebsocketClusterAddon\Server $server;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected Server $server, protected NodeInterface $node, protected StdoutLoggerInterface $logger)
     {
-        $this->node = $container->get(NodeInterface::class);
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
     }
 
     /**
@@ -79,7 +67,16 @@ class OnPipeMessageListener implements ListenerInterface
                 $this->node->del($fd, $uid);
             }
 
-            $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.', $this->server->getServerId(), $this->server->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', self::class));
+            $this->logger->debug(
+                sprintf(
+                    '[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.',
+                    $this->server->getServerId(),
+                    $this->server->getWorkerId(),
+                    $fd,
+                    $isAdd ? 'added' : 'deleted',
+                    self::class
+                )
+            );
         }
     }
 }

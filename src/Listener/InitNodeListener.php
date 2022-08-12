@@ -18,24 +18,12 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BeforeMainServerStart;
-use Psr\Container\ContainerInterface;
 
-/**
- * @Listener
- */
+#[Listener]
 class InitNodeListener implements ListenerInterface
 {
-    private \Hyperf\Contract\StdoutLoggerInterface $logger;
-
-    private \FriendsOfHyperf\WebsocketClusterAddon\Node\TableNode $node;
-
-    private \Hyperf\Contract\ConfigInterface $config;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(protected ConfigInterface $config, protected StdoutLoggerInterface $logger, protected NodeInterface $node)
     {
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->node = $container->get(NodeInterface::class);
-        $this->config = $container->get(ConfigInterface::class);
     }
 
     /**

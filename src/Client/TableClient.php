@@ -16,9 +16,22 @@ use Swoole\Table;
 
 class TableClient implements ClientInterface
 {
-    private \Swoole\Table $userTable;
+    protected Table $userTable;
 
-    private \Swoole\Table $connTable;
+    protected Table $connTable;
+
+    public function initTable(int $size = 10240): void
+    {
+        $this->userTable = tap(new Table($size), function (Table $table) {
+            $table->column('fds', Table::TYPE_STRING, 102400);
+            $table->create();
+        });
+
+        $this->connTable = tap(new Table($size * 20), function (Table $table) {
+            $table->column('fd', Table::TYPE_INT);
+            $table->create();
+        });
+    }
 
     public function add(int $fd, $uid): void
     {
@@ -72,19 +85,6 @@ class TableClient implements ClientInterface
         }
 
         return $result;
-    }
-
-    public function initTable(int $size = 10240): void
-    {
-        $this->userTable = tap(new Table($size), function (Table $table) {
-            $table->column('fds', Table::TYPE_STRING, 102400);
-            $table->create();
-        });
-
-        $this->connTable = tap(new Table($size * 20), function (Table $table) {
-            $table->column('fd', Table::TYPE_INT);
-            $table->create();
-        });
     }
 
     protected function makeAdapter(int|string $uid): TableAdapter

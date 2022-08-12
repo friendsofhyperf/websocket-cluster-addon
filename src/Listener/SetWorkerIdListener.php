@@ -16,21 +16,12 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\AfterWorkerStart;
-use Psr\Container\ContainerInterface;
 
-/**
- * @Listener
- */
+#[Listener]
 class SetWorkerIdListener implements ListenerInterface
 {
-    private \Hyperf\Contract\StdoutLoggerInterface $logger;
-
-    private \FriendsOfHyperf\WebsocketClusterAddon\Server $server;
-
-    public function __construct(private ContainerInterface $container)
+    public function __construct(protected StdoutLoggerInterface $logger, private Server $server)
     {
-        $this->logger = $container->get(StdoutLoggerInterface::class);
-        $this->server = $container->get(Server::class);
     }
 
     /**

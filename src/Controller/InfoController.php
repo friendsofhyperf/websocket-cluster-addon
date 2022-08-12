@@ -17,39 +17,21 @@ use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
-use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * @Controller(prefix="websocket")
- */
+#[Controller(prefix: 'websocket')]
 class InfoController
 {
-    /**
-     * @var RequestInterface
-     */
-    protected $request;
-
-    /**
-     * @var Server
-     */
-    protected $server;
-
-    /**
-     * @var ClientInterface
-     */
-    protected $client;
-
-    public function __construct(protected ContainerInterface $container)
-    {
-        $this->request = $container->get(RequestInterface::class);
-        $this->server = $container->get(Server::class);
-        $this->client = $container->get(ClientInterface::class);
+    public function __construct(
+        protected ContainerInterface $container,
+        protected ServerRequestInterface $request,
+        protected Server $server,
+        protected ClientInterface $client
+    ) {
     }
 
-    /**
-     * @GetMapping(path="info")
-     */
+    #[GetMapping(path: 'info')]
     public function info()
     {
         if ($uid = $this->request->input('uid')) {
