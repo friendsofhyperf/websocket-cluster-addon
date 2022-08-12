@@ -100,7 +100,7 @@ class MemoryNode implements NodeInterface
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId !== $currentWorkerId) {
                 $swooleServer->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
-                $this->logger->debug("[WebsocketClusterAddon] Let Worker.{$workerId} try to {$fd}.");
+                $this->logger->debug(sprintf('[WebsocketClusterAddon] Let Worker.%s try to %s.', $workerId, $fd));
             }
         }
     }

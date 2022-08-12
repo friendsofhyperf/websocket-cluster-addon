@@ -14,20 +14,15 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
-use Hyperf\Redis\Redis;
-use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
 class RedisNode implements NodeInterface
 {
     protected string $prefix;
 
-    protected Redis $redis;
-
-    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger, ConfigInterface $config)
+    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger, protected Redis $redis, ConfigInterface $config)
     {
         $this->prefix = $config->get('websocket_cluster.node.prefix', 'wsca:node');
-        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.node.pool', 'default'));
     }
 
     public function add(int $fd, $uid): void

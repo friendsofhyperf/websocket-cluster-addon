@@ -37,11 +37,7 @@ class MixSubscriber implements SubscriberInterface
             $pass = $redis->getAuth();
 
             try {
-                $sub = new Subscriber($host, $port, $pass ?? '', 5);
-                defer(function () use ($sub) {
-                    $sub->close();
-                });
-                return $sub;
+                return new Subscriber($host, $port, $pass ?? '', 5);
             } catch (\Throwable) {
                 return null;
             }
@@ -73,7 +69,14 @@ class MixSubscriber implements SubscriberInterface
 
             Coroutine::create(function () use ($callback, $data) {
                 $callback($data->channel, $data->payload);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $data->channel, json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE), self::class));
+                $this->logger->debug(
+                    sprintf(
+                        '[WebsocketClusterAddon] channel: %s, payload: %s by %s',
+                        $data->channel,
+                        json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE),
+                        self::class
+                    )
+                );
             });
         }
     }

@@ -32,7 +32,14 @@ class PhpRedisSubscriber implements SubscriberInterface
         $this->redis->subscribe((array) $channel, function ($redis, $channel, $payload) use ($callback) {
             Coroutine::create(function () use ($channel, $payload, $callback) {
                 $callback($channel, $payload);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $channel, json_encode(unserialize($payload), JSON_UNESCAPED_UNICODE), self::class));
+                $this->logger->debug(
+                    sprintf(
+                        '[WebsocketClusterAddon] channel: %s, payload: %s by %s',
+                        $channel,
+                        json_encode(unserialize($payload), JSON_UNESCAPED_UNICODE),
+                        self::class
+                    )
+                );
             });
         });
     }
