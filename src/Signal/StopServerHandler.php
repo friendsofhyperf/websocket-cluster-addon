@@ -17,9 +17,7 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Signal\Annotation\Signal;
 use Hyperf\Signal\SignalHandlerInterface;
 
-/**
- * @Signal(priority=-1)
- */
+#[Signal(priority: -1)]
 class StopServerHandler implements SignalHandlerInterface
 {
     public function __construct(protected ConfigInterface $config, protected Server $server, protected StdoutLoggerInterface $logger)
