@@ -31,7 +31,7 @@ class RedisClient implements ClientInterface
             $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
         }
 
-        $this->redis->multi();
+        $this->redis->multi(\Redis::PIPELINE);
         $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
         $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
         $this->redis->exec();
@@ -62,7 +62,7 @@ class RedisClient implements ClientInterface
             return;
         }
 
-        $this->redis->multi();
+        $this->redis->multi(\Redis::PIPELINE);
 
         foreach ($uids as $uid) {
             $this->redis->del($this->getUserClientKey($uid));

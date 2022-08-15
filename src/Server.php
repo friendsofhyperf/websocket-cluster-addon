@@ -202,7 +202,7 @@ class Server
             return;
         }
 
-        $this->redis->multi();
+        $this->redis->multi(\Redis::PIPELINE);
         $this->redis->zRem($this->getNodeKey(), ...$expiredServers);
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
         $this->redis->exec();

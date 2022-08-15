@@ -57,7 +57,7 @@ class RedisNode implements NodeInterface
     public function flush(?string $serverId = null): void
     {
         $keys = $this->redis->keys($this->getKey('*', $serverId));
-        $this->redis->multi();
+        $this->redis->multi(\Redis::PIPELINE);
 
         foreach ($keys as $key) {
             $this->redis->del($key);
