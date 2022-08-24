@@ -21,6 +21,7 @@ class ConfigProvider
             'dependencies' => [
                 Client\ClientInterface::class => Client\RedisClient::class,
                 Node\NodeInterface::class => Node\MemoryNode::class,
+                Status\StatusInterface::class => Status\RedisBitmapStatus::class,
                 Subscriber\SubscriberInterface::class => class_exists(\Mix\Redis\Subscriber\Subscriber::class) ? Subscriber\MixSubscriber::class : Subscriber\PhpRedisSubscriber::class,
             ],
             'processes' => [],
