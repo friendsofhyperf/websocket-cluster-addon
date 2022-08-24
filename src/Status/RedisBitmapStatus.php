@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Status;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Util\Bitmap;
 use Hyperf\Redis\Redis;
 
 class RedisBitmapStatus implements StatusInterface
