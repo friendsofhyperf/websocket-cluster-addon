@@ -80,8 +80,8 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
     {
         $uid = Context::get('uid');
 
-        $this->node->add($fd, $uid);
-        $this->client->add($fd, $uid);
+        $this->node->del($fd, $uid);
+        $this->client->del($fd, $uid);
 
         $this->sender->push($fd, 'Bye!');
     }
