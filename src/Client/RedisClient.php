@@ -46,6 +46,7 @@ class RedisClient implements ClientInterface
 
     public function add(int $fd, $uid): void
     {
+        $this->redis->setBit($this->getUserOnlineBitmapKey(), $uid, true);
         if ($this->redis->sAdd($this->getUserOnlineKey(), $uid)) {
             $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
         }
@@ -66,6 +67,7 @@ class RedisClient implements ClientInterface
         $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
 
         if ($this->size($uid) == 0) {
+            $this->redis->setBit($this->getUserOnlineBitmapKey(), $uid, false);
             $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
 
@@ -85,6 +87,7 @@ class RedisClient implements ClientInterface
 
         foreach ($uids as $uid) {
             $this->redis->del($this->getUserClientKey($uid));
+            $this->redis->setBit($this->getUserOnlineBitmapKey(), $uid, false);
             $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
         }
@@ -150,6 +153,11 @@ class RedisClient implements ClientInterface
     protected function getUserOnlineKey(): string
     {
         return join(':', [$this->prefix, 'online_users']);
+    }
+
+    protected function getUserOnlineBitmapKey(): string
+    {
+        return join(':', [$this->prefix, 'online_users_bitmap']);
     }
 
     protected function getUserActiveKey(): string
