@@ -16,10 +16,7 @@ use Hyperf\Utils\Contracts\Arrayable;
 
 class TableAdapter implements Countable, Arrayable
 {
-    /**
-     * @var array
-     */
-    private $container = [];
+    private array $container = [];
 
     public function __construct(string $serialized)
     {

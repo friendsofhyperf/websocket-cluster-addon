@@ -16,15 +16,9 @@ use Swoole\Table;
 
 class TableClient implements ClientInterface
 {
-    /**
-     * @var Table
-     */
-    private $userTable;
+    private Table $userTable;
 
-    /**
-     * @var Table
-     */
-    private $connTable;
+    private Table $connTable;
 
     public function add(int $fd, $uid): void
     {

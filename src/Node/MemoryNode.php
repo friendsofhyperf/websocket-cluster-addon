@@ -24,17 +24,11 @@ class MemoryNode implements NodeInterface
     /**
      * @var MemoryAdapter[]
      */
-    protected $adapters = [];
+    protected array $adapters = [];
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
+    protected StdoutLoggerInterface $logger;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -65,9 +59,7 @@ class MemoryNode implements NodeInterface
     public function users(): int
     {
         return collect($this->adapters)
-            ->reject(function (MemoryAdapter $adapter, $uid) {
-                return $uid == 0 || $adapter->count() <= 0;
-            })
+            ->reject(fn (MemoryAdapter $adapter, $uid) => $uid == 0 || $adapter->count() <= 0)
             ->count();
     }
 

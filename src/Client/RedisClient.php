@@ -12,27 +12,27 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Event\StatusChanged;
+use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class RedisClient implements ClientInterface
 {
-    /**
-     * @var string
-     */
-    protected $prefix;
+    protected string $prefix;
 
     /**
      * @var \Redis
      */
-    protected $redis;
+    protected Redis $redis;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
+
+    protected StatusInterface $status;
+
+    protected EventDispatcherInterface $eventDispatcher;
 
     public function __construct(ContainerInterface $container)
     {
@@ -42,13 +42,17 @@ class RedisClient implements ClientInterface
         $pool = $config->get('websocket_cluster.client.pool', 'default');
         $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:client');
         $this->redis = $container->get(RedisFactory::class)->get($pool);
+        $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
+        $this->status = make(StatusInterface::class, [
+            'redis' => $this->redis,
+            'key' => $this->getUserOnlineKey(),
+        ]);
     }
 
     public function add(int $fd, $uid): void
     {
-        if ($this->redis->sAdd($this->getUserOnlineKey(), $uid)) {
-            $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
-        }
+        $this->status->set($uid, true);
+        $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
 
         $this->redis->multi();
         $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
@@ -66,10 +70,10 @@ class RedisClient implements ClientInterface
         $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
 
         if ($this->size($uid) == 0) {
-            $this->redis->sRem($this->getUserOnlineKey(), $uid);
+            $this->status->set($uid, false);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
 
-            $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 0));
+            $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
         }
     }
 
@@ -85,8 +89,8 @@ class RedisClient implements ClientInterface
 
         foreach ($uids as $uid) {
             $this->redis->del($this->getUserClientKey($uid));
-            $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
+            $this->status->set($uid, false);
         }
 
         $this->redis->exec();
@@ -94,30 +98,12 @@ class RedisClient implements ClientInterface
 
     public function getOnlineStatus($uid): bool
     {
-        return $this->redis->sIsMember($this->getUserOnlineKey(), $uid);
+        return $this->status->get($uid);
     }
 
     public function multiGetOnlineStatus(array $uids): array
     {
-        $uids = array_filter($uids);
-        $result = array_fill_keys($uids, false);
-        $tmpKey = $this->getOnlineTmpKey();
-
-        try {
-            // tmp
-            $this->redis->sAdd($tmpKey, ...$uids);
-
-            // intersection
-            $onlines = $this->redis->sInter($tmpKey, $this->getUserOnlineKey());
-            $onlines = array_fill_keys($onlines, true);
-
-            // array merge
-            $result = array_replace($result, $onlines);
-        } finally {
-            $this->redis->del($tmpKey);
-        }
-
-        return $result;
+        return $this->status->multiGet($uids);
     }
 
     public function clients($uid): array

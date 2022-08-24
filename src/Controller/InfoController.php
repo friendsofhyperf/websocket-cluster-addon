@@ -25,25 +25,13 @@ use Psr\Container\ContainerInterface;
  */
 class InfoController
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
 
-    /**
-     * @var RequestInterface
-     */
-    protected $request;
+    protected RequestInterface $request;
 
-    /**
-     * @var Server
-     */
-    protected $server;
+    protected Server $server;
 
-    /**
-     * @var ClientInterface
-     */
-    protected $client;
+    protected ClientInterface $client;
 
     public function __construct(ContainerInterface $container)
     {

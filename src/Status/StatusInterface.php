@@ -9,26 +9,18 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
-namespace FriendsOfHyperf\WebsocketClusterAddon;
+namespace FriendsOfHyperf\WebsocketClusterAddon\Status;
 
-class PipeMessage
+interface StatusInterface
 {
-    public int $fd;
+    public function set($uid, bool $status): void;
+
+    public function get($uid): bool;
 
     /**
-     * @var int|string
+     * @return array<int, bool>
      */
-    public $uid;
+    public function multiGet(array $uids): array;
 
-    public bool $isAdd;
-
-    /**
-     * @param int|string $uid
-     */
-    public function __construct(int $fd, $uid, bool $isAdd = true)
-    {
-        $this->fd = $fd;
-        $this->uid = $uid;
-        $this->isAdd = $isAdd;
-    }
+    public function count(): int;
 }

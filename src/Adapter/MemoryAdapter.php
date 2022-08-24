@@ -16,7 +16,7 @@ use Hyperf\Utils\Contracts\Arrayable;
 
 class MemoryAdapter implements Countable, Arrayable
 {
-    protected $container = [];
+    protected array $container = [];
 
     public function add(int $fd): void
     {

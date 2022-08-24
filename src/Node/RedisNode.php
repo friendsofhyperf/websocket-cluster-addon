@@ -20,25 +20,16 @@ use Psr\Container\ContainerInterface;
 
 class RedisNode implements NodeInterface
 {
-    /**
-     * @var string
-     */
-    protected $prefix;
+    protected string $prefix;
 
     /**
      * @var \Hyperf\Redis\RedisProxy|Redis|\Redis
      */
-    protected $redis;
+    protected Redis $redis;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
+    protected StdoutLoggerInterface $logger;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {

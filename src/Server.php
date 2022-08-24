@@ -16,6 +16,7 @@ use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coordinator\Constants;
 use Hyperf\Utils\Coordinator\CoordinatorManager;
@@ -26,61 +27,33 @@ use Throwable;
 
 class Server
 {
-    /**
-     * @var string
-     */
-    protected $prefix;
+    protected string $prefix;
 
-    /**
-     * @var int
-     */
-    protected $workerId;
+    protected int $workerId;
 
     /**
      * @var \Redis
      */
-    protected $redis;
+    protected Redis $redis;
 
-    /**
-     * @var string
-     */
-    protected $serverId;
+    protected string $serverId;
 
-    /**
-     * @var bool
-     */
-    protected $stopped = false;
+    protected bool $stopped = false;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
+    protected StdoutLoggerInterface $logger;
 
-    /**
-     * @var NodeInterface
-     */
-    protected $node;
+    protected NodeInterface $node;
 
-    /**
-     * @var Sender
-     */
-    protected $sender;
+    protected Sender $sender;
 
-    /**
-     * @var string
-     */
-    protected $channel;
+    protected string $channel;
 
     /**
      * Milliseconds.
-     * @var int
      */
-    protected $retryInterval = 1000;
+    protected int $retryInterval = 1000;
 
-    /**
-     * @var ClientInterface
-     */
-    protected $client;
+    protected ClientInterface $client;
 
     public function __construct(ContainerInterface $container)
     {
@@ -169,7 +142,7 @@ class Server
 
             while (true) {
                 if ($this->stopped) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, self::class));
                     break;
                 }
 
@@ -185,7 +158,7 @@ class Server
                 $this->redis->hSet($this->getMonitorKey(), $this->getServerId(), $data);
 
                 if (time() % 5 == 0) {
-                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, __CLASS__));
+                    $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s keepalive by %s', $this->serverId, self::class));
                 }
 
                 sleep(1);
@@ -200,7 +173,7 @@ class Server
 
             while (true) {
                 if ($this->stopped) {
-                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, __CLASS__));
+                    $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, self::class));
                     break;
                 }
 
@@ -223,9 +196,7 @@ class Server
     public function getMonitors(): array
     {
         return collect($this->redis->hGetAll($this->getMonitorKey()))
-            ->transform(function ($item) {
-                return json_decode($item, true);
-            })
+            ->transform(fn ($item) => json_decode($item, true, 512, JSON_THROW_ON_ERROR))
             ->values()
             ->toArray();
     }
@@ -249,7 +220,7 @@ class Server
             $this->node->flush($serverId);
         }
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clear up expired servers by %s', $this->serverId, self::class));
     }
 
     protected function publish(string $channel, string $payload): void

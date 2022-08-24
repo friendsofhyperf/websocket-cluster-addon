@@ -24,20 +24,11 @@ use RuntimeException;
 
 class MixSubscriber implements SubscriberInterface
 {
-    /**
-     * @var Subscriber
-     */
-    protected $sub;
+    protected Subscriber $sub;
 
-    /**
-     * @var string
-     */
-    protected $redisPool = 'default';
+    protected string $redisPool = 'default';
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private StdoutLoggerInterface $logger;
 
     public function __construct(ContainerInterface $container)
     {
@@ -87,7 +78,7 @@ class MixSubscriber implements SubscriberInterface
 
             Coroutine::create(function () use ($callback, $data) {
                 $callback($data->channel, $data->payload);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $data->channel, json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE), __CLASS__));
+                $this->logger->debug(sprintf('[WebsocketClusterAddon] channel: %s, payload: %s by %s', $data->channel, json_encode(unserialize($data->payload), JSON_UNESCAPED_UNICODE), self::class));
             });
         }
     }
