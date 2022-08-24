@@ -34,8 +34,6 @@ class RedisClient implements ClientInterface
 
     public function add(int $fd, $uid): void
     {
-        // if ($this->redis->sAdd($this->getUserOnlineKey(), $uid)) {
-        // }
         $this->status->set($uid, true);
         $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
 
@@ -55,7 +53,6 @@ class RedisClient implements ClientInterface
         $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
 
         if ($this->size($uid) == 0) {
-            // $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->status->set($uid, false);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
 
@@ -75,7 +72,6 @@ class RedisClient implements ClientInterface
 
         foreach ($uids as $uid) {
             $this->redis->del($this->getUserClientKey($uid));
-            // $this->redis->sRem($this->getUserOnlineKey(), $uid);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
             $this->status->set($uid, false);
         }
@@ -85,27 +81,11 @@ class RedisClient implements ClientInterface
 
     public function getOnlineStatus($uid): bool
     {
-        // return $this->redis->sIsMember($this->getUserOnlineKey(), $uid);
         return $this->status->get($uid);
     }
 
     public function multiGetOnlineStatus(array $uids): array
     {
-        // $uids = array_filter($uids);
-        // $result = array_fill_keys($uids, false);
-        // $tmpKey = $this->getOnlineTmpKey();
-
-        // try {
-        //     $this->redis->sAdd($tmpKey, ...$uids);
-        //     $onlines = $this->redis->sInter($tmpKey, $this->getUserOnlineKey());
-        //     $onlines = array_fill_keys($onlines, true);
-        //     $result = array_replace($result, $onlines);
-        // } finally {
-        //     $this->redis->del($tmpKey);
-        // }
-
-        // return $result;
-
         return $this->status->multiGet($uids);
     }
 
@@ -117,7 +97,6 @@ class RedisClient implements ClientInterface
     public function size($uid): int
     {
         if ($uid == 0) {
-            // return $this->redis->sCard($this->getUserOnlineKey());
             return $this->status->count();
         }
 
