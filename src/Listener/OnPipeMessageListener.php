@@ -28,20 +28,11 @@ use Psr\Container\ContainerInterface;
  */
 class OnPipeMessageListener implements ListenerInterface
 {
-    /**
-     * @var NodeInterface
-     */
-    private $node;
+    private NodeInterface $node;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    private $logger;
+    private StdoutLoggerInterface $logger;
 
-    /**
-     * @var Server
-     */
-    private $server;
+    private Server $server;
 
     public function __construct(ContainerInterface $container)
     {
@@ -88,7 +79,7 @@ class OnPipeMessageListener implements ListenerInterface
                 $this->node->del($fd, $uid);
             }
 
-            $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.', $this->server->getServerId(), $this->server->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', __CLASS__));
+            $this->logger->debug(sprintf('[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.', $this->server->getServerId(), $this->server->getWorkerId(), $fd, $isAdd ? 'added' : 'deleted', self::class));
         }
     }
 }

@@ -18,10 +18,7 @@ class StatusChanged
      */
     public $uid;
 
-    /**
-     * @var int
-     */
-    public $status;
+    public int $status;
 
     /**
      * @param int|string $uid

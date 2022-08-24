@@ -23,20 +23,11 @@ use Psr\Container\ContainerInterface;
  */
 class StopServerHandler implements SignalHandlerInterface
 {
-    /**
-     * @var ConfigInterface
-     */
-    protected $config;
+    protected ConfigInterface $config;
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
+    protected StdoutLoggerInterface $logger;
 
-    /**
-     * @var Server
-     */
-    protected $server;
+    protected Server $server;
 
     public function __construct(ContainerInterface $container)
     {
@@ -62,6 +53,6 @@ class StopServerHandler implements SignalHandlerInterface
 
         $this->server->stop();
 
-        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s stopped by %s.', $this->server->getServerId(), $this->server->getWorkerId(), __CLASS__));
+        $this->logger->info(sprintf('[WebsocketClusterAddon] @%s #%s stopped by %s.', $this->server->getServerId(), $this->server->getWorkerId(), self::class));
     }
 }

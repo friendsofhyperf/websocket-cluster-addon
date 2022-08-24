@@ -13,20 +13,14 @@ namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 class PipeMessage
 {
-    /**
-     * @var int
-     */
-    public $fd;
+    public int $fd;
 
     /**
      * @var int|string
      */
     public $uid;
 
-    /**
-     * @var bool
-     */
-    public $isAdd;
+    public bool $isAdd;
 
     /**
      * @param int|string $uid
