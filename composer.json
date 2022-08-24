@@ -48,6 +48,9 @@
         "cs-fix": "php-cs-fixer fix $1"
     },
     "extra": {
+        "branch-alias": {
+            "3.x-dev": "3.1.x-dev"
+        },
         "hyperf": {
             "config": "FriendsOfHyperf\\WebsocketClusterAddon\\ConfigProvider"
         }
