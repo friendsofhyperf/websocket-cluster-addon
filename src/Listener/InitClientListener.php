@@ -13,6 +13,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Client\TableClient;
+use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
+use FriendsOfHyperf\WebsocketClusterAddon\Status\TableStatus;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Annotation\Listener;
@@ -30,7 +32,12 @@ class InitClientListener implements ListenerInterface
     /**
      * @var TableClient
      */
-    private $client;
+    private ClientInterface $client;
+
+    /**
+     * @var TableStatus
+     */
+    private StatusInterface $status;
 
     private ConfigInterface $config;
 
@@ -38,6 +45,7 @@ class InitClientListener implements ListenerInterface
     {
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->client = $container->get(ClientInterface::class);
+        $this->status = $container->get(StatusInterface::class);
         $this->config = $container->get(ConfigInterface::class);
     }
 
@@ -59,7 +67,13 @@ class InitClientListener implements ListenerInterface
         if ($this->client instanceof TableClient) {
             $size = (int) $this->config->get('websocket_cluster.client.table.size', 10240);
             $this->client->initTable($size);
-            $this->logger->info(sprintf('[WebsocketClusterAddon] table initialized by %s', self::class));
+            $this->logger->info(sprintf('[WebsocketClusterAddon] client table initialized by %s', self::class));
+        }
+
+        if ($this->status instanceof TableStatus) {
+            $size = (int) $this->config->get('websocket_cluster.client.table.size', 10240);
+            $this->status->initTable($size);
+            $this->logger->info(sprintf('[WebsocketClusterAddon] status table initialized by %s', self::class));
         }
     }
 }
