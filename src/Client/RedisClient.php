@@ -32,8 +32,6 @@ class RedisClient implements ClientInterface
 
     protected StatusInterface $status;
 
-    protected EventDispatcherInterface $eventDispatcher;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -42,7 +40,6 @@ class RedisClient implements ClientInterface
         $pool = $config->get('websocket_cluster.client.pool', 'default');
         $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:client');
         $this->redis = $container->get(RedisFactory::class)->get($pool);
-        $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
         $this->status = make(StatusInterface::class, [
             'redis' => $this->redis,
             'key' => $this->getUserOnlineKey(),
@@ -52,7 +49,7 @@ class RedisClient implements ClientInterface
     public function add(int $fd, $uid): void
     {
         $this->status->set($uid, true);
-        $this->eventDispatcher->dispatch(new StatusChanged($uid, 1));
+        $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
 
         $this->redis->multi();
         $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
@@ -73,7 +70,7 @@ class RedisClient implements ClientInterface
             $this->status->set($uid, false);
             $this->redis->zRem($this->getUserActiveKey(), $uid);
 
-            $this->eventDispatcher->dispatch(new StatusChanged($uid, 0));
+            $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 0));
         }
     }
 
@@ -118,6 +115,11 @@ class RedisClient implements ClientInterface
         }
 
         return $this->redis->sCard($this->getUserClientKey($uid));
+    }
+
+    public function getStatusInstance(): ?StatusInterface
+    {
+        return $this->status;
     }
 
     /**

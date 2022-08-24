@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Adapter\TableAdapter;
+use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use Swoole\Table;
 
 class TableClient implements ClientInterface
@@ -85,6 +86,11 @@ class TableClient implements ClientInterface
             $table->column('fd', Table::TYPE_INT);
             $table->create();
         });
+    }
+
+    public function getStatusInstance(): ?StatusInterface
+    {
+        return null;
     }
 
     /**

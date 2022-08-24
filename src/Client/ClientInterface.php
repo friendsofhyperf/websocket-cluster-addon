@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
+use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
+
 interface ClientInterface
 {
     /**
@@ -49,4 +51,6 @@ interface ClientInterface
      * @param (int|string)[] $uids
      */
     public function multiGetOnlineStatus(array $uids): array;
+
+    public function getStatusInstance(): ?StatusInterface;
 }
