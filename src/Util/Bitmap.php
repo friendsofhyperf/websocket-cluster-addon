@@ -23,6 +23,7 @@ class Bitmap
 
     public function __construct(Redis $redis)
     {
+        $this->redis = $redis;
         $this->isCluster = value(function () use ($redis) {
             $redisConnection = (fn () => $this->getConnection(true))->call($redis);
             $connection = (fn () => $this->connection)->call($redisConnection);
