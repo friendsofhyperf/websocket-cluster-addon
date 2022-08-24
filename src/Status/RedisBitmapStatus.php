@@ -38,8 +38,9 @@ class RedisBitmapStatus implements StatusInterface
     public function multiGet(array $uids): array
     {
         $uids = array_map(fn ($uid) => (int) $uid, $uids);
+        $result = $this->bitmap->multiGet($this->key, $uids);
 
-        return $this->bitmap->multiGet($this->key, $uids);
+        return array_map(fn ($status) => $status === 1, $result);
     }
 
     public function count(): int
