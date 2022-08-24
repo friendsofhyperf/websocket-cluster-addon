@@ -29,14 +29,14 @@ class Server
 {
     protected string $prefix;
 
-    protected int $workerId;
-
     /**
      * @var \Redis
      */
     protected Redis $redis;
 
-    protected string $serverId;
+    protected ?string $serverId = null;
+
+    protected ?int $workerId = null;
 
     protected bool $stopped = false;
 
