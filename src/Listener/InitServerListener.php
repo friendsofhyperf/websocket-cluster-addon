@@ -26,7 +26,9 @@ use Hyperf\Framework\Event\BeforeMainServerStart;
 use Hyperf\Framework\Event\MainWorkerStart;
 use Hyperf\Utils\Str;
 
-#[Listener]
+/**
+ * @Listener
+ */
 class InitServerListener implements ListenerInterface
 {
     protected ConfigInterface $config;
