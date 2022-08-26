@@ -22,7 +22,7 @@ use Hyperf\HttpServer\Annotation\GetMapping;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-#[Controller(prefix: 'websocket')]
+#[Controller(prefix: 'websocket-cluster-addon')]
 class InfoController
 {
     public function __construct(
