@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
+use Closure;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Context\Context;
@@ -30,10 +31,7 @@ class MemoryNode implements NodeInterface
 
     public function add(int $fd, $uid): void
     {
-        if (! isset($this->users[$uid])) {
-            $this->users[$uid] = [];
-        }
-        $this->users[$uid][] = $fd;
+        $this->overrideUserConnections($uid, fn ($fds) => $fds[] = $fd);
 
         $this->connections[] = $fd;
 
@@ -44,13 +42,13 @@ class MemoryNode implements NodeInterface
 
     public function del(int $fd, $uid): void
     {
-        if (isset($this->users[$uid])) {
-            $index = array_search($fd, $this->users[$uid]);
-
+        $this->overrideUserConnections($uid, function ($fds) use ($fd) {
+            $index = array_search($fd, $fds);
             if ($index !== false) {
-                unset($this->users[$uid][$index]);
+                unset($fds[$index]);
             }
-        }
+            return $fds;
+        });
 
         $index = array_search($fd, $this->connections);
         if ($index !== false) {
@@ -99,7 +97,7 @@ class MemoryNode implements NodeInterface
         return $this->container->get(Server::class);
     }
 
-    protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
+    protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
     {
         $isAdd = $method == 'add';
         $swooleServer = $this->getSwooleServer();
@@ -112,5 +110,10 @@ class MemoryNode implements NodeInterface
                 $this->logger->debug(sprintf('[WebsocketClusterAddon] Let Worker.%s try to %s.', $workerId, $fd));
             }
         }
+    }
+
+    protected function overrideUserConnections($uid, Closure $callback): array
+    {
+        return $this->users[$uid] = $callback($this->users[$uid] ?? []);
     }
 }
