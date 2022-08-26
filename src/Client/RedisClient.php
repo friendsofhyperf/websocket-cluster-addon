@@ -43,10 +43,8 @@ class RedisClient implements ClientInterface
         $this->status->set($uid, true);
         $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
 
-        $this->redis->multi(\Redis::PIPELINE);
         $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
         $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
-        $this->redis->exec();
     }
 
     public function renew(int $fd, $uid): void
@@ -74,15 +72,11 @@ class RedisClient implements ClientInterface
             return;
         }
 
-        $this->redis->multi(\Redis::PIPELINE);
-
         foreach ($uids as $uid) {
             $this->redis->del($this->getUserClientKey($uid));
             $this->redis->zRem($this->getUserActiveKey(), $uid);
             $this->status->set($uid, false);
         }
-
-        $this->redis->exec();
     }
 
     public function getOnlineStatus($uid): bool

@@ -192,10 +192,8 @@ class Server
             return;
         }
 
-        $this->redis->multi(\Redis::PIPELINE);
         $this->redis->zRem($this->getNodeKey(), ...$expiredServers);
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
-        $this->redis->exec();
 
         foreach ($expiredServers as $serverId) {
             $this->node->flush($serverId);
