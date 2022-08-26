@@ -33,7 +33,7 @@ class MemoryNode implements NodeInterface
     {
         $this->overrideUserConnections($uid, fn ($fds) => $fds[] = $fd);
 
-        $this->connections[] = $fd;
+        $this->overrideGlobalConnections(fn ($fds) => $fds[] = $fd);
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -50,10 +50,13 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        $index = array_search($fd, $this->connections);
-        if ($index !== false) {
-            unset($this->connections[$index]);
-        }
+        $this->overrideGlobalConnections(function ($fds) use ($fd) {
+            $index = array_search($fd, $fds);
+            if ($index !== false) {
+                unset($fds[$index]);
+            }
+            return $fds;
+        });
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -115,5 +118,10 @@ class MemoryNode implements NodeInterface
     protected function overrideUserConnections($uid, Closure $callback): array
     {
         return $this->users[$uid] = $callback($this->users[$uid] ?? []);
+    }
+
+    protected function overrideGlobalConnections(Closure $callback): array
+    {
+        return $this->connections = $callback($this->connections);
     }
 }
