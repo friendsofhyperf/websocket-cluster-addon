@@ -11,35 +11,39 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Adapter\TableAdapter;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use Swoole\Table;
 
 class TableClient implements ClientInterface
 {
-    protected Table $userTable;
+    public const FD = 'fd';
 
-    protected Table $connTable;
+    public const FDS = 'fds';
+
+    protected Table $users;
+
+    protected Table $connections;
 
     public function initTable(int $size = 10240): void
     {
-        $this->userTable = tap(new Table($size), function (Table $table) {
-            $table->column('fds', Table::TYPE_STRING, 102400);
+        $this->users = tap(new Table($size), function (Table $table) {
+            $table->column(self::FDS, Table::TYPE_STRING, 102400);
             $table->create();
         });
 
-        $this->connTable = tap(new Table($size * 20), function (Table $table) {
-            $table->column('fd', Table::TYPE_INT);
+        $this->connections = tap(new Table($size * 20), function (Table $table) {
+            $table->column(self::FD, Table::TYPE_INT);
             $table->create();
         });
     }
 
     public function add(int $fd, $uid): void
     {
-        $fds = $this->makeAdapter($uid)->add($fd)->__toString();
+        $fds = $this->clients($uid);
+        $fds[] = $fd;
 
-        $this->userTable->set((string) $uid, ['fds' => $fds]);
-        $this->connTable->set((string) $fd, ['fd' => $fd]);
+        $this->users->set((string) $uid, [self::FDS => json_encode($fds)]);
+        $this->connections->set((string) $fd, [self::FD => $fd]);
     }
 
     public function renew(int $fd, $uid): void
@@ -48,24 +52,34 @@ class TableClient implements ClientInterface
 
     public function del(int $fd, $uid): void
     {
-        $fds = $this->makeAdapter($uid)->del($fd)->__toString();
+        $fds = $this->clients($uid);
+        $index = array_search($fd, $fds);
+        if ($index !== false) {
+            unset($fds[$index]);
+        }
 
-        $this->userTable->set((string) $uid, ['fds' => $fds]);
-        $this->connTable->del((string) $fd);
+        $this->users->set((string) $uid, [self::FDS => json_encode($fds)]);
+        $this->connections->del((string) $fd);
     }
 
     public function clients($uid): array
     {
-        return $this->makeAdapter($uid)->toArray();
-    }
+        $fds = $this->users->get((string) $uid, self::FDS);
 
-    public function size($uid): int
-    {
-        if ($uid == 0) {
-            return $this->connTable->count();
+        if ($fds) {
+            return json_decode($fds, true);
         }
 
-        return $this->makeAdapter($uid)->count();
+        return [];
+    }
+
+    public function size($uid = null): int
+    {
+        if (! $uid) {
+            return $this->connections->count();
+        }
+
+        return count($this->clients($uid));
     }
 
     public function clearUpExpired(): void
@@ -91,12 +105,5 @@ class TableClient implements ClientInterface
     public function getStatusInstance(): ?StatusInterface
     {
         return null;
-    }
-
-    protected function makeAdapter(int|string $uid): TableAdapter
-    {
-        $serialized = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
-
-        return new TableAdapter($serialized);
     }
 }

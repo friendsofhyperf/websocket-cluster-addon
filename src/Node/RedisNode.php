@@ -14,15 +14,21 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Redis\Redis;
+use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 
 class RedisNode implements NodeInterface
 {
     protected string $prefix;
 
-    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger, protected Redis $redis, ConfigInterface $config)
+    protected Redis $redis;
+
+    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger, ConfigInterface $config)
     {
         $this->prefix = $config->get('websocket_cluster.node.prefix', 'wsca:node');
+        $pool = $config->get('websocket_cluster.node.pool', 'default');
+        $this->redis = $container->get(RedisFactory::class)->get($pool);
     }
 
     public function add(int $fd, $uid): void
@@ -44,14 +50,14 @@ class RedisNode implements NodeInterface
         return $num > 0 ? ($num - 1) : $num;
     }
 
-    public function clients($uid): array
+    public function clients($uid = null): array
     {
-        return $this->redis->sMembers($this->getKey($uid));
+        return $this->redis->sMembers($this->getKey($uid ?? 0));
     }
 
-    public function size($uid): int
+    public function size($uid = null): int
     {
-        return $this->redis->sCard($this->getKey($uid));
+        return $this->redis->sCard($this->getKey($uid ?? 0));
     }
 
     public function flush(?string $serverId = null): void

@@ -14,6 +14,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 use FriendsOfHyperf\WebsocketClusterAddon\Event\StatusChanged;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Redis\Redis;
+use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -23,11 +25,15 @@ class RedisClient implements ClientInterface
 
     protected StatusInterface $status;
 
-    public function __construct(protected ContainerInterface $container, protected Redis $redis, ConfigInterface $config)
+    protected Redis $redis;
+
+    public function __construct(protected ContainerInterface $container, ConfigInterface $config)
     {
         $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:client');
+        $pool = $config->get('websocket_cluster.client.pool', 'default');
+        $this->redis = $container->get(RedisFactory::class)->get($pool);
         $this->status = make(StatusInterface::class, [
-            'redis' => $redis,
+            'redis' => $this->redis,
             'key' => $this->getUserOnlineKey(),
         ]);
     }
@@ -94,9 +100,9 @@ class RedisClient implements ClientInterface
         return $this->redis->sMembers($this->getUserClientKey($uid));
     }
 
-    public function size($uid): int
+    public function size($uid = null): int
     {
-        if ($uid == 0) {
+        if (! $uid) {
             return $this->status->count();
         }
 

@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Adapter\MemoryAdapter;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Context\Context;
@@ -21,10 +20,9 @@ use Swoole\Server as SwooleServer;
 
 class MemoryNode implements NodeInterface
 {
-    /**
-     * @var MemoryAdapter[]
-     */
-    protected array $adapters = [];
+    protected array $users = [];
+
+    protected array $connections = [];
 
     public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger)
     {
@@ -32,8 +30,12 @@ class MemoryNode implements NodeInterface
 
     public function add(int $fd, $uid): void
     {
-        $this->getAdapter($uid)->add($fd);
-        $this->getAdapter(0)->add($fd);
+        if (! isset($this->users[$uid])) {
+            $this->users[$uid] = [];
+        }
+        $this->users[$uid][] = $fd;
+
+        $this->connections[] = $fd;
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -42,8 +44,18 @@ class MemoryNode implements NodeInterface
 
     public function del(int $fd, $uid): void
     {
-        $this->getAdapter($uid)->del($fd);
-        $this->getAdapter(0)->del($fd);
+        if (isset($this->users[$uid])) {
+            $index = array_search($fd, $this->users[$uid]);
+
+            if ($index !== false) {
+                unset($this->users[$uid][$index]);
+            }
+        }
+
+        $index = array_search($fd, $this->connections);
+        if ($index !== false) {
+            unset($this->connections[$index]);
+        }
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -52,32 +64,29 @@ class MemoryNode implements NodeInterface
 
     public function users(): int
     {
-        return collect($this->adapters)
-            ->reject(fn (MemoryAdapter $adapter, $uid) => $uid == 0 || $adapter->count() <= 0)
-            ->count();
+        return count($this->users);
     }
 
-    public function clients($uid): array
+    public function clients($uid = null): array
     {
-        return $this->getAdapter($uid)->toArray();
+        if (! $uid) {
+            return $this->connections;
+        }
+
+        if (! isset($this->users[$uid])) {
+            $this->users[$uid] = [];
+        }
+
+        return $this->users[$uid];
     }
 
-    public function size($uid): int
+    public function size($uid = null): int
     {
-        return $this->getAdapter($uid)->count();
+        return count($this->users[$uid] ?? []);
     }
 
     public function flush(?string $serverId = null): void
     {
-    }
-
-    protected function getAdapter($uid): MemoryAdapter
-    {
-        if (! isset($this->adapters[$uid])) {
-            $this->adapters[$uid] = make(MemoryAdapter::class);
-        }
-
-        return $this->adapters[$uid];
     }
 
     protected function getSwooleServer(): SwooleServer
