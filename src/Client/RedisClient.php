@@ -14,6 +14,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 use FriendsOfHyperf\WebsocketClusterAddon\Event\StatusChanged;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Redis\Redis;
+use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -23,11 +25,15 @@ class RedisClient implements ClientInterface
 
     protected StatusInterface $status;
 
-    public function __construct(protected ContainerInterface $container, protected Redis $redis, ConfigInterface $config)
+    protected Redis $redis;
+
+    public function __construct(protected ContainerInterface $container, ConfigInterface $config)
     {
         $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:client');
+        $pool = $config->get('websocket_cluster.client.pool', 'default');
+        $this->redis = $container->get(RedisFactory::class)->get($pool);
         $this->status = make(StatusInterface::class, [
-            'redis' => $redis,
+            'redis' => $this->redis,
             'key' => $this->getUserOnlineKey(),
         ]);
     }
@@ -37,10 +43,8 @@ class RedisClient implements ClientInterface
         $this->status->set($uid, true);
         $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
 
-        $this->redis->multi(\Redis::PIPELINE);
         $this->redis->sAdd($this->getUserClientKey($uid), $this->getSid($uid, $fd));
         $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
-        $this->redis->exec();
     }
 
     public function renew(int $fd, $uid): void
@@ -68,15 +72,11 @@ class RedisClient implements ClientInterface
             return;
         }
 
-        $this->redis->multi(\Redis::PIPELINE);
-
         foreach ($uids as $uid) {
             $this->redis->del($this->getUserClientKey($uid));
             $this->redis->zRem($this->getUserActiveKey(), $uid);
             $this->status->set($uid, false);
         }
-
-        $this->redis->exec();
     }
 
     public function getOnlineStatus($uid): bool
@@ -94,9 +94,9 @@ class RedisClient implements ClientInterface
         return $this->redis->sMembers($this->getUserClientKey($uid));
     }
 
-    public function size($uid): int
+    public function size($uid = null): int
     {
-        if ($uid == 0) {
+        if (! $uid) {
             return $this->status->count();
         }
 

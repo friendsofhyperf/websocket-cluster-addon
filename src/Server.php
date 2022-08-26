@@ -136,11 +136,6 @@ class Server
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             $this->timer->tick(1, function () {
-                // if ($this->stopped) {
-                //     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, self::class));
-                //     return;
-                // }
-
                 // Keep server alive
                 $this->redis->zAdd($this->getNodeKey(), time(), $this->serverId);
 
@@ -165,11 +160,6 @@ class Server
             CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             $this->timer->tick(5, function () {
-                // if ($this->stopped) {
-                //     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, self::class));
-                //     return;
-                // }
-
                 // Clear up expired servers
                 $this->clearUpExpiredNodes();
 
@@ -202,10 +192,8 @@ class Server
             return;
         }
 
-        $this->redis->multi(\Redis::PIPELINE);
         $this->redis->zRem($this->getNodeKey(), ...$expiredServers);
         $this->redis->hDel($this->getMonitorKey(), ...$expiredServers);
-        $this->redis->exec();
 
         foreach ($expiredServers as $serverId) {
             $this->node->flush($serverId);

@@ -32,9 +32,7 @@ class TableStatus implements StatusInterface
 
     public function get($uid): bool
     {
-        $status = $this->table->get($uid)['status'] ?? 0;
-
-        return (bool) $status;
+        return (bool) $this->table->get($uid)['status'] ?? false;
     }
 
     public function multiGet(array $uids): array

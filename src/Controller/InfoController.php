@@ -14,13 +14,15 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Controller;
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
+use FriendsOfHyperf\WebsocketClusterAddon\Status\RedisBitmapStatus;
+use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-#[Controller(prefix: 'websocket')]
+#[Controller(prefix: 'websocket-cluster-addon')]
 class InfoController
 {
     public function __construct(
@@ -47,9 +49,10 @@ class InfoController
             'instances' => [
                 NodeInterface::class => $this->container->get(NodeInterface::class)::class,
                 ClientInterface::class => $this->container->get(ClientInterface::class)::class,
+                StatusInterface::class => RedisBitmapStatus::class,
                 SubscriberInterface::class => $this->container->get(SubscriberInterface::class)::class,
             ],
-            'online' => $this->client->size(0),
+            'online' => $this->client->size(),
             'nodes' => $this->server->getMonitors(),
         ];
     }

@@ -11,24 +11,27 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Adapter\TableAdapter;
 use Swoole\Table;
 
 class TableNode implements NodeInterface
 {
-    private Table $userTable;
+    public const FD = 'fd';
 
-    private Table $connTable;
+    public const FDS = 'fds';
+
+    private Table $users;
+
+    private Table $connections;
 
     public function initTable(int $size = 10240): void
     {
-        $this->userTable = tap(new Table($size), function (Table $table) {
-            $table->column('fds', Table::TYPE_STRING, 102400);
+        $this->users = tap(new Table($size), function (Table $table) {
+            $table->column(self::FDS, Table::TYPE_STRING, 102400);
             $table->create();
         });
 
-        $this->connTable = tap(new Table($size * 20), function (Table $table) {
-            $table->column('fd', Table::TYPE_INT);
+        $this->connections = tap(new Table($size * 20), function (Table $table) {
+            $table->column(self::FD, Table::TYPE_INT);
             $table->create();
         });
     }
@@ -38,10 +41,11 @@ class TableNode implements NodeInterface
      */
     public function add(int $fd, $uid): void
     {
-        $fds = $this->makeAdapter($uid)->add($fd)->__toString();
+        $fds = $this->clients($uid);
+        $fds[] = $fd;
 
-        $this->userTable->set((string) $uid, ['fds' => $fds]);
-        $this->connTable->set((string) $fd, ['fd' => $fd]);
+        $this->users->set((string) $uid, [self::FDS => json_encode($fds)]);
+        $this->connections->set((string) $fd, [self::FD => $fd]);
     }
 
     /**
@@ -49,55 +53,53 @@ class TableNode implements NodeInterface
      */
     public function del(int $fd, $uid): void
     {
-        $fds = $this->makeAdapter($uid)->del($fd)->__toString();
+        $fds = $this->clients($uid);
+        $index = array_search($fd, $fds);
 
-        $this->userTable->set((string) $uid, ['fds' => $fds]);
-        $this->connTable->del((string) $fd);
-    }
-
-    /**
-     * @param int|string $uid
-     */
-    public function size($uid): int
-    {
-        if ($uid == 0) {
-            return $this->connTable->count();
+        if ($index !== false) {
+            unset($fds[$index]);
         }
 
-        return $this->makeAdapter($uid)->count();
+        $this->users->set((string) $uid, [self::FDS => json_encode($fds)]);
+        $this->connections->del((string) $fd);
     }
 
     public function users(): int
     {
-        return $this->userTable->count();
+        return $this->users->count();
     }
 
-    /**
-     * @param int|string $uid
-     */
-    public function clients($uid): array
+    public function size($uid = null): int
     {
-        if ($uid == 0) {
+        if (! $uid) {
+            return $this->connections->count();
+        }
+
+        return count($this->clients($uid));
+    }
+
+    public function clients($uid = null): array
+    {
+        if (! $uid) {
             $fds = [];
 
-            foreach ($this->connTable as $row) {
-                $fds[] = $row['fd'];
+            foreach ($this->connections as $row) {
+                $fds[] = $row[self::FD];
             }
 
             return $fds;
         }
 
-        return $this->makeAdapter($uid)->toArray();
+        $fds = $this->users->get((string) $uid, self::FDS);
+
+        if (! $fds) {
+            return [];
+        }
+
+        return json_decode($fds, true);
     }
 
     public function flush(?string $serverId = null): void
     {
-    }
-
-    protected function makeAdapter(int|string $uid): TableAdapter
-    {
-        $serialized = (string) ($this->userTable->get((string) $uid, 'fds') ?: '');
-
-        return new TableAdapter($serialized);
     }
 }

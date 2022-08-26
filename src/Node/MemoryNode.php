@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Adapter\MemoryAdapter;
+use Closure;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Context\Context;
@@ -21,10 +21,9 @@ use Swoole\Server as SwooleServer;
 
 class MemoryNode implements NodeInterface
 {
-    /**
-     * @var MemoryAdapter[]
-     */
-    protected array $adapters = [];
+    protected array $users = [];
+
+    protected array $connections = [];
 
     public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger)
     {
@@ -32,8 +31,9 @@ class MemoryNode implements NodeInterface
 
     public function add(int $fd, $uid): void
     {
-        $this->getAdapter($uid)->add($fd);
-        $this->getAdapter(0)->add($fd);
+        $this->overrideUserConnections($uid, fn ($fds) => $fds[] = $fd);
+
+        $this->overrideGlobalConnections(fn ($fds) => $fds[] = $fd);
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -42,8 +42,21 @@ class MemoryNode implements NodeInterface
 
     public function del(int $fd, $uid): void
     {
-        $this->getAdapter($uid)->del($fd);
-        $this->getAdapter(0)->del($fd);
+        $this->overrideUserConnections($uid, function ($fds) use ($fd) {
+            $index = array_search($fd, $fds);
+            if ($index !== false) {
+                unset($fds[$index]);
+            }
+            return $fds;
+        });
+
+        $this->overrideGlobalConnections(function ($fds) use ($fd) {
+            $index = array_search($fd, $fds);
+            if ($index !== false) {
+                unset($fds[$index]);
+            }
+            return $fds;
+        });
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -52,32 +65,29 @@ class MemoryNode implements NodeInterface
 
     public function users(): int
     {
-        return collect($this->adapters)
-            ->reject(fn (MemoryAdapter $adapter, $uid) => $uid == 0 || $adapter->count() <= 0)
-            ->count();
+        return count($this->users);
     }
 
-    public function clients($uid): array
+    public function clients($uid = null): array
     {
-        return $this->getAdapter($uid)->toArray();
+        if (! $uid) {
+            return $this->connections;
+        }
+
+        if (! isset($this->users[$uid])) {
+            $this->users[$uid] = [];
+        }
+
+        return $this->users[$uid];
     }
 
-    public function size($uid): int
+    public function size($uid = null): int
     {
-        return $this->getAdapter($uid)->count();
+        return count($this->users[$uid] ?? []);
     }
 
     public function flush(?string $serverId = null): void
     {
-    }
-
-    protected function getAdapter($uid): MemoryAdapter
-    {
-        if (! isset($this->adapters[$uid])) {
-            $this->adapters[$uid] = make(MemoryAdapter::class);
-        }
-
-        return $this->adapters[$uid];
     }
 
     protected function getSwooleServer(): SwooleServer
@@ -90,7 +100,7 @@ class MemoryNode implements NodeInterface
         return $this->container->get(Server::class);
     }
 
-    protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
+    protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
     {
         $isAdd = $method == 'add';
         $swooleServer = $this->getSwooleServer();
@@ -103,5 +113,15 @@ class MemoryNode implements NodeInterface
                 $this->logger->debug(sprintf('[WebsocketClusterAddon] Let Worker.%s try to %s.', $workerId, $fd));
             }
         }
+    }
+
+    protected function overrideUserConnections($uid, Closure $callback): array
+    {
+        return $this->users[$uid] = $callback($this->users[$uid] ?? []);
+    }
+
+    protected function overrideGlobalConnections(Closure $callback): array
+    {
+        return $this->connections = $callback($this->connections);
     }
 }

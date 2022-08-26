@@ -36,7 +36,6 @@ class RedisSetStatus implements StatusInterface
         $tmpKey = uniqid($this->key . ':');
 
         try {
-            // tmp
             $this->redis->sAdd($tmpKey, ...$uids);
             $onlines = $this->redis->sInter($tmpKey, $this->key);
             $onlines = array_fill_keys($onlines, true);

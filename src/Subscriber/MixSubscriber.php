@@ -15,6 +15,7 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Coordinator\Constants;
 use Hyperf\Coordinator\CoordinatorManager;
+use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Utils\Coroutine;
 use Mix\Redis\Subscriber\Message;
@@ -24,13 +25,14 @@ use RuntimeException;
 
 class MixSubscriber implements SubscriberInterface
 {
-    protected Subscriber $sub;
+    protected Subscriber $subscriber;
 
     public function __construct(ContainerInterface $container, protected StdoutLoggerInterface $logger)
     {
-        $this->sub = value(function () use ($container) {
+        $this->subscriber = value(function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
+            /** @var Redis $redis */
             $redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.subscriber.pool', 'default'));
             $host = $redis->getHost();
             $port = $redis->getPort();
@@ -46,7 +48,7 @@ class MixSubscriber implements SubscriberInterface
 
     public function subscribe($channel, callable $callback): void
     {
-        $sub = $this->sub;
+        $sub = $this->subscriber;
 
         $sub->subscribe($channel);
         $chan = $sub->channel();
