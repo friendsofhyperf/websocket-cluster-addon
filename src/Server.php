@@ -18,8 +18,6 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
-use Hyperf\Utils\Coordinator\Constants;
-use Hyperf\Utils\Coordinator\CoordinatorManager;
 use Hyperf\Utils\Coroutine;
 use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerInterface;
@@ -117,8 +115,6 @@ class Server
     public function subscribe(): void
     {
         Coroutine::create(function () {
-            // CoordinatorManager::until(Constants::WORKER_START)->yield();
-
             retry(PHP_INT_MAX, function () {
                 try {
                     // fix Uncaught Swoole\Error: API must be called in the coroutine when $subscriber instanceof \Mix\Redis\Subscribe\Subscriber
@@ -138,8 +134,6 @@ class Server
     public function keepalive(): void
     {
         Coroutine::create(function () {
-            // CoordinatorManager::until(Constants::WORKER_START)->yield();
-
             while (true) {
                 if ($this->stopped) {
                     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s keepalive stopped by %s', $this->serverId, self::class));
@@ -169,8 +163,6 @@ class Server
     public function clearUpExpired(): void
     {
         Coroutine::create(function () {
-            // CoordinatorManager::until(Constants::WORKER_START)->yield();
-
             while (true) {
                 if ($this->stopped) {
                     $this->logger->info(sprintf('[WebsocketClusterAddon] @%s clearUpExpired stopped by %s', $this->serverId, self::class));
