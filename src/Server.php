@@ -112,7 +112,7 @@ class Server
     public function subscribe(): void
     {
         Coroutine::create(function () {
-            CoordinatorManager::until(Constants::WORKER_START)->yield();
+            // CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             retry(PHP_INT_MAX, function () {
                 try {
@@ -133,7 +133,7 @@ class Server
     public function keepalive(): void
     {
         Coroutine::create(function () {
-            CoordinatorManager::until(Constants::WORKER_START)->yield();
+            // CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             $this->timer->tick(1, function () {
                 // Keep server alive
@@ -157,7 +157,7 @@ class Server
     public function clearUpExpired(): void
     {
         Coroutine::create(function () {
-            CoordinatorManager::until(Constants::WORKER_START)->yield();
+            // CoordinatorManager::until(Constants::WORKER_START)->yield();
 
             $this->timer->tick(5, function () {
                 // Clear up expired servers
