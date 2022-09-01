@@ -59,7 +59,7 @@ class OnPipeMessageListener implements ListenerInterface
      */
     public function process(object $event)
     {
-        if (! ($this->node instanceof MemoryNode)) {
+        if (! $this->node instanceof MemoryNode) {
             return;
         }
 
