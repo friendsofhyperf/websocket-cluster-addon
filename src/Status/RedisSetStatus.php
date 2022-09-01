@@ -33,6 +33,15 @@ class RedisSetStatus implements StatusInterface
         return $this->redis->sIsMember($this->key, $uid);
     }
 
+    public function multiSet(array $uids, bool $status): void
+    {
+        if (! $status) {
+            $this->redis->sRem($this->key, ...$uids);
+        } else {
+            $this->redis->sAdd($this->key, ...$uids);
+        }
+    }
+
     public function multiGet(array $uids): array
     {
         $uids = array_filter($uids);
