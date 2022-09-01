@@ -27,7 +27,11 @@ class RedisSetStatus implements StatusInterface
 
     public function set($uid, bool $status = true): void
     {
-        $this->redis->sAdd($this->key, $uid);
+        if (! $status) {
+            $this->redis->sRem($this->key, $uid);
+        } else {
+            $this->redis->sAdd($this->key, $uid);
+        }
     }
 
     public function get($uid): bool
