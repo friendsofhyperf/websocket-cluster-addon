@@ -37,6 +37,13 @@ class TableStatus implements StatusInterface
         return (bool) $status;
     }
 
+    public function multiSet(array $uids, bool $status): void
+    {
+        foreach ($uids as $uid) {
+            $this->set($uid, $status);
+        }
+    }
+
     public function multiGet(array $uids): array
     {
         $result = [];

@@ -17,6 +17,8 @@ interface StatusInterface
 
     public function get($uid): bool;
 
+    public function multiSet(array $uids, bool $status): void;
+
     /**
      * @return array<int, bool>
      */
