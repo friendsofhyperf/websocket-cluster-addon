@@ -82,15 +82,9 @@ class RedisClient implements ClientInterface
             return;
         }
 
-        $this->redis->multi();
-
-        foreach ($uids as $uid) {
-            $this->redis->del($this->getUserClientKey($uid));
-            $this->redis->zRem($this->getUserActiveKey(), $uid);
-            $this->status->set($uid, false);
-        }
-
-        $this->redis->exec();
+        $this->redis->del(...array_map(fn ($uid) => $this->getUserClientKey($uid), $uids));
+        $this->redis->zRem($this->getUserActiveKey(), ...$uids);
+        $this->status->multiSet($uids, false);
     }
 
     public function getOnlineStatus($uid): bool

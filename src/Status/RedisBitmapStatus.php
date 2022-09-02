@@ -38,6 +38,11 @@ class RedisBitmapStatus implements StatusInterface
         return $status[$uid] ?? false;
     }
 
+    public function multiSet(array $uids, bool $status): void
+    {
+        $this->bitmap->multiSet($this->key, array_fill_keys(array_map('intval', $uids), $status ? 1 : 0));
+    }
+
     public function multiGet(array $uids): array
     {
         $uids = array_map(fn ($uid) => (int) $uid, $uids);
