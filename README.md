@@ -11,14 +11,14 @@ Websocket cluster addon base redis subscribe.
 
 - Requirements
 
-  - PHP >= 7.2
+  - PHP >= 7.4
   - Swoole >= 4.5.10
-  - hyperf/websocket-server >= 2.0
+  - hyperf/websocket-server >= 2.2.0
 
 - Composer install
 
 ~~~base
-composer require friendsofhyperf/websocket-cluster-addon
+composer require friendsofhyperf/websocket-cluster-addon:^3.1
 ~~~
 
 - Publish
