@@ -35,7 +35,7 @@ class Emitter
         /** @var Addon $addon */
         $addon = $this->container->get(Addon::class);
         // Set serverId for null when executed on custom process
-        $serverId = $addon->getWorkerId() ? $addon->getServerId() : null;
+        $serverId = $addon->getWorkerId() !== null ? $addon->getServerId() : null;
         $addon->broadcast(serialize([$uid, $data, $serverId]));
     }
 
