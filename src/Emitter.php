@@ -26,7 +26,7 @@ class Emitter
     {
         $data = $this->formatData($data);
         // Set serverId for null when executed on custom process
-        $serverId = $this->server->getWorkerId() ? $this->server->getServerId() : null;
+        $serverId = $this->server->getWorkerId() !== null ? $this->server->getServerId() : null;
         $this->server->broadcast(serialize([$uid, $data, $serverId]));
     }
 
