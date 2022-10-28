@@ -32,7 +32,7 @@ class Emitter
         /** @var Server $server */
         $server = $this->container->get(Server::class);
         // Set serverId for null when executed on custom process
-        $serverId = $server->getWorkerId() ? $server->getServerId() : null;
+        $serverId = $server->getWorkerId() !== null ? $server->getServerId() : null;
         $server->broadcast(serialize([$uid, $data, $serverId]));
     }
 
