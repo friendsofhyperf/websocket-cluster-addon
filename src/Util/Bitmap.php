@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Util;
 
 use Hyperf\Redis\Redis;
+use RedisCluster;
 
 class Bitmap
 {
@@ -25,7 +26,7 @@ class Bitmap
             $redisConnection = (fn () => $this->getConnection(true))->call($redis);
             $connection = (fn () => $this->connection)->call($redisConnection);
 
-            return $connection instanceof \RedisCluster;
+            return $connection instanceof RedisCluster;
         });
     }
 

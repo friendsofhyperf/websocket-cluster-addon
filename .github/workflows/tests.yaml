@@ -4,12 +4,12 @@ on: [push, pull_request]
 
 jobs:
   ci:
-    name: Test on PHP ${{ matrix.php-version }}
+    name: Test on PHP ${{ matrix.php }}
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
         os: [ubuntu-latest]
-        php-version: ['8.0', '8.1']
+        php: ['8.0', '8.1', '8.2']
       max-parallel: 3
     steps:
       - name: Checkout
@@ -17,12 +17,19 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ matrix.php }}
           tools: phpize, pecl
           extensions: swoole,redis
           coverage: none
       - name: Setup Packages
         run: composer update -o
+      - name: Run Cs Fixer
+        run: |
+          if [ "${{ matrix.php }}" = "8.2" ]; then
+            PHP_CS_FIXER_IGNORE_ENV=true php vendor/bin/php-cs-fixer fix src --dry-run
+          else
+            vendor/bin/php-cs-fixer fix src --dry-run
+          fi
       - name: Run Analyse
         run: |
           composer analyse src

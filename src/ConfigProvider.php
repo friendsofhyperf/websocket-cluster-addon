@@ -15,23 +15,14 @@ class ConfigProvider
 {
     public function __invoke(): array
     {
-        defined('BASE_PATH') or define('BASE_PATH', __DIR__ . '/../../../');
+        defined('BASE_PATH') or define('BASE_PATH', dirname(__DIR__, 2));
 
         return [
             'dependencies' => [
                 Client\ClientInterface::class => Client\RedisClient::class,
                 Node\NodeInterface::class => Node\MemoryNode::class,
                 Status\StatusInterface::class => Status\RedisBitmapStatus::class,
-                Subscriber\SubscriberInterface::class => class_exists(\Mix\Redis\Subscriber\Subscriber::class) ? Subscriber\MixSubscriber::class : Subscriber\PhpRedisSubscriber::class,
-            ],
-            'processes' => [],
-            'listeners' => [],
-            'annotations' => [
-                'scan' => [
-                    'paths' => [
-                        __DIR__,
-                    ],
-                ],
+                Subscriber\SubscriberInterface::class => Subscriber\SubscriberFactory::class,
             ],
             'publish' => [
                 [

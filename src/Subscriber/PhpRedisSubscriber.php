@@ -24,7 +24,8 @@ class PhpRedisSubscriber implements SubscriberInterface
 
     public function __construct(ContainerInterface $container, ConfigInterface $config, protected StdoutLoggerInterface $logger)
     {
-        $this->redis = $container->get(RedisFactory::class)->get($config->get('websocket_cluster.subscriber.pool', 'default'));
+        $pool = $config->get('websocket_cluster.subscriber.pool', 'default');
+        $this->redis = $container->get(RedisFactory::class)->get($pool);
     }
 
     public function subscribe($channel, callable $callback): void
