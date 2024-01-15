@@ -9,15 +9,14 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Status;
 
 use Hyperf\Redis\Redis;
 
 class RedisSetStatus implements StatusInterface
 {
-    public function __construct(private Redis $redis, private string $key)
-    {
-    }
+    public function __construct(private Redis $redis, private string $key) {}
 
     public function set($uid, bool $status = true): void
     {

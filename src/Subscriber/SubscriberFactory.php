@@ -9,7 +9,10 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
+
+use Mix\Redis\Subscriber\Subscriber;
 
 use function Hyperf\Support\make;
 
@@ -17,7 +20,7 @@ class SubscriberFactory
 {
     public function __invoke()
     {
-        $driver = class_exists(\Mix\Redis\Subscriber\Subscriber::class) ? MixSubscriber::class : PhpRedisSubscriber::class;
+        $driver = class_exists(Subscriber::class) ? MixSubscriber::class : PhpRedisSubscriber::class;
 
         return make($driver);
     }

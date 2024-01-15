@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Closure;
@@ -25,9 +26,7 @@ class MemoryNode implements NodeInterface
 
     protected array $connections = [];
 
-    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger)
-    {
-    }
+    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger) {}
 
     public function add(int $fd, $uid): void
     {
@@ -86,9 +85,7 @@ class MemoryNode implements NodeInterface
         return count($this->users[$uid] ?? []);
     }
 
-    public function flush(?string $serverId = null): void
-    {
-    }
+    public function flush(?string $serverId = null): void {}
 
     protected function getSwooleServer(): SwooleServer
     {

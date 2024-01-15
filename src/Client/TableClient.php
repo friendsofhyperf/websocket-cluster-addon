@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
@@ -48,9 +49,7 @@ class TableClient implements ClientInterface
         $this->connections->set((string) $fd, [self::FD => $fd]);
     }
 
-    public function renew(int $fd, $uid): void
-    {
-    }
+    public function renew(int $fd, $uid): void {}
 
     public function del(int $fd, $uid): void
     {
@@ -84,9 +83,7 @@ class TableClient implements ClientInterface
         return count($this->clients($uid));
     }
 
-    public function clearUpExpired(): void
-    {
-    }
+    public function clearUpExpired(): void {}
 
     public function getOnlineStatus($uid): bool
     {

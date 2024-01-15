@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Signal;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
@@ -20,9 +21,7 @@ use Hyperf\Signal\SignalHandlerInterface;
 #[Signal(priority: -1)]
 class StopServerHandler implements SignalHandlerInterface
 {
-    public function __construct(protected ConfigInterface $config, protected Server $server, protected StdoutLoggerInterface $logger)
-    {
-    }
+    public function __construct(protected ConfigInterface $config, protected Server $server, protected StdoutLoggerInterface $logger) {}
 
     public function listen(): array
     {

@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Controller;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
@@ -30,8 +31,7 @@ class InfoController
         protected ServerRequestInterface $request,
         protected Server $server,
         protected ClientInterface $client
-    ) {
-    }
+    ) {}
 
     #[GetMapping(path: 'info')]
     public function info()

@@ -9,15 +9,14 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 use Psr\Container\ContainerInterface;
 
 class Emitter
 {
-    public function __construct(protected ContainerInterface $container, protected Server $server)
-    {
-    }
+    public function __construct(protected ContainerInterface $container, protected Server $server) {}
 
     /**
      * @param array|object|string $data

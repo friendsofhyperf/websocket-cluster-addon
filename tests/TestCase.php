@@ -9,13 +9,16 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Tests;
+
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
-class TestCase extends \PHPUnit\Framework\TestCase
+class TestCase extends TestCase
 {
     public function __construct($name = null, array $data = [], $dataName = '')
     {

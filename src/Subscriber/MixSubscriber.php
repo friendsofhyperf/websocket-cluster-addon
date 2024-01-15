@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
 use Hyperf\Contract\ConfigInterface;
@@ -22,6 +23,7 @@ use Mix\Redis\Subscriber\Message;
 use Mix\Redis\Subscriber\Subscriber;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
+use Throwable;
 
 use function Hyperf\Collection\value;
 
@@ -42,7 +44,7 @@ class MixSubscriber implements SubscriberInterface
 
             try {
                 return new Subscriber($host, $port, $pass ?? '', 5);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 return null;
             }
         });

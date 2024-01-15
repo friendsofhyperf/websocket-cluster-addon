@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Node\MemoryNode;
@@ -25,9 +26,7 @@ use Hyperf\Process\Event\PipeMessage as UserProcessPipMessage;
 #[Listener]
 class OnPipeMessageListener implements ListenerInterface
 {
-    public function __construct(protected Server $server, protected NodeInterface $node, protected StdoutLoggerInterface $logger)
-    {
-    }
+    public function __construct(protected Server $server, protected NodeInterface $node, protected StdoutLoggerInterface $logger) {}
 
     /**
      * @return string[] returns the events that you want to listen

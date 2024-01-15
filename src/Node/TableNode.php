@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Swoole\Table;
@@ -101,7 +102,5 @@ class TableNode implements NodeInterface
         return json_decode($fds, true);
     }
 
-    public function flush(?string $serverId = null): void
-    {
-    }
+    public function flush(?string $serverId = null): void {}
 }

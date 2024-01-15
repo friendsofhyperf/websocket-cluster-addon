@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 class PipeMessage
@@ -16,7 +17,5 @@ class PipeMessage
     /**
      * @param int|string $uid
      */
-    public function __construct(public int $fd, public $uid, public bool $isAdd = true)
-    {
-    }
+    public function __construct(public int $fd, public $uid, public bool $isAdd = true) {}
 }

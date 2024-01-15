@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Event;
 
 class StatusChanged
@@ -16,7 +17,5 @@ class StatusChanged
     /**
      * @param int|string $uid
      */
-    public function __construct(public $uid, public int $status)
-    {
-    }
+    public function __construct(public $uid, public int $status) {}
 }

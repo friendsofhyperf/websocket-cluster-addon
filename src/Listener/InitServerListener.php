@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  huangdijia@gmail.com
  * @license  https://github.com/friendofhyperf/websocket-cluster-addon/blob/main/LICENSE
  */
+
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
 use FriendsOfHyperf\WebsocketClusterAddon\Client\ClientInterface;
@@ -35,8 +36,7 @@ class InitServerListener implements ListenerInterface
         protected ClientInterface $client,
         protected NodeInterface $node,
         protected Server $server
-    ) {
-    }
+    ) {}
 
     /**
      * @return string[] returns the events that you want to listen
