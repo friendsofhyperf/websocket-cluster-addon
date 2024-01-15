@@ -13,9 +13,9 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Coroutine\Coroutine;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
-use Hyperf\Utils\Coroutine;
 use Psr\Container\ContainerInterface;
 
 class PhpRedisSubscriber implements SubscriberInterface

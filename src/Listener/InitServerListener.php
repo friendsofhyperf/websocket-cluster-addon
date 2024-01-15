@@ -24,7 +24,7 @@ use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\AfterWorkerStart;
 use Hyperf\Framework\Event\BeforeMainServerStart;
 use Hyperf\Framework\Event\MainWorkerStart;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
 
 #[Listener]
 class InitServerListener implements ListenerInterface

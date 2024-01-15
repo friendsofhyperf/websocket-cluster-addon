@@ -15,13 +15,15 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Coordinator\Constants;
 use Hyperf\Coordinator\CoordinatorManager;
+use Hyperf\Coroutine\Coroutine;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
-use Hyperf\Utils\Coroutine;
 use Mix\Redis\Subscriber\Message;
 use Mix\Redis\Subscriber\Subscriber;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
+
+use function Hyperf\Collection\value;
 
 class MixSubscriber implements SubscriberInterface
 {

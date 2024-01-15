@@ -14,6 +14,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Client;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use Swoole\Table;
 
+use function Hyperf\Tappable\tap;
+
 class TableClient implements ClientInterface
 {
     public const FD = 'fd';

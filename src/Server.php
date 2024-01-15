@@ -17,12 +17,16 @@ use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Coordinator\Timer;
+use Hyperf\Coroutine\Coroutine;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisFactory;
-use Hyperf\Utils\Coroutine;
 use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerInterface;
 use Throwable;
+
+use function Hyperf\Collection\collect;
+use function Hyperf\Support\make;
+use function Hyperf\Support\retry;
 
 class Server
 {

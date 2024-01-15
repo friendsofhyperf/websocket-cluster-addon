@@ -13,6 +13,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Status;
 
 use Swoole\Table;
 
+use function Hyperf\Tappable\tap;
+
 class TableStatus implements StatusInterface
 {
     private Table $table;

@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
+use function Hyperf\Support\make;
+
 class SubscriberFactory
 {
     public function __invoke()

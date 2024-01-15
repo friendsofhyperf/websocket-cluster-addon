@@ -13,6 +13,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Swoole\Table;
 
+use function Hyperf\Tappable\tap;
+
 class TableNode implements NodeInterface
 {
     public const FD = 'fd';

@@ -14,6 +14,8 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Util;
 use Hyperf\Redis\Redis;
 use RedisCluster;
 
+use function Hyperf\Collection\value;
+
 class Bitmap
 {
     public const BIT_SIZE = 'u1';

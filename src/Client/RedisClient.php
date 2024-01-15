@@ -19,6 +19,8 @@ use Hyperf\Redis\RedisFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
+use function Hyperf\Support\make;
+
 class RedisClient implements ClientInterface
 {
     protected string $prefix;
