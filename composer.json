@@ -51,6 +51,9 @@
         "mix/redis-subscriber": "Redis subscriber for websocket cluster."
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "5.x-dev"
+        },
         "hyperf": {
             "config": "FriendsOfHyperf\\WebsocketClusterAddon\\ConfigProvider"
         }
