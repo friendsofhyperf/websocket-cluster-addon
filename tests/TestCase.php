@@ -12,13 +12,13 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\WebsocketClusterAddon\Tests;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
  * @internal
  * @coversNothing
  */
-class TestCase extends TestCase
+class TestCase extends BaseTestCase
 {
     public function __construct($name = null, array $data = [], $dataName = '')
     {
