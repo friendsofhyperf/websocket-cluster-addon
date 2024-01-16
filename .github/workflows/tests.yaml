@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        php: ['8.0', '8.1', '8.2']
+        php: ['8.1', '8.2', '8.3']
       max-parallel: 3
     steps:
       - name: Checkout
@@ -24,15 +24,9 @@ jobs:
       - name: Setup Packages
         run: composer update -o
       - name: Run Cs Fixer
-        run: |
-          if [ "${{ matrix.php }}" = "8.2" ]; then
-            PHP_CS_FIXER_IGNORE_ENV=true php vendor/bin/php-cs-fixer fix src --dry-run
-          else
-            vendor/bin/php-cs-fixer fix src --dry-run
-          fi
+        run: vendor/bin/php-cs-fixer fix src --dry-run
       - name: Run Analyse
-        run: |
-          composer analyse src
+        run: composer analyse src
       - name: Run Test Cases
         run: |
           cp phpunit.xml.dist phpunit.xml
