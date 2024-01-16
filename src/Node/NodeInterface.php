@@ -16,27 +16,15 @@ interface NodeInterface
 {
     public const FROM_WORKER_ID = 'FROM_WORKER_ID';
 
-    /**
-     * @param int|string $uid
-     */
-    public function add(int $fd, $uid): void;
+    public function add(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function del(int $fd, $uid): void;
+    public function del(int $fd, int|string $uid): void;
 
     public function users(): int;
 
-    /**
-     * @param null|int|string $uid
-     */
-    public function clients($uid = null): array;
+    public function clients(null|int|string $uid = null): array;
 
-    /**
-     * @param null|int|string $uid
-     */
-    public function size($uid = null): int;
+    public function size(null|int|string $uid = null): int;
 
     public function flush(?string $serverId = null): void;
 }

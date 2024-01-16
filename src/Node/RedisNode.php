@@ -32,13 +32,13 @@ class RedisNode implements NodeInterface
         $this->redis = $container->get(RedisFactory::class)->get($pool);
     }
 
-    public function add(int $fd, $uid): void
+    public function add(int $fd, int|string $uid): void
     {
         $this->redis->sAdd($this->getKey($uid), $fd);
         $this->redis->sAdd($this->getKey(0), $fd);
     }
 
-    public function del(int $fd, $uid): void
+    public function del(int $fd, int|string $uid): void
     {
         $this->redis->sRem($this->getKey($uid), $fd);
         $this->redis->sRem($this->getKey(0), $fd);
@@ -51,12 +51,12 @@ class RedisNode implements NodeInterface
         return $num > 0 ? ($num - 1) : $num;
     }
 
-    public function clients($uid = null): array
+    public function clients(null|int|string $uid = null): array
     {
         return $this->redis->sMembers($this->getKey($uid ?? 0));
     }
 
-    public function size($uid = null): int
+    public function size(null|int|string $uid = null): int
     {
         return $this->redis->sCard($this->getKey($uid ?? 0));
     }
@@ -70,7 +70,7 @@ class RedisNode implements NodeInterface
         }
     }
 
-    protected function getKey($uid, string $serverId = null): string
+    protected function getKey(int|string $uid, string $serverId = null): string
     {
         return join(':', [
             $this->prefix,

@@ -14,8 +14,5 @@ namespace FriendsOfHyperf\WebsocketClusterAddon;
 
 class PipeMessage
 {
-    /**
-     * @param int|string $uid
-     */
-    public function __construct(public int $fd, public $uid, public bool $isAdd = true) {}
+    public function __construct(public int $fd, public int|string $uid, public bool $isAdd = true) {}
 }

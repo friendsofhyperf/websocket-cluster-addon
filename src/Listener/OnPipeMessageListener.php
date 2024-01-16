@@ -18,12 +18,10 @@ use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Context\Context;
 use Hyperf\Contract\StdoutLoggerInterface;
-use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\OnPipeMessage;
 use Hyperf\Process\Event\PipeMessage as UserProcessPipMessage;
 
-#[Listener]
 class OnPipeMessageListener implements ListenerInterface
 {
     public function __construct(protected Server $server, protected NodeInterface $node, protected StdoutLoggerInterface $logger) {}

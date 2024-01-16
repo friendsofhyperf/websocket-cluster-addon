@@ -30,8 +30,9 @@ class RedisClient implements ClientInterface
 
     protected Redis $redis;
 
-    public function __construct(protected ContainerInterface $container, ConfigInterface $config)
+    public function __construct(protected ContainerInterface $container)
     {
+        $config = $container->get(ConfigInterface::class);
         $this->prefix = $config->get('websocket_cluster.client.prefix', 'wsca:client');
         $pool = $config->get('websocket_cluster.client.pool', 'default');
         $this->redis = $container->get(RedisFactory::class)->get($pool);
@@ -41,7 +42,7 @@ class RedisClient implements ClientInterface
         ]);
     }
 
-    public function add(int $fd, $uid): void
+    public function add(int $fd, int|string $uid): void
     {
         $this->status->set($uid, true);
         $this->container->get(EventDispatcherInterface::class)->dispatch(new StatusChanged($uid, 1));
@@ -50,12 +51,12 @@ class RedisClient implements ClientInterface
         $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
     }
 
-    public function renew(int $fd, $uid): void
+    public function renew(int $fd, int|string $uid): void
     {
         $this->redis->zAdd($this->getUserActiveKey(), time(), $uid);
     }
 
-    public function del(int $fd, $uid): void
+    public function del(int $fd, int|string $uid): void
     {
         $this->redis->sRem($this->getUserClientKey($uid), $this->getSid($uid, $fd));
 
@@ -80,7 +81,7 @@ class RedisClient implements ClientInterface
         $this->status->multiSet($uids, false);
     }
 
-    public function getOnlineStatus($uid): bool
+    public function getOnlineStatus(int|string $uid): bool
     {
         return $this->status->get($uid);
     }
@@ -90,12 +91,12 @@ class RedisClient implements ClientInterface
         return $this->status->multiGet($uids);
     }
 
-    public function clients($uid): array
+    public function clients(int|string $uid): array
     {
         return $this->redis->sMembers($this->getUserClientKey($uid));
     }
 
-    public function size($uid = null): int
+    public function size(null|int|string $uid = null): int
     {
         if (! $uid) {
             return $this->status->count();
@@ -109,15 +110,12 @@ class RedisClient implements ClientInterface
         return $this->status;
     }
 
-    /**
-     * @return null|string
-     */
-    protected function getUid(string $sid)
+    protected function getUid(string $sid): ?string
     {
         return explode('#', $sid)[0] ?? null;
     }
 
-    protected function getSid($uid, int $fd)
+    protected function getSid(int|string $uid, int $fd)
     {
         return join('#', [$uid, $fd]);
     }
@@ -132,7 +130,7 @@ class RedisClient implements ClientInterface
         return join(':', [$this->getUserOnlineKey(), 'active']);
     }
 
-    protected function getUserClientKey($uid): string
+    protected function getUserClientKey(int|string $uid): string
     {
         return join(':', [$this->getUserOnlineKey(), $uid]);
     }

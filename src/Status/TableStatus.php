@@ -28,12 +28,12 @@ class TableStatus implements StatusInterface
         });
     }
 
-    public function set($uid, bool $status = true): void
+    public function set(int|string $uid, bool $status = true): void
     {
         $this->table->set($uid, ['status' => $status ? 1 : 0]);
     }
 
-    public function get($uid): bool
+    public function get(int|string $uid): bool
     {
         return (bool) $this->table->get($uid)['status'] ?? false;
     }

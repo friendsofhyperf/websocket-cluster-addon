@@ -39,10 +39,7 @@ class TableNode implements NodeInterface
         });
     }
 
-    /**
-     * @param int|string $uid
-     */
-    public function add(int $fd, $uid): void
+    public function add(int $fd, int|string $uid): void
     {
         $fds = $this->clients($uid);
         $fds[] = $fd;
@@ -51,10 +48,7 @@ class TableNode implements NodeInterface
         $this->connections->set((string) $fd, [self::FD => $fd]);
     }
 
-    /**
-     * @param int|string $uid
-     */
-    public function del(int $fd, $uid): void
+    public function del(int $fd, int|string $uid): void
     {
         $fds = $this->clients($uid);
         $index = array_search($fd, $fds);
@@ -72,7 +66,7 @@ class TableNode implements NodeInterface
         return $this->users->count();
     }
 
-    public function size($uid = null): int
+    public function size(null|int|string $uid = null): int
     {
         if (! $uid) {
             return $this->connections->count();
@@ -81,7 +75,7 @@ class TableNode implements NodeInterface
         return count($this->clients($uid));
     }
 
-    public function clients($uid = null): array
+    public function clients(null|int|string $uid = null): array
     {
         if (! $uid) {
             $fds = [];

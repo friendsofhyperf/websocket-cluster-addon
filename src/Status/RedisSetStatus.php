@@ -18,7 +18,7 @@ class RedisSetStatus implements StatusInterface
 {
     public function __construct(private Redis $redis, private string $key) {}
 
-    public function set($uid, bool $status = true): void
+    public function set(int|string $uid, bool $status = true): void
     {
         if (! $status) {
             $this->redis->sRem($this->key, $uid);
@@ -27,7 +27,7 @@ class RedisSetStatus implements StatusInterface
         }
     }
 
-    public function get($uid): bool
+    public function get(int|string $uid): bool
     {
         return $this->redis->sIsMember($this->key, $uid);
     }

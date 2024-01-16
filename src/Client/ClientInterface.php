@@ -16,37 +16,19 @@ use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 
 interface ClientInterface
 {
-    /**
-     * @param int|string $uid
-     */
-    public function add(int $fd, $uid): void;
+    public function add(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function renew(int $fd, $uid): void;
+    public function renew(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function del(int $fd, $uid): void;
+    public function del(int $fd, int|string $uid): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function clients($uid): array;
+    public function clients(int|string $uid): array;
 
-    /**
-     * @param null|int|string $uid
-     */
-    public function size($uid = null): int;
+    public function size(null|int|string $uid = null): int;
 
     public function clearUpExpired(): void;
 
-    /**
-     * @param int|string $uid
-     */
-    public function getOnlineStatus($uid): bool;
+    public function getOnlineStatus(int|string $uid): bool;
 
     /**
      * @param (int|string)[] $uids

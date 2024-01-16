@@ -24,12 +24,12 @@ class RedisBitmapStatus implements StatusInterface
         $this->bitmap = new Bitmap($redis);
     }
 
-    public function set($uid, bool $status = true): void
+    public function set(int|string $uid, bool $status = true): void
     {
         $this->bitmap->multiSet($this->key, [(int) $uid => $status ? 1 : 0]);
     }
 
-    public function get($uid): bool
+    public function get(int|string $uid): bool
     {
         $status = $this->multiGet([$uid]);
 

@@ -40,7 +40,7 @@ class TableClient implements ClientInterface
         });
     }
 
-    public function add(int $fd, $uid): void
+    public function add(int $fd, int|string $uid): void
     {
         $fds = $this->clients($uid);
         $fds[] = $fd;
@@ -49,9 +49,9 @@ class TableClient implements ClientInterface
         $this->connections->set((string) $fd, [self::FD => $fd]);
     }
 
-    public function renew(int $fd, $uid): void {}
+    public function renew(int $fd, int|string $uid): void {}
 
-    public function del(int $fd, $uid): void
+    public function del(int $fd, int|string $uid): void
     {
         $fds = $this->clients($uid);
         $index = array_search($fd, $fds);
@@ -63,7 +63,7 @@ class TableClient implements ClientInterface
         $this->connections->del((string) $fd);
     }
 
-    public function clients($uid): array
+    public function clients(int|string $uid): array
     {
         $fds = $this->users->get((string) $uid, self::FDS);
 
@@ -74,7 +74,7 @@ class TableClient implements ClientInterface
         return [];
     }
 
-    public function size($uid = null): int
+    public function size(null|int|string $uid = null): int
     {
         if (! $uid) {
             return $this->connections->count();
@@ -85,7 +85,7 @@ class TableClient implements ClientInterface
 
     public function clearUpExpired(): void {}
 
-    public function getOnlineStatus($uid): bool
+    public function getOnlineStatus(int|string $uid): bool
     {
         return $this->size($uid) > 0;
     }

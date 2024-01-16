@@ -14,9 +14,9 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Status;
 
 interface StatusInterface
 {
-    public function set($uid, bool $status): void;
+    public function set(int|string $uid, bool $status): void;
 
-    public function get($uid): bool;
+    public function get(int|string $uid): bool;
 
     public function multiSet(array $uids, bool $status): void;
 

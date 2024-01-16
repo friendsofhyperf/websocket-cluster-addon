@@ -20,14 +20,12 @@ use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\TableStatus;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
-use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\AfterWorkerStart;
 use Hyperf\Framework\Event\BeforeMainServerStart;
 use Hyperf\Framework\Event\MainWorkerStart;
 use Hyperf\Stringable\Str;
 
-#[Listener]
 class InitServerListener implements ListenerInterface
 {
     public function __construct(

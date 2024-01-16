@@ -25,6 +25,10 @@ class ConfigProvider
                 Status\StatusInterface::class => Status\RedisBitmapStatus::class,
                 Subscriber\SubscriberInterface::class => Subscriber\SubscriberFactory::class,
             ],
+            'listeners' => [
+                Listener\InitServerListener::class,
+                Listener\OnPipeMessageListener::class,
+            ],
             'publish' => [
                 [
                     'id' => 'config',

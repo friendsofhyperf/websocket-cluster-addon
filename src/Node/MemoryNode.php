@@ -28,7 +28,7 @@ class MemoryNode implements NodeInterface
 
     public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger) {}
 
-    public function add(int $fd, $uid): void
+    public function add(int $fd, int|string $uid): void
     {
         $this->overrideUserConnections($uid, fn ($fds) => $fds[] = $fd);
 
@@ -39,7 +39,7 @@ class MemoryNode implements NodeInterface
         }
     }
 
-    public function del(int $fd, $uid): void
+    public function del(int $fd, int|string $uid): void
     {
         $this->overrideUserConnections($uid, function ($fds) use ($fd) {
             $index = array_search($fd, $fds);
@@ -67,7 +67,7 @@ class MemoryNode implements NodeInterface
         return count($this->users);
     }
 
-    public function clients($uid = null): array
+    public function clients(null|int|string $uid = null): array
     {
         if (! $uid) {
             return $this->connections;
@@ -80,7 +80,7 @@ class MemoryNode implements NodeInterface
         return $this->users[$uid];
     }
 
-    public function size($uid = null): int
+    public function size(null|int|string $uid = null): int
     {
         return count($this->users[$uid] ?? []);
     }
@@ -97,7 +97,7 @@ class MemoryNode implements NodeInterface
         return $this->container->get(Server::class);
     }
 
-    protected function sendPipeMessage(int $fd, $uid, string $method = ''): void
+    protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
     {
         $isAdd = $method == 'add';
         $swooleServer = $this->getSwooleServer();
@@ -112,7 +112,7 @@ class MemoryNode implements NodeInterface
         }
     }
 
-    protected function overrideUserConnections($uid, Closure $callback): array
+    protected function overrideUserConnections(int|string $uid, Closure $callback): array
     {
         return $this->users[$uid] = $callback($this->users[$uid] ?? []);
     }
