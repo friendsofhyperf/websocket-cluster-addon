@@ -70,7 +70,7 @@ class RedisNode implements NodeInterface
         }
     }
 
-    protected function getKey(int|string $uid, string $serverId = null): string
+    protected function getKey(int|string $uid, ?string $serverId = null): string
     {
         return join(':', [
             $this->prefix,

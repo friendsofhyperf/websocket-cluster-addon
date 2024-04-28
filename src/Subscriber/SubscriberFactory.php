@@ -12,7 +12,10 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\WebsocketClusterAddon\Subscriber;
 
-use Mix\Redis\Subscriber\Subscriber;
+use FriendsOfHyperf\Redis\Subscriber\Subscriber;
+use Mix\Redis\Subscriber\Subscriber as MixRedisSubscriber;
+use Redis;
+use RuntimeException;
 
 use function Hyperf\Support\make;
 
@@ -20,8 +23,11 @@ class SubscriberFactory
 {
     public function __invoke()
     {
-        $driver = class_exists(Subscriber::class) ? MixSubscriber::class : PhpRedisSubscriber::class;
-
-        return make($driver);
+        return match (true) {
+            class_exists(Subscriber::class) => make(CoroutineSubscriber::class),
+            class_exists(MixRedisSubscriber::class) => make(MixSubscriber::class),
+            class_exists(Redis::class) => make(PhpRedisSubscriber::class),
+            default => throw new RuntimeException('No redis driver found.'),
+        };
     }
 }
