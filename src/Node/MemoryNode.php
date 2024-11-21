@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Closure;
+use FriendsOfHyperf\WebsocketClusterAddon\Context;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
-use Hyperf\Context\Context;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Psr\Container\ContainerInterface;
 use Swoole\Server as SwooleServer;
@@ -50,9 +50,7 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        if (! Context::get(self::FROM_WORKER_ID)) {
-            $this->sendPipeMessage($fd, $uid, __FUNCTION__);
-        }
+        $this->sendPipeMessage($fd, $uid, __FUNCTION__);
     }
 
     public function del(int $fd, int|string $uid): void
@@ -73,9 +71,7 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        if (! Context::get(self::FROM_WORKER_ID)) {
-            $this->sendPipeMessage($fd, $uid, __FUNCTION__);
-        }
+        $this->sendPipeMessage($fd, $uid, __FUNCTION__);
     }
 
     public function users(): int
@@ -115,6 +111,10 @@ class MemoryNode implements NodeInterface
 
     protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
     {
+        if (Context::getCurrentWorkerId()) {
+            return;
+        }
+
         $isAdd = $method == 'add';
         $swooleServer = $this->getSwooleServer();
         $workerCount = $swooleServer->setting['worker_num'] - 1;
