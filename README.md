@@ -12,39 +12,39 @@ Websocket cluster addon base redis subscribe.
 
 - Requirements
 
-  - PHP >= 8.0
-  - Swoole >= 4.5.10
-  - hyperf/websocket-server >= 3.0
+  - PHP >= 8.1
+  - Swoole >= 5.0.0
+  - hyperf/websocket-server >= 3.1.0
 
 - Composer install
 
-~~~base
-composer require friendsofhyperf/websocket-cluster-addon:^4.0
-~~~
+```base
+composer require friendsofhyperf/websocket-cluster-addon:^5.0
+```
 
 - Publish
 
-~~~bash
+```bash
 php bin/hyperf.php vendor:publish friendsofhyperf/websocket-cluster-addon
-~~~
+```
 
 ## Usage
 
 - Send message
 
-~~~php
+```php
 use FriendsOfHyperf\WebsocketClusterAddon\Emitter;
 $emitter = $container->get(Emitter::class);
 $emitter->emit($contactId, $message);
-~~~
+```
 
 - Broadcast message
 
-~~~php
+```php
 use FriendsOfHyperf\WebsocketClusterAddon\Emitter;
 $emitter = $container->get(Emitter::class);
 $emitter->broadcast($message);
-~~~
+```
 
 ## Examples
 
