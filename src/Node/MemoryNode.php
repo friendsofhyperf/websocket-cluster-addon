@@ -22,17 +22,33 @@ use Swoole\Server as SwooleServer;
 
 class MemoryNode implements NodeInterface
 {
+    /**
+     * @var array<int|string, array<int>>
+     */
     protected array $users = [];
 
+    /**
+     * @var array<int>
+     */
     protected array $connections = [];
 
     public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger) {}
 
     public function add(int $fd, int|string $uid): void
     {
-        $this->overrideUserConnections($uid, fn ($fds) => $fds[] = $fd);
+        $this->overrideUserConnections($uid, function ($fds) use ($fd) {
+            if (! in_array($fd, $fds)) {
+                $fds[] = $fd;
+            }
+            return $fds;
+        });
 
-        $this->overrideGlobalConnections(fn ($fds) => $fds[] = $fd);
+        $this->overrideGlobalConnections(function ($fds) use ($fd) {
+            if (! in_array($fd, $fds)) {
+                $fds[] = $fd;
+            }
+            return $fds;
+        });
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
@@ -112,13 +128,21 @@ class MemoryNode implements NodeInterface
         }
     }
 
-    protected function overrideUserConnections(int|string $uid, Closure $callback): array
+    /**
+     * @param Closure(int[]):array $callback
+     */
+    protected function overrideUserConnections(int|string $uid, Closure $callback): void
     {
-        return $this->users[$uid] = $callback($this->users[$uid] ?? []);
+        $this->users[$uid] = $callback(
+            (array) ($this->users[$uid] ?? [])
+        );
     }
 
-    protected function overrideGlobalConnections(Closure $callback): array
+    /**
+     * @param Closure(int[]):array $callback
+     */
+    protected function overrideGlobalConnections(Closure $callback): void
     {
-        return $this->connections = $callback($this->connections);
+        $this->connections = $callback($this->connections);
     }
 }
