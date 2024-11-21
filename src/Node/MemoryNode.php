@@ -114,7 +114,7 @@ class MemoryNode implements NodeInterface
 
     protected function overrideUserConnections(int|string $uid, Closure $callback): array
     {
-        return $this->users[$uid] = $callback($this->users[$uid] ?? []);
+        return $this->users[$uid] = $callback((array) ($this->users[$uid] ?? []));
     }
 
     protected function overrideGlobalConnections(Closure $callback): array
