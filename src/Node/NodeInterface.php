@@ -14,8 +14,6 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 interface NodeInterface
 {
-    public const FROM_WORKER_ID = 'FROM_WORKER_ID';
-
     public function add(int $fd, int|string $uid): void;
 
     public function del(int $fd, int|string $uid): void;
