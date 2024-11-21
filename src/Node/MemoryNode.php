@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Closure;
-use FriendsOfHyperf\WebsocketClusterAddon\Context;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
+use FriendsOfHyperf\WebsocketClusterAddon\Runner;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Psr\Container\ContainerInterface;
@@ -111,7 +111,7 @@ class MemoryNode implements NodeInterface
 
     protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
     {
-        if (Context::getCurrentWorkerId()) {
+        if (Runner::isRunningInListener()) {
             return;
         }
 

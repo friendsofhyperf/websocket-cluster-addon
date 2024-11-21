@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\WebsocketClusterAddon\Listener;
 
-use FriendsOfHyperf\WebsocketClusterAddon\Context;
 use FriendsOfHyperf\WebsocketClusterAddon\Node\MemoryNode;
 use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
+use FriendsOfHyperf\WebsocketClusterAddon\Runner;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -56,7 +56,7 @@ class OnPipeMessageListener implements ListenerInterface
             $uid = $data->uid;
             $isAdd = $data->isAdd;
 
-            Context::setCurrentWorkerId($event->fromWorkerId);
+            Runner::setRunningInListener();
 
             if ($isAdd) {
                 $this->node->add($fd, $uid);

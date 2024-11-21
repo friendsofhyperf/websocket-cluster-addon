@@ -12,19 +12,19 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\WebsocketClusterAddon;
 
-use Hyperf\Context\Context as Ctx;
+use Hyperf\Context\Context;
 
-class Context
+class Runner
 {
-    public const CURRENT_WORKER_ID = 'context.current_worker_id';
+    public const RUNNING_IN_LISTENER = 'context.running_in_listener';
 
-    public static function setCurrentWorkerId(?int $workerId): void
+    public static function setRunningInListener(): void
     {
-        Ctx::set(self::CURRENT_WORKER_ID, $workerId);
+        Context::set(self::RUNNING_IN_LISTENER, 1);
     }
 
-    public static function getCurrentWorkerId(): ?int
+    public static function isRunningInListener(): bool
     {
-        return Ctx::get(self::CURRENT_WORKER_ID, 0);
+        return Context::has(self::RUNNING_IN_LISTENER);
     }
 }
