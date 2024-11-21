@@ -57,13 +57,15 @@ class MemoryNode implements NodeInterface
 
     public function del(int $fd, int|string $uid): void
     {
-        $this->overrideUserConnections($uid, function ($fds) use ($fd) {
-            $index = array_search($fd, $fds);
-            if ($index !== false) {
-                unset($fds[$index]);
-            }
-            return $fds;
-        });
+        if (empty($this->users[$uid])) {
+            $this->overrideUserConnections($uid, function ($fds) use ($fd) {
+                $index = array_search($fd, $fds);
+                if ($index !== false) {
+                    unset($fds[$index]);
+                }
+                return $fds;
+            });
+        }
 
         $this->overrideGlobalConnections(function ($fds) use ($fd) {
             $index = array_search($fd, $fds);
