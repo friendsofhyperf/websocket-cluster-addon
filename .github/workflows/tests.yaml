@@ -22,6 +22,10 @@ jobs:
           tools: phpize, pecl
           extensions: redis, swoole-${{ matrix.swoole }}
           coverage: none
+      - name: Show PHP Information
+        run: |
+          php -v
+          php --ri swoole
       - name: Setup Packages
         run: composer update -o
       - name: Run Cs Fixer
