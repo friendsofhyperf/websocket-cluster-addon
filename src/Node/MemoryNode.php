@@ -30,9 +30,19 @@ class MemoryNode implements NodeInterface
 
     public function add(int $fd, int|string $uid): void
     {
-        $this->overrideUserConnections($uid, fn ($fds) => $fds[] = $fd);
+        $this->overrideUserConnections($uid, function ($fds) use ($fd) {
+            if (! in_array($fd, $fds)) {
+                $fds[] = $fd;
+            }
+            return $fds;
+        });
 
-        $this->overrideGlobalConnections(fn ($fds) => $fds[] = $fd);
+        $this->overrideGlobalConnections(function ($fds) use ($fd) {
+            if (! in_array($fd, $fds)) {
+                $fds[] = $fd;
+            }
+            return $fds;
+        });
 
         if (! Context::get(self::FROM_WORKER_ID)) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
