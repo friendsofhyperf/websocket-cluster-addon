@@ -56,9 +56,9 @@ class OnPipeMessageListener implements ListenerInterface
             $isAdd = $data->isAdd;
 
             if ($isAdd) {
-                $this->node->add($fd, $uid, true);
+                $this->node->add($fd, $uid, false);
             } else {
-                $this->node->del($fd, $uid, true);
+                $this->node->del($fd, $uid, false);
             }
 
             $this->logger->debug(

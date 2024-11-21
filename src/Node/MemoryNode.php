@@ -33,7 +33,7 @@ class MemoryNode implements NodeInterface
 
     public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger) {}
 
-    public function add(int $fd, int|string $uid, bool $runningInListener = false): void
+    public function add(int $fd, int|string $uid, bool $sync = true): void
     {
         $this->overrideUserConnections($uid, function ($fds) use ($fd) {
             if (! in_array($fd, $fds)) {
@@ -49,12 +49,12 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        if (! $runningInListener) {
+        if ($sync) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
         }
     }
 
-    public function del(int $fd, int|string $uid, bool $runningInListener = false): void
+    public function del(int $fd, int|string $uid, bool $sync = true): void
     {
         $this->overrideUserConnections($uid, function ($fds) use ($fd) {
             $index = array_search($fd, $fds);
@@ -72,7 +72,7 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        if (! $runningInListener) {
+        if ($sync) {
             $this->sendPipeMessage($fd, $uid, __FUNCTION__);
         }
     }
