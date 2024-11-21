@@ -22,8 +22,14 @@ use Swoole\Server as SwooleServer;
 
 class MemoryNode implements NodeInterface
 {
+    /**
+     * @var array<int|string, array<int>>
+     */
     protected array $users = [];
 
+    /**
+     * @var array<int>
+     */
     protected array $connections = [];
 
     public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger) {}
@@ -122,13 +128,21 @@ class MemoryNode implements NodeInterface
         }
     }
 
-    protected function overrideUserConnections(int|string $uid, Closure $callback): array
+    /**
+     * @param Closure(int[]):array $callback
+     */
+    protected function overrideUserConnections(int|string $uid, Closure $callback): void
     {
-        return $this->users[$uid] = $callback((array) ($this->users[$uid] ?? []));
+        $this->users[$uid] = $callback(
+            (array) ($this->users[$uid] ?? [])
+        );
     }
 
-    protected function overrideGlobalConnections(Closure $callback): array
+    /**
+     * @param Closure(int[]):array $callback
+     */
+    protected function overrideGlobalConnections(Closure $callback): void
     {
-        return $this->connections = $callback($this->connections);
+        $this->connections = $callback($this->connections);
     }
 }
