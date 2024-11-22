@@ -26,6 +26,8 @@ use Hyperf\Framework\Event\BeforeMainServerStart;
 use Hyperf\Framework\Event\MainWorkerStart;
 use Hyperf\Stringable\Str;
 
+use function Hyperf\Collection\value;
+
 class InitServerListener implements ListenerInterface
 {
     public function __construct(
@@ -49,23 +51,20 @@ class InitServerListener implements ListenerInterface
     }
 
     /**
-     * @param AfterWorkerStart|BeforeMainServerStart $event
+     * @param AfterWorkerStart|BeforeMainServerStart|MainWorkerStart|object $event
      */
     public function process(object $event): void
     {
-        if ($event instanceof BeforeMainServerStart) {
-            $this->setServerId();
-            $this->initClient();
-            $this->initNode();
-        }
-
-        if ($event instanceof MainWorkerStart) {
-            $this->start();
-        }
-
-        if ($event instanceof AfterWorkerStart) {
-            $this->setWorkerId($event->workerId);
-        }
+        match (true) {
+            $event instanceof BeforeMainServerStart => value(function () {
+                $this->setServerId();
+                $this->initClient();
+                $this->initNode();
+            }),
+            $event instanceof MainWorkerStart => $this->start(),
+            $event instanceof AfterWorkerStart => $this->setWorkerId($event->workerId),
+            default => null
+        };
     }
 
     public function initClient(): void
