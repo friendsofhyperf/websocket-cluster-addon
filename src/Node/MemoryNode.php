@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Closure;
+use FriendsOfHyperf\IpcBroadcaster\Contract\BroadcasterInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -31,9 +32,13 @@ class MemoryNode implements NodeInterface
      */
     protected array $connections = [];
 
-    public function __construct(protected ContainerInterface $container, protected StdoutLoggerInterface $logger) {}
+    public function __construct(
+        protected ContainerInterface $container,
+        protected BroadcasterInterface $broadcaster,
+        protected StdoutLoggerInterface $logger
+    ) {}
 
-    public function add(int $fd, int|string $uid, bool $sync = true): void
+    public function add(int $fd, int|string $uid, bool $onPipeMessage = false): void
     {
         $this->overrideUserConnections($uid, function ($fds) use ($fd) {
             if (! in_array($fd, $fds)) {
@@ -49,12 +54,12 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        if ($sync) {
-            $this->sendPipeMessage($fd, $uid, __FUNCTION__);
+        if (! $onPipeMessage) {
+            $this->broadcaster->broadcast(new PipeMessage($fd, $uid, true));
         }
     }
 
-    public function del(int $fd, int|string $uid, bool $sync = true): void
+    public function del(int $fd, int|string $uid, bool $onPipeMessage = false): void
     {
         $this->overrideUserConnections($uid, function ($fds) use ($fd) {
             $index = array_search($fd, $fds);
@@ -72,8 +77,8 @@ class MemoryNode implements NodeInterface
             return $fds;
         });
 
-        if ($sync) {
-            $this->sendPipeMessage($fd, $uid, __FUNCTION__);
+        if (! $onPipeMessage) {
+            $this->broadcaster->broadcast(new PipeMessage($fd, $uid, false));
         }
     }
 
@@ -112,21 +117,6 @@ class MemoryNode implements NodeInterface
         return $this->container->get(Server::class);
     }
 
-    protected function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
-    {
-        $isAdd = $method == 'add';
-        $swooleServer = $this->getSwooleServer();
-        $workerCount = $swooleServer->setting['worker_num'] - 1;
-        $currentWorkerId = $this->getServer()->getWorkerId();
-
-        for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
-            if ($workerId !== $currentWorkerId) {
-                $swooleServer->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
-                $this->logger->debug(sprintf('[WebsocketClusterAddon] Let Worker.%s try to %s.', $workerId, $fd));
-            }
-        }
-    }
-
     /**
      * @param Closure(int[]):array $callback
      */
@@ -147,5 +137,20 @@ class MemoryNode implements NodeInterface
     protected function overrideGlobalConnections(Closure $callback): void
     {
         $this->connections = $callback($this->connections);
+    }
+
+    private function sendPipeMessage(int $fd, int|string $uid, string $method = ''): void
+    {
+        $isAdd = $method == 'add';
+        $swooleServer = $this->getSwooleServer();
+        $workerCount = $swooleServer->setting['worker_num'] - 1;
+        $currentWorkerId = $this->getServer()->getWorkerId();
+
+        for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
+            if ($workerId !== $currentWorkerId) {
+                $swooleServer->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
+                $this->logger->debug(sprintf('[WebsocketClusterAddon] Let Worker.%s try to %s.', $workerId, $fd));
+            }
+        }
     }
 }
