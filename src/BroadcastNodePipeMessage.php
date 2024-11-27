@@ -18,7 +18,7 @@ use FriendsOfHyperf\WebsocketClusterAddon\Node\NodeInterface;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\StdoutLoggerInterface;
 
-class PipeMessage extends IpcMessage
+class BroadcastNodePipeMessage extends IpcMessage
 {
     public function __construct(
         public int $fd,

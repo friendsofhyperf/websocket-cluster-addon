@@ -14,7 +14,7 @@ namespace FriendsOfHyperf\WebsocketClusterAddon\Node;
 
 use Closure;
 use FriendsOfHyperf\IpcBroadcaster\Contract\BroadcasterInterface;
-use FriendsOfHyperf\WebsocketClusterAddon\PipeMessage;
+use FriendsOfHyperf\WebsocketClusterAddon\BroadcastNodePipeMessage;
 use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Psr\Container\ContainerInterface;
@@ -55,7 +55,7 @@ class MemoryNode implements NodeInterface
         });
 
         if (! $onPipeMessage) {
-            $this->broadcaster->broadcast(new PipeMessage($fd, $uid, true));
+            $this->broadcaster->broadcast(new BroadcastNodePipeMessage($fd, $uid, true));
         }
     }
 
@@ -78,7 +78,7 @@ class MemoryNode implements NodeInterface
         });
 
         if (! $onPipeMessage) {
-            $this->broadcaster->broadcast(new PipeMessage($fd, $uid, false));
+            $this->broadcaster->broadcast(new BroadcastNodePipeMessage($fd, $uid, false));
         }
     }
 
@@ -148,7 +148,7 @@ class MemoryNode implements NodeInterface
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId !== $currentWorkerId) {
-                $swooleServer->sendMessage(new PipeMessage($fd, $uid, $isAdd), $workerId);
+                $swooleServer->sendMessage(new BroadcastNodePipeMessage($fd, $uid, $isAdd), $workerId);
                 $this->logger->debug(sprintf('[WebsocketClusterAddon] Let Worker.%s try to %s.', $workerId, $fd));
             }
         }
