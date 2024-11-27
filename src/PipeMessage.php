@@ -33,7 +33,6 @@ class PipeMessage extends IpcMessage
         $isAdd = $this->isAdd;
         $node = $this->get(NodeInterface::class);
         $server = $this->get(Server::class);
-        $logger = $this->get(StdoutLoggerInterface::class);
 
         if (! $node || ! $node instanceof MemoryNode) {
             return;
@@ -45,7 +44,7 @@ class PipeMessage extends IpcMessage
             $node->del($fd, $uid, true);
         }
 
-        $logger?->debug(
+        $this->get(StdoutLoggerInterface::class)?->debug(
             sprintf(
                 '[WebsocketClusterAddon] @%s #%s [%s] is %s by %s listener.',
                 $server?->getServerId(),
