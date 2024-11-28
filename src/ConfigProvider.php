@@ -27,7 +27,6 @@ class ConfigProvider
             ],
             'listeners' => [
                 Listener\InitServerListener::class,
-                Listener\OnPipeMessageListener::class,
             ],
             'publish' => [
                 [
