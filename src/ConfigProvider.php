@@ -27,6 +27,7 @@ class ConfigProvider
             ],
             'listeners' => [
                 Listener\InitServerListener::class,
+                Listener\RegisterRoutesListener::class => -1,
             ],
             'publish' => [
                 [
