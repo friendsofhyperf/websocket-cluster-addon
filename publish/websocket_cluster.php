@@ -29,4 +29,8 @@ return [
         'pool' => 'default',
         'retry_interval' => 1000,
     ],
+
+    'path' => '/websocket-cluster',
+    'server' => 'http',
+    'middlewares' => [],
 ];

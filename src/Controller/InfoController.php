@@ -18,22 +18,18 @@ use FriendsOfHyperf\WebsocketClusterAddon\Server;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\RedisBitmapStatus;
 use FriendsOfHyperf\WebsocketClusterAddon\Status\StatusInterface;
 use FriendsOfHyperf\WebsocketClusterAddon\Subscriber\SubscriberInterface;
-use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
-#[Controller(prefix: 'websocket-cluster-addon')]
 class InfoController
 {
     public function __construct(
         protected ContainerInterface $container,
-        protected ServerRequestInterface $request,
+        protected RequestInterface $request,
         protected Server $server,
         protected ClientInterface $client
     ) {}
 
-    #[GetMapping(path: 'info')]
     public function info()
     {
         if ($uid = $this->request->input('uid')) {
